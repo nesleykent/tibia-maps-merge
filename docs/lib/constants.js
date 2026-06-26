@@ -1,10 +1,4 @@
-// See https://tibiamaps.io/guides/map-file-format and
-// https://tibiamaps.io/guides/minimap-file-format for the underlying spec.
-
-export const TILE_SIZE = 256;
-
-export const UNEXPLORED_MAP_COLOR = [0, 0, 0];
-export const UNEXPLORED_PATH_COLOR = [255, 0, 255];
+// See https://tibiamaps.io/guides/minimap-file-format for the underlying spec.
 
 export const ICONS_BY_ID = new Map([
   [0x00, 'checkmark'],

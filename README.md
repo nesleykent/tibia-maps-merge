@@ -1,27 +1,36 @@
 # tibia-maps-merge
 
-Convert and merge Tibia minimap exports -- a from-scratch reimplementation of
-[tibiamaps/tibia-maps-script](https://github.com/tibiamaps/tibia-maps-script),
-with more control over merging multiple exports.
+Tibia's map changes with every game update, and the community at
+[tibiamaps.io](https://tibiamaps.io/) keeps its marker data updated to match.
+This merges *your* personal Tibia markers with the latest community markers,
+so you get both -- your own win if you've marked the same spot differently.
 
 ## Web app (recommended)
 
 **[nesleykent.github.io/tibia-maps-merge](https://nesleykent.github.io/tibia-maps-merge/)**
 
-A static page, hosted on GitHub Pages -- no install, no server. Everything
-runs client-side in your browser (vanilla JS, Canvas for image stitching, a
-hand-rolled ZIP writer for output) using plain folder/file pickers, so it
-works in Safari too, not just Chrome. Your Tibia files never leave your
-machine -- nothing is uploaded anywhere; results download as a `.zip` (or a
-single file, for the Markers tab) that you unzip into place yourself.
+A static page, hosted on GitHub Pages -- no install, no server. It fetches
+the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
+["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
+download (the same file the site itself distributes -- so it's always current
+with the latest game update), lets you pick your own marker file(s)
+(`minimapmarkers.bin` from your Tibia client, or `markers.json`), and merges
+them -- your markers take priority over community ones at the same
+coordinate. Output downloads as `minimapmarkers.bin`, ready to drop back into
+your Tibia client's `minimap` folder, or as `.json` if you want the raw data.
 
-Source for the web app lives in [`docs/`](docs/) -- `index.html` + `app.js`
-wire up the UI, `lib/` has the actual conversion/merge/zip logic, framework-free.
+Everything runs client-side (vanilla JS: a ZIP reader + native
+`DecompressionStream` to unpack tibiamaps.io's download, the same binary
+marker parser/writer as the CLI below). Your files never leave your machine.
+
+Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
+`lib/` has the actual fetch/parse/merge logic, framework-free.
 
 ## CLI (for scripting / automation)
 
-A separate Python/Pillow implementation of the same logic, for terminal use
-or automation -- reads/writes directly on disk instead of zip downloads.
+A separate Python/Pillow implementation covering the full original scope --
+converting raw minimap exports to PNG + JSON and merging multiple exports
+(images included, not just markers) -- for terminal use or automation.
 
 ### Setup
 
