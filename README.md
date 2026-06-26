@@ -116,3 +116,26 @@ warning) any file it can't parse, rather than aborting the whole merge.
   modern 10-byte one) that isn't supported -- same limitation as the
   upstream tool, and the same one the web app has. Affected files are
   skipped with a warning rather than aborting.
+
+## Disclaimer & credits
+
+This is an independent, unofficial project -- not affiliated with,
+endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. **Tibia** is a
+registered trademark of CipSoft GmbH; see [tibia.com](https://www.tibia.com/)
+for the actual game.
+
+Community marker data is fetched live and unmodified from
+[tibiamaps.io's public "minimap with markers" download](https://tibiamaps.io/downloads/minimap-with-markers).
+Full credit for that data belongs to [tibiamaps.io](https://tibiamaps.io/)
+and its contributors -- this project only combines it with your own
+personal markers, entirely in your browser; nothing is uploaded anywhere.
+
+The binary minimap/marker file formats this project implements from
+scratch (in both the web app's JS and the CLI's Python) are documented by
+tibiamaps.io at
+[tibiamaps.io/guides/minimap-file-format](https://tibiamaps.io/guides/minimap-file-format)
+and [tibiamaps.io/guides/map-file-format](https://tibiamaps.io/guides/map-file-format).
+The CLI's original concept -- convert a `minimap` export to PNG + JSON and
+merge multiple exports -- is based on
+[tibiamaps/tibia-maps-script](https://github.com/tibiamaps/tibia-maps-script),
+also by tibiamaps.io.
