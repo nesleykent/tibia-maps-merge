@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tibia Maps Merge</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Tibia Maps Merge</h1>
+    <p class="subtitle">Convert raw minimap exports to PNG + JSON, and merge them -- entirely in your browser. Nothing is uploaded anywhere.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="convert">Convert</button>
+    <button class="tab-button" data-tab="merge">Merge</button>
+    <button class="tab-button" data-tab="markers">Markers</button>
+    <button class="tab-button" data-tab="info">Info</button>
+  </nav>
+
+  <section class="tab-panel active" id="tab-convert">
+    <p class="hint">Pick your Tibia client's <code>minimap</code> export folder
+      (the one full of <code>Minimap_Color_*.png</code> files) to produce PNG floor maps + JSON markers,
+      downloaded as a single <code>.zip</code>.</p>
+    <div class="field">
+      <label>Minimap export folder</label>
+      <label class="file-picker">
+        <input type="file" webkitdirectory multiple id="convert-input">
+        <span class="file-picker-label" data-default="Choose folder…">Choose folder…</span>
+      </label>
+    </div>
+    <div class="field-row">
+      <label class="checkbox"><input type="checkbox" id="convert-no-markers"> Skip markers</label>
+      <label class="checkbox"><input type="checkbox" id="convert-markers-only"> Markers only (skip floor images)</label>
+    </div>
+    <div class="field">
+      <label>Floors (optional, e.g. <code>0,1,7-9</code>)</label>
+      <input type="text" id="convert-floors" placeholder="all floors">
+    </div>
+    <button class="primary-btn" id="convert-run">Convert &amp; Download ZIP</button>
+    <div class="result" id="convert-result"></div>
+  </section>
+
+  <section class="tab-panel" id="tab-merge">
+    <p class="hint">Merge two or more sources -- raw exports or already-converted data folders, any mix.
+      Markers are unioned by coordinate; explored map/path tiles are unioned so gaps in one source
+      get filled from another. Order matters only when sources disagree on the same tile or marker --
+      later sources win.</p>
+    <div class="field">
+      <label>Sources (priority order, later wins on conflicts)</label>
+      <div id="merge-sources"></div>
+      <button class="secondary-btn" id="merge-add-source">+ Add source</button>
+    </div>
+    <div class="field-row">
+      <label class="checkbox"><input type="checkbox" id="merge-no-markers"> Skip markers</label>
+      <label class="checkbox"><input type="checkbox" id="merge-no-maps"> Skip map/path images (markers only)</label>
+    </div>
+    <div class="field">
+      <label>Floors (optional, e.g. <code>0,1,7-9</code>)</label>
+      <input type="text" id="merge-floors" placeholder="all floors">
+    </div>
+    <button class="primary-btn" id="merge-run">Merge &amp; Download ZIP</button>
+    <div class="result" id="merge-result"></div>
+  </section>
+
+  <section class="tab-panel" id="tab-markers">
+    <p class="hint">Merge any number of marker files directly -- <code>.bin</code> snapshots from the
+      Tibia client and/or already-converted <code>markers.json</code> files. Files that can't be parsed
+      (e.g. very old marker formats) are skipped with a warning instead of failing the whole merge.</p>
+    <div class="field">
+      <label>Marker files</label>
+      <label class="file-picker">
+        <input type="file" multiple accept=".bin,.json" id="markers-files">
+        <span class="file-picker-label" data-default="Choose files…">Choose files…</span>
+      </label>
+    </div>
+    <div class="field">
+      <label>Output filename</label>
+      <input type="text" id="markers-output-name" value="merged-markers.json">
+      <p class="micro-hint">End in <code>.json</code> or <code>.bin</code> to choose the output format.</p>
+    </div>
+    <button class="primary-btn" id="markers-run">Merge &amp; Download</button>
+    <div class="result" id="markers-result"></div>
+  </section>
+
+  <section class="tab-panel" id="tab-info">
+    <p class="hint">Inspect a raw export or data folder -- bounds, floors, tile counts, marker count.</p>
+    <div class="field">
+      <label>Folder</label>
+      <label class="file-picker">
+        <input type="file" webkitdirectory multiple id="info-input">
+        <span class="file-picker-label" data-default="Choose folder…">Choose folder…</span>
+      </label>
+    </div>
+    <button class="primary-btn" id="info-run">Inspect</button>
+    <div class="result" id="info-result"></div>
+  </section>
+
+  <footer>
+    <a href="https://github.com/nesleykent/tibia-maps-merge" id="repo-link" target="_blank" rel="noopener">Source on GitHub</a>
+  </footer>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

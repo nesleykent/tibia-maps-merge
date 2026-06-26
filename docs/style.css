@@ -1,0 +1,174 @@
+:root {
+  --bg: #f4f3f1;
+  --card: #ffffff;
+  --border: #e1ddd6;
+  --text: #2b2622;
+  --muted: #7a736a;
+  --accent: #b5651d;
+  --accent-hover: #9a5419;
+  --ok-bg: #eef6ea;
+  --ok-border: #b9dba2;
+  --err-bg: #fbeceb;
+  --err-border: #e3a39d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+header h1 { margin: 0 0 4px; font-size: 26px; }
+.subtitle { margin: 0 0 24px; color: var(--muted); }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.tab-button {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover { color: var(--text); }
+.tab-button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.hint { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 0; }
+.micro-hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+
+code { background: #eee9e2; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+
+.field-row { display: flex; gap: 24px; margin-bottom: 18px; }
+
+.checkbox { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--card);
+  color: var(--text);
+}
+
+input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+/* Native file/folder picker, styled as a button-like dropzone */
+.file-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.file-picker:hover { background: #f7f4ef; border-color: var(--accent); }
+.file-picker input[type="file"] {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.file-picker-label { color: var(--muted); }
+.file-picker-label.chosen { color: var(--text); font-weight: 600; }
+
+.source-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.source-row .file-picker { flex: 1; margin-bottom: 0; }
+
+button { font-family: inherit; cursor: pointer; }
+
+.secondary-btn, .remove-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.secondary-btn:hover { background: #f0ece5; }
+.remove-btn { color: #a33; padding: 8px 10px; }
+
+.primary-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary-btn:hover { background: var(--accent-hover); }
+.primary-btn:disabled { background: #c9bdae; cursor: default; }
+
+.result { margin-top: 18px; }
+
+.result-card {
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.result-card.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+.result-card.err { background: var(--err-bg); border-color: var(--err-border); }
+
+.result-card dl {
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+}
+
+.result-card dt { color: var(--muted); }
+.result-card dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.result-actions { margin-top: 10px; }
+
+.warn-list { margin: 8px 0 0; padding-left: 18px; color: #a3760b; font-size: 12px; }
+
+.progress-line { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+footer { margin-top: 40px; text-align: center; }
+footer a { color: var(--muted); font-size: 12px; text-decoration: none; }
+footer a:hover { color: var(--accent); }
