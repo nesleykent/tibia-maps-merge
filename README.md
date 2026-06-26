@@ -2,8 +2,13 @@
 
 Tibia's map changes with every game update, and the community at
 [tibiamaps.io](https://tibiamaps.io/) keeps its marker data updated to match.
-This merges *your* personal Tibia markers with the latest community markers,
-so you get both -- your own win if you've marked the same spot differently.
+**The web app** merges *your* personal Tibia markers with the latest
+community markers, so you get both -- your own win if you've marked the same
+spot differently.
+
+This repo also has a separate, broader **Python CLI** with no tibiamaps.io
+integration -- it converts/merges raw minimap exports (images + markers)
+entirely from local files. See [CLI](#cli-for-scripting--automation) below.
 
 ## Web app (recommended)
 
@@ -34,9 +39,11 @@ Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
 
 ## CLI (for scripting / automation)
 
-A separate Python/Pillow implementation covering the full original scope --
-converting raw minimap exports to PNG + JSON and merging multiple exports
-(images included, not just markers) -- for terminal use or automation.
+A separate, independent Python/Pillow tool -- it does **not** fetch anything
+from tibiamaps.io and has no "merge with community markers" feature. It
+covers the original, broader scope instead: converting raw minimap exports
+to PNG + JSON and merging multiple exports (map/path tile images included,
+not just markers), entirely from local files.
 
 ### Setup
 
@@ -45,9 +52,9 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
-## Commands
+### Commands
 
-### Convert a raw minimap export to PNG + JSON
+#### Convert a raw minimap export to PNG + JSON
 
 A raw export is whatever's in your Tibia client's `minimap` folder:
 `Minimap_Color_<x>_<y>_<z>.png`, `Minimap_WaypointCost_<x>_<y>_<z>.png`, and
@@ -61,7 +68,7 @@ A raw export is whatever's in your Tibia client's `minimap` folder:
 - `--no-markers` -- skip markers entirely
 - `--floors 0,1,7-9` -- only process the given floors
 
-### Merge two or more sources
+#### Merge two or more sources
 
 Sources can be raw exports, already-converted data directories, or a mix --
 each is auto-detected. Markers are unioned by `(x, y, z)`; explored map/path
@@ -76,7 +83,7 @@ sources explored the same tile differently.
 - `--no-markers` / `--no-maps` -- merge only the other half
 - `--floors 0,1,7-9` -- only merge the given floors
 
-### Inspect a source
+#### Inspect a source
 
 ```sh
 .venv/bin/python cli.py info ./data-a
@@ -84,7 +91,7 @@ sources explored the same tile differently.
 
 Prints bounds, floor list, tile counts, and marker count.
 
-### Standalone marker conversion
+#### Standalone marker conversion
 
 For working with `minimapmarkers.bin` snapshots directly, without the image
 pipeline:
@@ -98,7 +105,7 @@ pipeline:
 `merge-markers` accepts any mix of `.bin` and `.json` files and skips (with a
 warning) any file it can't parse, rather than aborting the whole merge.
 
-## Notes / limitations
+### CLI limitations
 
 - Only writes `data/*` (PNG + JSON). It does not write a Tibia-compatible
   `minimap/*` export back out (no client-side tile re-encoding) -- only the
@@ -107,5 +114,5 @@ warning) any file it can't parse, rather than aborting the whole merge.
 - The marker binary format has an older variant (seen in some legacy/renamed
   `.bin` files, e.g. one using a 14-byte coordinate block instead of the
   modern 10-byte one) that isn't supported -- same limitation as the
-  upstream tool. Affected files are skipped with a warning rather than
-  aborting.
+  upstream tool, and the same one the web app has. Affected files are
+  skipped with a warning rather than aborting.
