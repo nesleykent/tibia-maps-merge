@@ -23,6 +23,12 @@ Everything runs client-side (vanilla JS: a ZIP reader + native
 `DecompressionStream` to unpack tibiamaps.io's download, the same binary
 marker parser/writer as the CLI below). Your files never leave your machine.
 
+Also available in [Brazilian Portuguese](https://nesleykent.github.io/tibia-maps-merge/pt-br/)
+(`docs/pt-br/index.html`) -- a language switcher links between the two. Page
+text lives directly in each language's HTML file; the handful of strings
+`app.js` generates dynamically (status/result messages) go through
+[`docs/lib/i18n.js`](docs/lib/i18n.js), keyed off each page's `<html lang>`.
+
 Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
 `lib/` has the actual fetch/parse/merge logic, framework-free.
 

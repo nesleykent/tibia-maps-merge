@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tibia Maps Merge</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="lang-switch"><a href="../">English</a></div>
+    <h1>Tibia Maps Merge</h1>
+    <p class="subtitle">O mapa do Tibia muda a cada atualização do jogo, e o
+      <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
+      mantém as marcações da comunidade atualizadas para acompanhar. Esta
+      ferramenta mescla as <em>suas</em> marcações pessoais com as marcações
+      mais recentes da comunidade -- assim você fica com as duas, e as suas
+      têm prioridade se você tiver marcado o mesmo local de forma diferente.</p>
+  </header>
+
+  <section class="how-it-works">
+    <h2>Como funciona</h2>
+    <ol>
+      <li>Buscamos as marcações mais recentes da comunidade direto do tibiamaps.io -- o mesmo arquivo usado pelo instalador de mapas deles, por isso está sempre atualizado com a versão mais recente do Tibia.</li>
+      <li>Você envia suas próprias marcações -- o arquivo <code>minimapmarkers.bin</code> da pasta <code>minimap</code> do seu cliente Tibia (ou um <code>markers.json</code>, se você já tiver um).</li>
+      <li>Nós mesclamos tudo, totalmente no seu navegador -- as marcações são combinadas pelas coordenadas do mapa. Se você e a comunidade marcaram o mesmo local, a sua marcação prevalece.</li>
+      <li>Você recebe um novo <code>minimapmarkers.bin</code>. Coloque-o na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
+    </ol>
+    <details>
+      <summary>Onde encontro meu minimapmarkers.bin?</summary>
+      <dl>
+        <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
+        <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
+        <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
+      </dl>
+      <p class="micro-hint">Dos <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">guias de instalação do tibiamaps.io</a> -- consulte-os se a sua configuração for diferente (por exemplo, instalação em local não padrão, ou o cliente do Test Server).</p>
+    </details>
+  </section>
+
+  <div class="field">
+    <label>Marcações da comunidade (do tibiamaps.io)</label>
+    <div class="status-line" id="community-status">Carregando…</div>
+  </div>
+
+  <div class="field">
+    <label>Suas marcações</label>
+    <label class="file-picker">
+      <input type="file" multiple accept=".bin,.json" id="personal-files">
+      <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
+    </label>
+    <p class="micro-hint">Você pode escolher mais de um arquivo. Se houver divergência, o último escolhido prevalece.</p>
+  </div>
+
+  <div class="field">
+    <label>Nome do arquivo de saída</label>
+    <input type="text" id="output-name" value="minimapmarkers.bin">
+    <p class="micro-hint"><code>.bin</code> para colocar direto na pasta <code>minimap</code> do seu cliente Tibia, ou <code>.json</code> para os dados brutos.</p>
+  </div>
+
+  <button class="primary-btn" id="merge-run" disabled>Mesclar e Baixar</button>
+  <div class="result" id="merge-result"></div>
+
+  <aside class="disclaimer">
+    <p>Esta é uma ferramenta independente e não oficial, sem afiliação, endosso ou patrocínio da CipSoft GmbH ou do tibiamaps.io. <strong>Tibia</strong> é uma marca registrada da CipSoft GmbH. Os dados de marcações da comunidade são obtidos em tempo real e sem modificações do download público do tibiamaps.io -- todo o crédito por esses dados pertence ao tibiamaps.io e seus colaboradores. Esta ferramenta apenas combina esses dados com suas próprias marcações, totalmente no seu navegador; nada é enviado a lugar nenhum.</p>
+  </aside>
+
+  <footer>
+    <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Código-fonte no GitHub</a>
+  </footer>
+</div>
+
+<script type="module" src="../app.js"></script>
+</body>
+</html>

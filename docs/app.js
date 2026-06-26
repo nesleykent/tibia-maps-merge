@@ -1,35 +1,28 @@
 import { fetchCommunityMarkers } from './lib/community.js';
 import { loadMarkersFile, mergeMarkers, writeMarkersBin } from './lib/markers.js';
+import { localeDate, localeNumber, t } from './lib/i18n.js';
 
 const runButton = document.getElementById('merge-run');
 const statusEl = document.getElementById('community-status');
 const fileInput = document.getElementById('personal-files');
 
 let community = null; // {markers, lastModified}
-let communityError = null;
-
-function formatDate(date) {
-  if (!date) return 'unknown date';
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-}
 
 async function loadCommunityMarkers() {
-  statusEl.textContent = 'Loading…';
+  statusEl.textContent = t('loading');
   statusEl.classList.remove('error');
   runButton.disabled = true;
   try {
     community = await fetchCommunityMarkers();
-    communityError = null;
-    statusEl.textContent = `Loaded ${community.markers.length.toLocaleString()} community markers (updated ${formatDate(community.lastModified)})`;
+    statusEl.textContent = t('loaded', community.markers.length, localeDate(community.lastModified));
     runButton.disabled = false;
   } catch (err) {
     community = null;
-    communityError = err;
     statusEl.textContent = `${err.message} `;
     statusEl.classList.add('error');
     const retry = document.createElement('button');
     retry.className = 'secondary-btn';
-    retry.textContent = 'Retry';
+    retry.textContent = t('retry');
     retry.addEventListener('click', loadCommunityMarkers);
     statusEl.appendChild(retry);
   }
@@ -46,7 +39,7 @@ fileInput.addEventListener('change', () => {
     label.classList.remove('chosen');
     return;
   }
-  label.textContent = files.length === 1 ? files[0].name : `${files.length} files selected`;
+  label.textContent = files.length === 1 ? files[0].name : t('filesSelected', files.length);
   label.classList.add('chosen');
 });
 
@@ -70,7 +63,7 @@ function withBusy(button, fn) {
   return async (...args) => {
     button.disabled = true;
     const original = button.textContent;
-    button.textContent = 'Working…';
+    button.textContent = t('working');
     try {
       await fn(...args);
     } finally {
@@ -83,11 +76,11 @@ function withBusy(button, fn) {
 // ---------- Merge ----------
 runButton.addEventListener('click', withBusy(runButton, async () => {
   if (!community) {
-    renderResult('Community markers failed to load -- click Retry above first.', true);
+    renderResult(t('communityFailed'), true);
     return;
   }
   if (!fileInput.files || fileInput.files.length === 0) {
-    renderResult('Choose at least one of your own marker files first.', true);
+    renderResult(t('chooseFile'), true);
     return;
   }
   const outputName = document.getElementById('output-name').value.trim() || 'minimapmarkers.bin';
@@ -102,7 +95,7 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
     }
   }
   if (personalGroups.length === 0) {
-    renderResult('None of your marker files could be parsed.', true);
+    renderResult(t('noneParsed'), true);
     return;
   }
 
@@ -129,15 +122,15 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
 
   const personalTotal = personalGroups.reduce((sum, g) => sum + g.length, 0);
   const skippedHtml = skipped.length
-    ? `<ul class="warn-list">${skipped.map((s) => `<li>${s.file}: ${s.error}</li>`).join('')}</ul>`
+    ? `<p>${t('skippedIntro')}</p><ul class="warn-list">${skipped.map((s) => `<li>${s.file}: ${s.error}</li>`).join('')}</ul>`
     : '';
   renderResult(`
-    Merged successfully -- <strong>${outputName}</strong> downloaded.
+    ${t('mergedSuccess', outputName)}
     <dl>
-      <dt>Community markers</dt><dd>${community.markers.length.toLocaleString()}</dd>
-      <dt>Your markers</dt><dd>${personalTotal.toLocaleString()}</dd>
-      <dt>Yours overrode community</dt><dd>${overriddenCount.toLocaleString()}</dd>
-      <dt>Total in result</dt><dd>${merged.length.toLocaleString()}</dd>
+      <dt>${t('labelCommunity')}</dt><dd>${localeNumber(community.markers.length)}</dd>
+      <dt>${t('labelYours')}</dt><dd>${localeNumber(personalTotal)}</dd>
+      <dt>${t('labelOverridden')}</dt><dd>${localeNumber(overriddenCount)}</dd>
+      <dt>${t('labelTotal')}</dt><dd>${localeNumber(merged.length)}</dd>
     </dl>
     ${skippedHtml}
   `, false);

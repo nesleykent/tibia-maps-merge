@@ -9,14 +9,33 @@
 <body>
 <div class="app">
   <header>
+    <div class="lang-switch"><a href="pt-br/">Português (BR)</a></div>
     <h1>Tibia Maps Merge</h1>
     <p class="subtitle">Tibia's map changes with every game update, and
       <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
       keeps its community markers updated to match. This merges <em>your</em>
       personal markers with the latest community ones -- so you get both,
-      with your own winning if you've marked the same spot differently.
-      Everything runs in your browser; nothing is uploaded anywhere.</p>
+      with your own winning if you've marked the same spot differently.</p>
   </header>
+
+  <section class="how-it-works">
+    <h2>How it works</h2>
+    <ol>
+      <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
+      <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
+      <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
+      <li>You get a new <code>minimapmarkers.bin</code> back. Drop it into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
+    </ol>
+    <details>
+      <summary>Where do I find my minimapmarkers.bin?</summary>
+      <dl>
+        <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
+        <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
+        <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
+      </dl>
+      <p class="micro-hint">From <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">tibiamaps.io's installation guides</a> -- check there if your setup differs (e.g. a non-default install location, or the Test Server client).</p>
+    </details>
+  </section>
 
   <div class="field">
     <label>Community markers (from tibiamaps.io)</label>
@@ -40,6 +59,10 @@
 
   <button class="primary-btn" id="merge-run" disabled>Merge &amp; Download</button>
   <div class="result" id="merge-result"></div>
+
+  <aside class="disclaimer">
+    <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
+  </aside>
 
   <footer>
     <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
