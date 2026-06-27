@@ -4,6 +4,17 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.1.1] - 2026-06-26
+
+### Changed
+
+- Extended the community marker cache from 10 minutes to 24 hours.
+  tibiamaps.io's data only changes a handful of times a year (tied to game
+  updates), so this keeps things current in practice while cutting repeat-
+  visit load against tibiamaps.io's server much further. The "Check for
+  updates" button still bypasses the cache instantly for anyone who wants
+  the latest data right away.
+
 ## [1.1.0] - 2026-06-26
 
 ### Changed

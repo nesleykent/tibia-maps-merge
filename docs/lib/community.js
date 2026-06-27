@@ -9,11 +9,12 @@ import { parseMarkersBin } from './markers.js';
 const COMMUNITY_ZIP_URL = 'https://tibiamaps.github.io/tibia-map-data/minimap-with-markers.zip';
 
 const CACHE_KEY = 'tibia-maps-merge:community-cache:v1';
-// tibiamaps.io's own CDN serves this file with `Cache-Control: max-age=600`
-// (10 minutes) -- matching that means we never hold data the origin itself
-// considers stale, while never hitting the network more often than that for
-// repeat page loads/reloads within the same window.
-const CACHE_TTL_MS = 10 * 60 * 1000;
+// tibiamaps.io's data only changes a handful of times a year (tied to Tibia
+// game updates), so a much longer cache than the origin's own 10-minute
+// Cache-Control still keeps things current in practice -- and it cuts way
+// down on repeat-visit load against tibiamaps.io's server. Anyone who wants
+// the absolute latest immediately can hit "Check for updates" to bypass it.
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 function readCache() {
   try {
