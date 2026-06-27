@@ -4,6 +4,19 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.1.0] - 2026-06-26
+
+### Changed
+
+- The community `minimapmarkers.bin` download (~6.5MB) was being fetched
+  on every single page load, with `cache: 'no-cache'` forcing revalidation
+  every time -- no caching at all. Added a `localStorage` cache (10-minute
+  TTL, matching tibiamaps.io's own `Cache-Control: max-age=600`), so
+  reloading or revisiting the page within that window loads instantly from
+  cache instead of re-downloading. Added a "Check for updates" button next
+  to the status line for anyone who wants the latest data immediately
+  regardless of cache age.
+
 ## [1.0.1] - 2026-06-26
 
 ### Fixed

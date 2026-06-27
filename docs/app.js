@@ -31,14 +31,19 @@ const personalInput = document.getElementById('personal-files');
 
 let community = null; // {markers, lastModified}
 
-async function loadCommunityMarkers() {
+async function loadCommunityMarkers(forceRefresh = false) {
   statusEl.textContent = t('loading');
   statusEl.classList.remove('error');
   runButton.disabled = true;
   try {
-    community = await fetchCommunityMarkers();
+    community = await fetchCommunityMarkers({ forceRefresh });
     statusEl.textContent = t('loaded', community.markers.length, localeDate(community.lastModified));
     runButton.disabled = false;
+    const refresh = document.createElement('button');
+    refresh.className = 'secondary-btn';
+    refresh.textContent = t('checkForUpdates');
+    refresh.addEventListener('click', () => loadCommunityMarkers(true));
+    statusEl.appendChild(refresh);
   } catch (err) {
     community = null;
     statusEl.textContent = `${err.message} `;
@@ -46,7 +51,7 @@ async function loadCommunityMarkers() {
     const retry = document.createElement('button');
     retry.className = 'secondary-btn';
     retry.textContent = t('retry');
-    retry.addEventListener('click', loadCommunityMarkers);
+    retry.addEventListener('click', () => loadCommunityMarkers(true));
     statusEl.appendChild(retry);
   }
 }
