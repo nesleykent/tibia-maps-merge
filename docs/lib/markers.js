@@ -123,12 +123,38 @@ export function writeMarkersBin(markers) {
   return result;
 }
 
+/** Throws with a specific reason if `markers` isn't a valid marker array. */
+export function validateMarkers(markers, { source } = {}) {
+  const label = source || '<data>';
+  if (!Array.isArray(markers)) {
+    throw new Error(`${label}: expected a JSON array of markers`);
+  }
+  markers.forEach((m, i) => {
+    if (!m || typeof m !== 'object') {
+      throw new Error(`${label}: entry ${i} is not an object`);
+    }
+    if (!Number.isInteger(m.x) || !Number.isInteger(m.y)) {
+      throw new Error(`${label}: entry ${i} has a non-integer x/y coordinate`);
+    }
+    if (!Number.isInteger(m.z) || m.z < 0 || m.z > 15) {
+      throw new Error(`${label}: entry ${i} has an invalid floor z=${m.z} (expected 0-15)`);
+    }
+    if (m.icon !== null && typeof m.icon !== 'string') {
+      throw new Error(`${label}: entry ${i} has a non-string icon`);
+    }
+    if (typeof m.description !== 'string') {
+      throw new Error(`${label}: entry ${i} has a non-string description`);
+    }
+  });
+  return markers;
+}
+
 /** Load and parse a single marker file -- `.bin` or `.json`, by extension. */
 export async function loadMarkersFile(file) {
   if (file.name.endsWith('.bin')) {
     return parseMarkersBin(await file.arrayBuffer(), { source: file.name });
   }
-  return JSON.parse(await file.text());
+  return validateMarkers(JSON.parse(await file.text()), { source: file.name });
 }
 
 /**

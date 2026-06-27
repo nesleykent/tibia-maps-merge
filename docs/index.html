@@ -24,8 +24,9 @@
       <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
       <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
       <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
-      <li>You get a new <code>minimapmarkers.bin</code> back. Drop it into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
+      <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
     </ol>
+    <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>.</p>
     <details>
       <summary>Where do I find my minimapmarkers.bin?</summary>
       <dl>
@@ -37,28 +38,62 @@
     </details>
   </section>
 
-  <div class="field">
-    <label>Community markers (from tibiamaps.io)</label>
-    <div class="status-line" id="community-status">Loading…</div>
-  </div>
+  <nav class="mode-tabs">
+    <button class="mode-tab-button active" data-mode="merge">Merge Mode</button>
+    <button class="mode-tab-button" data-mode="convert">Conversion Mode</button>
+  </nav>
 
-  <div class="field">
-    <label>Your markers</label>
-    <label class="file-picker">
-      <input type="file" multiple accept=".bin,.json" id="personal-files">
-      <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+  <section class="mode-panel active" id="mode-merge">
+    <p class="hint">For everyday use -- merges the latest community markers with yours and gives you a ready-to-install file, an automatic backup of what you uploaded, and a full audit log.</p>
+
+    <div class="field">
+      <label>Community markers (from tibiamaps.io)</label>
+      <div class="status-line" id="community-status">Loading…</div>
+    </div>
+
+    <div class="field">
+      <label>Your markers</label>
+      <label class="file-picker">
+        <input type="file" multiple accept=".bin,.json" id="personal-files">
+        <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+      </label>
+      <p class="micro-hint">You can pick more than one file. If they disagree, the one picked last wins.</p>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="export-audit">
+      Also export audit files (<code>merged-markers.json</code> + <code>conflicts.json</code>)
     </label>
-    <p class="micro-hint">You can pick more than one file. If they disagree, the one picked last wins.</p>
-  </div>
 
-  <div class="field">
-    <label>Output filename</label>
-    <input type="text" id="output-name" value="minimapmarkers.bin">
-    <p class="micro-hint"><code>.bin</code> to drop straight back into your Tibia client's <code>minimap</code> folder, or <code>.json</code> for the raw data.</p>
-  </div>
+    <button class="primary-btn" id="merge-run" disabled>Merge &amp; Download</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the merged <code>minimapmarkers.bin</code>, a backup of your original file(s), and <code>merge-log.txt</code>.</p>
+    <div class="result" id="merge-result"></div>
+  </section>
 
-  <button class="primary-btn" id="merge-run" disabled>Merge &amp; Download</button>
-  <div class="result" id="merge-result"></div>
+  <section class="mode-panel" id="mode-convert">
+    <p class="hint">For advanced users -- converts a marker file between formats, with no merging at all. Useful for manual editing, version control, or feeding other tools.</p>
+
+    <div class="field">
+      <label>Conversion</label>
+      <select id="conversion-type">
+        <option value="bin-to-json">minimapmarkers.bin → markers.json</option>
+        <option value="json-to-bin">markers.json → minimapmarkers.bin</option>
+        <option value="community-to-json">Community markers (live) → community-markers.json</option>
+      </select>
+    </div>
+
+    <div class="field" id="conversion-file-field">
+      <label>File to convert</label>
+      <label class="file-picker">
+        <input type="file" accept=".bin" id="conversion-file">
+        <span class="file-picker-label" data-default="Choose a file…">Choose a file…</span>
+      </label>
+    </div>
+
+    <button class="primary-btn" id="convert-run">Convert &amp; Download</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the converted file and <code>conversion-log.txt</code>.</p>
+    <div class="result" id="convert-result"></div>
+  </section>
 
   <aside class="disclaimer">
     <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
@@ -66,6 +101,7 @@
 
   <footer>
     <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
+    · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
   </footer>
 </div>
 

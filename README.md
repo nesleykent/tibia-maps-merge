@@ -18,15 +18,27 @@ A static page, hosted on GitHub Pages -- no install, no server. It fetches
 the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 ["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
 download (the same file the site itself distributes -- so it's always current
-with the latest game update), lets you pick your own marker file(s)
-(`minimapmarkers.bin` from your Tibia client, or `markers.json`), and merges
-them -- your markers take priority over community ones at the same
-coordinate. Output downloads as `minimapmarkers.bin`, ready to drop back into
-your Tibia client's `minimap` folder, or as `.json` if you want the raw data.
+with the latest game update). Two modes:
+
+- **Merge Mode** -- pick your own marker file(s) (`minimapmarkers.bin` from
+  your Tibia client, or `markers.json`); they're merged with the live
+  community markers, yours taking priority at any shared coordinate.
+  Downloads a `.zip` containing the merged `minimapmarkers.bin`, an
+  unmodified backup of whatever you uploaded, and `merge-log.txt` (a full
+  audit: counts loaded/added/identical/conflicting, the policy applied, and
+  every detected conflict). An "export audit files" checkbox adds
+  `merged-markers.json` and `conflicts.json` for manual editing or
+  third-party tooling.
+- **Conversion Mode** -- pure format conversion, no merging:
+  `minimapmarkers.bin` ↔ `markers.json`, or the live community markers
+  straight to `community-markers.json`. Downloads a `.zip` with the
+  converted file and `conversion-log.txt` (source/output format, marker
+  count, and a real round-trip validation check).
 
 Everything runs client-side (vanilla JS: a ZIP reader + native
-`DecompressionStream` to unpack tibiamaps.io's download, the same binary
-marker parser/writer as the CLI below). Your files never leave your machine.
+`DecompressionStream` to unpack tibiamaps.io's download, a ZIP writer for
+the output archive, the same binary marker parser/writer as the CLI below).
+Your files never leave your machine.
 
 Also available in [Brazilian Portuguese](https://nesleykent.github.io/tibia-maps-merge/pt-br/)
 (`docs/pt-br/index.html`) -- a language switcher links between the two. Page
@@ -36,6 +48,14 @@ text lives directly in each language's HTML file; the handful of strings
 
 Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
 `lib/` has the actual fetch/parse/merge logic, framework-free.
+
+### Versioning
+
+The web app's version is tracked in [`docs/lib/version.js`](docs/lib/version.js)
+and shown (linked to the changelog) in the footer of both language pages.
+Every web app change bumps `VERSION` and gets an entry in
+[`CHANGELOG.md`](CHANGELOG.md). The CLI doesn't have its own version number --
+it's a separate tool, versioned implicitly by git history.
 
 ## CLI (for scripting / automation)
 

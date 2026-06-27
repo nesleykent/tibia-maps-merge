@@ -25,8 +25,9 @@
       <li>Buscamos as marcações mais recentes da comunidade direto do tibiamaps.io -- o mesmo arquivo usado pelo instalador de mapas deles, por isso está sempre atualizado com a versão mais recente do Tibia.</li>
       <li>Você envia suas próprias marcações -- o arquivo <code>minimapmarkers.bin</code> da pasta <code>minimap</code> do seu cliente Tibia (ou um <code>markers.json</code>, se você já tiver um).</li>
       <li>Nós mesclamos tudo, totalmente no seu navegador -- as marcações são combinadas pelas coordenadas do mapa. Se você e a comunidade marcaram o mesmo local, a sua marcação prevalece.</li>
-      <li>Você recebe um novo <code>minimapmarkers.bin</code>. Coloque-o na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
+      <li>Você recebe um novo <code>minimapmarkers.bin</code>, além de um backup do que você enviou e um log completo do que mudou. Coloque o novo arquivo na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
     </ol>
+    <p class="micro-hint">Esse é o <strong>Modo de Mesclagem</strong>, abaixo. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para o <strong>Modo de Conversão</strong>.</p>
     <details>
       <summary>Onde encontro meu minimapmarkers.bin?</summary>
       <dl>
@@ -38,28 +39,62 @@
     </details>
   </section>
 
-  <div class="field">
-    <label>Marcações da comunidade (do tibiamaps.io)</label>
-    <div class="status-line" id="community-status">Carregando…</div>
-  </div>
+  <nav class="mode-tabs">
+    <button class="mode-tab-button active" data-mode="merge">Modo de Mesclagem</button>
+    <button class="mode-tab-button" data-mode="convert">Modo de Conversão</button>
+  </nav>
 
-  <div class="field">
-    <label>Suas marcações</label>
-    <label class="file-picker">
-      <input type="file" multiple accept=".bin,.json" id="personal-files">
-      <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
+  <section class="mode-panel active" id="mode-merge">
+    <p class="hint">Para uso do dia a dia -- mescla as marcações mais recentes da comunidade com as suas e entrega um arquivo pronto para instalar, um backup automático do que você enviou, e um log de auditoria completo.</p>
+
+    <div class="field">
+      <label>Marcações da comunidade (do tibiamaps.io)</label>
+      <div class="status-line" id="community-status">Carregando…</div>
+    </div>
+
+    <div class="field">
+      <label>Suas marcações</label>
+      <label class="file-picker">
+        <input type="file" multiple accept=".bin,.json" id="personal-files">
+        <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
+      </label>
+      <p class="micro-hint">Você pode escolher mais de um arquivo. Se houver divergência, o último escolhido prevalece.</p>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="export-audit">
+      Também exportar arquivos de auditoria (<code>merged-markers.json</code> + <code>conflicts.json</code>)
     </label>
-    <p class="micro-hint">Você pode escolher mais de um arquivo. Se houver divergência, o último escolhido prevalece.</p>
-  </div>
 
-  <div class="field">
-    <label>Nome do arquivo de saída</label>
-    <input type="text" id="output-name" value="minimapmarkers.bin">
-    <p class="micro-hint"><code>.bin</code> para colocar direto na pasta <code>minimap</code> do seu cliente Tibia, ou <code>.json</code> para os dados brutos.</p>
-  </div>
+    <button class="primary-btn" id="merge-run" disabled>Mesclar e Baixar</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> mesclado, um backup do(s) seu(s) arquivo(s) original(is), e o <code>merge-log.txt</code>.</p>
+    <div class="result" id="merge-result"></div>
+  </section>
 
-  <button class="primary-btn" id="merge-run" disabled>Mesclar e Baixar</button>
-  <div class="result" id="merge-result"></div>
+  <section class="mode-panel" id="mode-convert">
+    <p class="hint">Para usuários avançados -- converte um arquivo de marcações entre formatos, sem nenhuma mesclagem. Útil para edição manual, controle de versão ou alimentar outras ferramentas.</p>
+
+    <div class="field">
+      <label>Conversão</label>
+      <select id="conversion-type">
+        <option value="bin-to-json">minimapmarkers.bin → markers.json</option>
+        <option value="json-to-bin">markers.json → minimapmarkers.bin</option>
+        <option value="community-to-json">Marcações da comunidade (em tempo real) → community-markers.json</option>
+      </select>
+    </div>
+
+    <div class="field" id="conversion-file-field">
+      <label>Arquivo para converter</label>
+      <label class="file-picker">
+        <input type="file" accept=".bin" id="conversion-file">
+        <span class="file-picker-label" data-default="Escolha um arquivo…">Escolha um arquivo…</span>
+      </label>
+    </div>
+
+    <button class="primary-btn" id="convert-run">Converter e Baixar</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com o arquivo convertido e o <code>conversion-log.txt</code>.</p>
+    <div class="result" id="convert-result"></div>
+  </section>
 
   <aside class="disclaimer">
     <p>Esta é uma ferramenta independente e não oficial, sem afiliação, endosso ou patrocínio da CipSoft GmbH ou do tibiamaps.io. <strong>Tibia</strong> é uma marca registrada da CipSoft GmbH. Os dados de marcações da comunidade são obtidos em tempo real e sem modificações do download público do tibiamaps.io -- todo o crédito por esses dados pertence ao tibiamaps.io e seus colaboradores. Esta ferramenta apenas combina esses dados com suas próprias marcações, totalmente no seu navegador; nada é enviado a lugar nenhum.</p>
@@ -67,6 +102,7 @@
 
   <footer>
     <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Código-fonte no GitHub</a>
+    · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
   </footer>
 </div>
 
