@@ -150,8 +150,7 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
     }
   }
   const conflictCount = conflicts.length;
-  const replacedCount = identicalCount + conflictCount;
-  const addedCount = personalByKey.size - replacedCount;
+  const addedCount = personalByKey.size - identicalCount - conflictCount;
 
   const merged = mergeMarkers(community.markers, ...personalGroups);
   const personalLoadedCount = personalGroups.reduce((sum, g) => sum + g.length, 0);
@@ -168,7 +167,6 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
         communityCount: community.markers.length,
         personalLoadedCount,
         addedCount,
-        replacedCount,
         identicalCount,
         conflictCount,
         totalCount: merged.length,
@@ -194,7 +192,6 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
       <dt>${t('labelCommunity')}</dt><dd>${localeNumber(community.markers.length)}</dd>
       <dt>${t('labelYours')}</dt><dd>${localeNumber(personalLoadedCount)}</dd>
       <dt>${t('labelAdded')}</dt><dd>${localeNumber(addedCount)}</dd>
-      <dt>${t('labelReplaced')}</dt><dd>${localeNumber(replacedCount)}</dd>
       <dt>${t('labelIdentical')}</dt><dd>${localeNumber(identicalCount)}</dd>
       <dt>${t('labelConflicts')}</dt><dd>${localeNumber(conflictCount)}</dd>
       <dt>${t('labelTotal')}</dt><dd>${localeNumber(merged.length)}</dd>

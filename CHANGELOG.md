@@ -4,6 +4,19 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.0.1] - 2026-06-26
+
+### Fixed
+
+- Merge Mode's result summary and `merge-log.txt` had a confusing, redundant
+  "Yours replaced community markers" line equal to identical + conflicts,
+  immediately followed by "Of those, real conflicts" -- worded as if
+  conflicts were a subset of the identical-and-skipped count rather than a
+  sibling category. Dropped the redundant line and relabeled the remaining
+  three as a clean, mutually-exclusive breakdown of "your markers loaded":
+  new-only-in-yours + unchanged + conflicts-resolved-in-your-favor, which
+  now visibly sums to that total.
+
 ## [1.0.0] - 2026-06-26
 
 First tracked version. Established the version/changelog practice itself,

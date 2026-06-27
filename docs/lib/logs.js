@@ -50,7 +50,7 @@ function describeMarker(m) {
 
 export function buildMergeLog({
   generatedAt, userFilenames, backupFilenames, communityCount, personalLoadedCount,
-  addedCount, replacedCount, identicalCount, conflictCount, totalCount, conflicts,
+  addedCount, identicalCount, conflictCount, totalCount, conflicts,
 }, lang) {
   const t = (key, ...args) => tFor(lang, key, ...args);
   const n = (value) => localeNumber(value, lang);
@@ -63,7 +63,6 @@ export function buildMergeLog({
     line(t('logCommunityLoaded'), n(communityCount)),
     line(t('logPersonalLoaded'), n(personalLoadedCount)),
     line(t('logAdded'), n(addedCount)),
-    line(t('logReplaced'), n(replacedCount)),
     line(t('logIdentical'), n(identicalCount)),
     line(t('logConflicts'), n(conflictCount)),
     line(t('logTotal'), n(totalCount)),
