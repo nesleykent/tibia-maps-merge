@@ -1,0 +1,235 @@
+/*
+ * Apple macOS 27 platform tokens.
+ * Extracted verbatim from the official Apple UI Kit Sketch export
+ * (see readme › Apple Platform). System colours, label/fill opacity
+ * ladders, grays, backgrounds, and the SF Pro type ramp.
+ *
+ * SF Pro is Apple-licensed and NOT redistributed here; the family stack
+ * resolves to the real San Francisco on Apple hardware via -apple-system.
+ */
+
+:root {
+  --apple-macos-font: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; /* @kind font */
+  --apple-macos-font-rounded: ui-rounded, -apple-system, BlinkMacSystemFont, system-ui, sans-serif; /* @kind font */
+  --apple-macos-font-mono: ui-monospace, Menlo, "Courier New", monospace; /* @kind font */
+
+  /* ---- Neutral / shared swatches ---- */
+  --apple-macos-x-kit-nested-symbol-bg-dark: rgb(54, 103, 153); /* @kind color */
+  --apple-macos-x-kit-nested-symbol-bg-light: rgb(204, 230, 255); /* @kind color */
+  --apple-macos-x-kit-symbol-bg-dark: rgb(51, 51, 51); /* @kind color */
+  --apple-macos-x-kit-symbol-bg-light: rgb(204, 204, 204); /* @kind color */
+
+  /* ---- Light appearance (default) ---- */
+  --apple-macos-system-colors-8-blue: rgb(0, 136, 255); /* @kind color */
+  --apple-macos-system-colors-4-green: rgb(52, 199, 89); /* @kind color */
+  --apple-macos-system-colors-10-purple: rgb(203, 48, 224); /* @kind color */
+  --apple-macos-system-colors-12-brown: rgb(172, 127, 94); /* @kind color */
+  --apple-macos-system-colors-3-yellow: rgb(255, 204, 0); /* @kind color */
+  --apple-macos-system-colors-6-teal: rgb(0, 195, 208); /* @kind color */
+  --apple-macos-system-colors-2-orange: rgb(255, 141, 40); /* @kind color */
+  --apple-macos-system-colors-5-mint: rgb(0, 200, 179); /* @kind color */
+  --apple-macos-system-colors-11-pink: rgb(255, 45, 85); /* @kind color */
+  --apple-macos-system-colors-1-red: rgb(255, 56, 60); /* @kind color */
+  --apple-macos-system-colors-7-cyan: rgb(0, 192, 232); /* @kind color */
+  --apple-macos-system-colors-9-indigo: rgb(97, 85, 245); /* @kind color */
+  --apple-macos-separators: rgba(60, 60, 67, 0.29); /* @kind color */
+  --apple-macos-fills-3-tertiary: rgba(0, 0, 0, 0.05); /* @kind color */
+  --apple-macos-fills-2-secondary: rgba(0, 0, 0, 0.08); /* @kind color */
+  --apple-macos-grays-black: rgb(0, 0, 0); /* @kind color */
+  --apple-macos-grays-grey: rgb(142, 142, 147); /* @kind color */
+  --apple-macos-grays-white: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-fills-1-primary: rgba(0, 0, 0, 0.1); /* @kind color */
+  --apple-macos-fills-4-quatenary: rgba(0, 0, 0, 0.03); /* @kind color */
+  --apple-macos-fills-5-quinary: rgba(0, 0, 0, 0.02); /* @kind color */
+  --apple-macos-fills-light-vibrant-1-primary: rgba(0, 0, 0, 0.15); /* @kind color */
+  --apple-macos-fills-light-vibrant-2-secondary: rgba(0, 0, 0, 0.07); /* @kind color */
+  --apple-macos-fills-light-vibrant-3-tertiary: rgba(0, 0, 0, 0.05); /* @kind color */
+  --apple-macos-fills-light-vibrant-4-quatenary: rgba(0, 0, 0, 0.03); /* @kind color */
+  --apple-macos-fills-light-vibrant-5-quinary: rgba(0, 0, 0, 0.02); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-8-blue: rgb(0, 120, 240); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-12-brown: rgb(158, 115, 84); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-7-cyan: rgb(0, 171, 207); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-4-green: rgb(38, 191, 77); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-9-indigo: rgb(92, 80, 230); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-5-mint: rgb(0, 189, 169); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-2-orange: rgb(245, 134, 37); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-11-pink: rgb(245, 35, 75); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-10-purple: rgb(183, 43, 201); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-1-red: rgb(245, 47, 50); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-6-teal: rgb(0, 179, 191); /* @kind color */
+  --apple-macos-system-colors-light-vibrant-3-yellow: rgb(245, 194, 0); /* @kind color */
+  --apple-macos-grays-light-vibrant-black: rgb(0, 0, 0); /* @kind color */
+  --apple-macos-grays-light-vibrant-grey: rgb(132, 132, 137); /* @kind color */
+  --apple-macos-grays-light-vibrant-white: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-labels-light-vibrant-1-primary: rgb(54, 54, 54); /* @kind color */
+  --apple-macos-labels-3-tertiary: rgba(0, 0, 0, 0.25); /* @kind color */
+  --apple-macos-labels-light-vibrant-3-tertiary: rgb(179, 179, 179); /* @kind color */
+  --apple-macos-labels-6-seximal: rgba(0, 0, 0, 0.03); /* @kind color */
+  --apple-macos-labels-light-vibrant-2-secondary: rgb(115, 115, 115); /* @kind color */
+  --apple-macos-labels-2-secondary: rgba(0, 0, 0, 0.5); /* @kind color */
+  --apple-macos-labels-4-quaternary: rgba(0, 0, 0, 0.1); /* @kind color */
+  --apple-macos-labels-5-quinary: rgba(0, 0, 0, 0.05); /* @kind color */
+  --apple-macos-labels-1-primary: rgba(0, 0, 0, 0.85); /* @kind color */
+  --apple-macos-labels-light-vibrant-4-quaternary: rgb(217, 217, 217); /* @kind color */
+  --apple-macos-labels-light-vibrant-5-quinary: rgb(230, 230, 230); /* @kind color */
+  --apple-macos-labels-light-vibrant-6-seximal: rgb(250, 250, 250); /* @kind color */
+  --apple-macos-window-backgrounds-light-background: rgb(255, 255, 255); /* @kind color */
+
+  /* ---- SF Pro type ramp (size + family per style) ---- */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --apple-macos-system-colors-6-teal: rgb(0, 210, 224); /* @kind color */
+    --apple-macos-system-colors-8-blue: rgb(0, 145, 255); /* @kind color */
+    --apple-macos-system-colors-4-green: rgb(48, 209, 88); /* @kind color */
+    --apple-macos-system-colors-1-red: rgb(255, 66, 69); /* @kind color */
+    --apple-macos-system-colors-12-brown: rgb(183, 138, 102); /* @kind color */
+    --apple-macos-system-colors-11-pink: rgb(255, 55, 95); /* @kind color */
+    --apple-macos-system-colors-10-purple: rgb(219, 52, 242); /* @kind color */
+    --apple-macos-system-colors-9-indigo: rgb(109, 124, 255); /* @kind color */
+    --apple-macos-system-colors-3-yellow: rgb(255, 214, 0); /* @kind color */
+    --apple-macos-system-colors-7-cyan: rgb(60, 211, 254); /* @kind color */
+    --apple-macos-system-colors-2-orange: rgb(255, 146, 48); /* @kind color */
+    --apple-macos-system-colors-5-mint: rgb(0, 218, 195); /* @kind color */
+    --apple-macos-labels-dark-vibrant-1-primary: rgba(255, 255, 255, 0.96); /* @kind color */
+    --apple-macos-grays-black: rgb(0, 0, 0); /* @kind color */
+    --apple-macos-grays-white: rgb(255, 255, 255); /* @kind color */
+    --apple-macos-grays-grey: rgb(152, 152, 157); /* @kind color */
+    --apple-macos-labels-dark-vibrant-5-quinary: rgb(18, 18, 18); /* @kind color */
+    --apple-macos-labels-dark-vibrant-4-quaternary: rgb(38, 38, 38); /* @kind color */
+    --apple-macos-labels-dark-vibrant-2-secondary: rgb(138, 138, 138); /* @kind color */
+    --apple-macos-labels-dark-vibrant-3-tertiary: rgb(77, 77, 77); /* @kind color */
+    --apple-macos-fills-4-quatenary: rgba(255, 255, 255, 0.03); /* @kind color */
+    --apple-macos-fills-3-tertiary: rgba(255, 255, 255, 0.05); /* @kind color */
+    --apple-macos-fills-5-quinary: rgba(255, 255, 255, 0.02); /* @kind color */
+    --apple-macos-fills-2-secondary: rgba(255, 255, 255, 0.08); /* @kind color */
+    --apple-macos-fills-1-primary: rgba(255, 255, 255, 0.1); /* @kind color */
+    --apple-macos-fills-dark-vibrant-1-primary: rgba(255, 255, 255, 0.14); /* @kind color */
+    --apple-macos-fills-dark-vibrant-2-secondary: rgba(255, 255, 255, 0.08); /* @kind color */
+    --apple-macos-fills-dark-vibrant-3-tertiary: rgba(255, 255, 255, 0.05); /* @kind color */
+    --apple-macos-fills-dark-vibrant-4-quatenary: rgba(255, 255, 255, 0.04); /* @kind color */
+    --apple-macos-fills-dark-vibrant-5-quinary: rgba(255, 255, 255, 0.03); /* @kind color */
+    --apple-macos-system-colors-dark-8-blue: rgb(10, 153, 255); /* @kind color */
+    --apple-macos-system-colors-dark-12-brown: rgb(194, 150, 114); /* @kind color */
+    --apple-macos-system-colors-dark-7-cyan: rgb(71, 216, 252); /* @kind color */
+    --apple-macos-system-colors-dark-4-green: rgb(59, 219, 99); /* @kind color */
+    --apple-macos-system-colors-dark-9-indigo: rgb(113, 99, 255); /* @kind color */
+    --apple-macos-system-colors-dark-5-mint: rgb(45, 224, 205); /* @kind color */
+    --apple-macos-system-colors-dark-2-orange: rgb(255, 158, 51); /* @kind color */
+    --apple-macos-system-colors-dark-11-pink: rgb(255, 65, 105); /* @kind color */
+    --apple-macos-system-colors-dark-10-purple: rgb(230, 71, 252); /* @kind color */
+    --apple-macos-system-colors-dark-1-red: rgb(255, 71, 71); /* @kind color */
+    --apple-macos-system-colors-dark-6-teal: rgb(45, 215, 224); /* @kind color */
+    --apple-macos-system-colors-dark-3-yellow: rgb(255, 224, 20); /* @kind color */
+    --apple-macos-grays-dark-black: rgb(0, 0, 0); /* @kind color */
+    --apple-macos-grays-dark-grey: rgb(162, 162, 167); /* @kind color */
+    --apple-macos-grays-dark-white: rgb(255, 255, 255); /* @kind color */
+    --apple-macos-labels-1-primary: rgb(255, 255, 255); /* @kind color */
+    --apple-macos-labels-2-secondary: rgba(255, 255, 255, 0.55); /* @kind color */
+    --apple-macos-labels-3-tertiary: rgba(255, 255, 255, 0.25); /* @kind color */
+    --apple-macos-labels-4-quaternary: rgba(255, 255, 255, 0.1); /* @kind color */
+    --apple-macos-labels-5-quinary: rgba(255, 255, 255, 0.05); /* @kind color */
+    --apple-macos-labels-6-seximal: rgba(255, 255, 255, 0.03); /* @kind color */
+    --apple-macos-window-backgrounds-dark-background: rgb(30, 30, 30); /* @kind color */
+  }
+}
+
+[data-apple-macos-appearance="dark"] {
+  --apple-macos-system-colors-6-teal: rgb(0, 210, 224); /* @kind color */
+  --apple-macos-system-colors-8-blue: rgb(0, 145, 255); /* @kind color */
+  --apple-macos-system-colors-4-green: rgb(48, 209, 88); /* @kind color */
+  --apple-macos-system-colors-1-red: rgb(255, 66, 69); /* @kind color */
+  --apple-macos-system-colors-12-brown: rgb(183, 138, 102); /* @kind color */
+  --apple-macos-system-colors-11-pink: rgb(255, 55, 95); /* @kind color */
+  --apple-macos-system-colors-10-purple: rgb(219, 52, 242); /* @kind color */
+  --apple-macos-system-colors-9-indigo: rgb(109, 124, 255); /* @kind color */
+  --apple-macos-system-colors-3-yellow: rgb(255, 214, 0); /* @kind color */
+  --apple-macos-system-colors-7-cyan: rgb(60, 211, 254); /* @kind color */
+  --apple-macos-system-colors-2-orange: rgb(255, 146, 48); /* @kind color */
+  --apple-macos-system-colors-5-mint: rgb(0, 218, 195); /* @kind color */
+  --apple-macos-labels-dark-vibrant-1-primary: rgba(255, 255, 255, 0.96); /* @kind color */
+  --apple-macos-grays-black: rgb(0, 0, 0); /* @kind color */
+  --apple-macos-grays-white: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-grays-grey: rgb(152, 152, 157); /* @kind color */
+  --apple-macos-labels-dark-vibrant-5-quinary: rgb(18, 18, 18); /* @kind color */
+  --apple-macos-labels-dark-vibrant-4-quaternary: rgb(38, 38, 38); /* @kind color */
+  --apple-macos-labels-dark-vibrant-2-secondary: rgb(138, 138, 138); /* @kind color */
+  --apple-macos-labels-dark-vibrant-3-tertiary: rgb(77, 77, 77); /* @kind color */
+  --apple-macos-fills-4-quatenary: rgba(255, 255, 255, 0.03); /* @kind color */
+  --apple-macos-fills-3-tertiary: rgba(255, 255, 255, 0.05); /* @kind color */
+  --apple-macos-fills-5-quinary: rgba(255, 255, 255, 0.02); /* @kind color */
+  --apple-macos-fills-2-secondary: rgba(255, 255, 255, 0.08); /* @kind color */
+  --apple-macos-fills-1-primary: rgba(255, 255, 255, 0.1); /* @kind color */
+  --apple-macos-fills-dark-vibrant-1-primary: rgba(255, 255, 255, 0.14); /* @kind color */
+  --apple-macos-fills-dark-vibrant-2-secondary: rgba(255, 255, 255, 0.08); /* @kind color */
+  --apple-macos-fills-dark-vibrant-3-tertiary: rgba(255, 255, 255, 0.05); /* @kind color */
+  --apple-macos-fills-dark-vibrant-4-quatenary: rgba(255, 255, 255, 0.04); /* @kind color */
+  --apple-macos-fills-dark-vibrant-5-quinary: rgba(255, 255, 255, 0.03); /* @kind color */
+  --apple-macos-system-colors-dark-8-blue: rgb(10, 153, 255); /* @kind color */
+  --apple-macos-system-colors-dark-12-brown: rgb(194, 150, 114); /* @kind color */
+  --apple-macos-system-colors-dark-7-cyan: rgb(71, 216, 252); /* @kind color */
+  --apple-macos-system-colors-dark-4-green: rgb(59, 219, 99); /* @kind color */
+  --apple-macos-system-colors-dark-9-indigo: rgb(113, 99, 255); /* @kind color */
+  --apple-macos-system-colors-dark-5-mint: rgb(45, 224, 205); /* @kind color */
+  --apple-macos-system-colors-dark-2-orange: rgb(255, 158, 51); /* @kind color */
+  --apple-macos-system-colors-dark-11-pink: rgb(255, 65, 105); /* @kind color */
+  --apple-macos-system-colors-dark-10-purple: rgb(230, 71, 252); /* @kind color */
+  --apple-macos-system-colors-dark-1-red: rgb(255, 71, 71); /* @kind color */
+  --apple-macos-system-colors-dark-6-teal: rgb(45, 215, 224); /* @kind color */
+  --apple-macos-system-colors-dark-3-yellow: rgb(255, 224, 20); /* @kind color */
+  --apple-macos-grays-dark-black: rgb(0, 0, 0); /* @kind color */
+  --apple-macos-grays-dark-grey: rgb(162, 162, 167); /* @kind color */
+  --apple-macos-grays-dark-white: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-labels-1-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-labels-2-secondary: rgba(255, 255, 255, 0.55); /* @kind color */
+  --apple-macos-labels-3-tertiary: rgba(255, 255, 255, 0.25); /* @kind color */
+  --apple-macos-labels-4-quaternary: rgba(255, 255, 255, 0.1); /* @kind color */
+  --apple-macos-labels-5-quinary: rgba(255, 255, 255, 0.05); /* @kind color */
+  --apple-macos-labels-6-seximal: rgba(255, 255, 255, 0.03); /* @kind color */
+  --apple-macos-window-backgrounds-dark-background: rgb(30, 30, 30); /* @kind color */
+}
+
+/* ---- Curated semantic aliases (the everyday set) ---- */
+:root {
+  --apple-macos-tint: var(--apple-macos-system-colors-8-blue);          /* @kind color */
+  --apple-macos-label: var(--apple-macos-grays-black);                 /* @kind color */
+  --apple-macos-separator: var(--apple-macos-separators);              /* @kind color */
+  --apple-macos-fill: var(--apple-macos-fills-1-primary);              /* @kind color */
+  --apple-macos-radius-window: 10px;  /* @kind radius */
+  --apple-macos-radius-control: 6px;  /* @kind radius */
+  --apple-macos-traffic-red: rgb(255, 95, 87);    /* @kind color */
+  --apple-macos-traffic-yellow: rgb(254, 188, 46);/* @kind color */
+  --apple-macos-traffic-green: rgb(40, 200, 64);  /* @kind color */
+}
+
+/* ---- SF Pro text sizes (canonical macOS styles) ---- */
+:root {
+  --apple-macos-text-large-title: 26px; /* @kind spacing */
+  --apple-macos-text-title1: 22px;      /* @kind spacing */
+  --apple-macos-text-title2: 17px;      /* @kind spacing */
+  --apple-macos-text-title3: 15px;      /* @kind spacing */
+  --apple-macos-text-headline: 13px;    /* @kind spacing */
+  --apple-macos-text-body: 13px;        /* @kind spacing */
+  --apple-macos-text-callout: 12px;     /* @kind spacing */
+  --apple-macos-text-subheadline: 11px; /* @kind spacing */
+  --apple-macos-text-footnote: 10px;    /* @kind spacing */
+  --apple-macos-text-caption1: 10px;    /* @kind spacing */
+  --apple-macos-text-caption2: 10px;    /* @kind spacing */
+}
+
+/* ---- Dark/light consistency: --apple-macos-label points at a literal
+ * gray that does NOT flip; pin it per appearance so it pairs with the
+ * background (which does flip). */
+@media (prefers-color-scheme: dark) {
+  :root { --apple-macos-label: rgb(255, 255, 255); /* @kind color */ }
+}
+[data-apple-macos-appearance="dark"] {
+  --apple-macos-label: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-backgrounds-primary: rgb(0, 0, 0); /* @kind color */
+}
+[data-apple-macos-appearance="light"] {
+  --apple-macos-label: rgb(0, 0, 0); /* @kind color */
+  --apple-macos-backgrounds-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-macos-backgrounds-secondary: rgb(246, 246, 246); /* @kind color */
+}

@@ -1,0 +1,247 @@
+/*
+ * Apple iOS 27 platform tokens.
+ * Extracted verbatim from the official Apple UI Kit Sketch export
+ * (see readme › Apple Platform). System colours, label/fill opacity
+ * ladders, grays, backgrounds, and the SF Pro type ramp.
+ *
+ * SF Pro is Apple-licensed and NOT redistributed here; the family stack
+ * resolves to the real San Francisco on Apple hardware via -apple-system.
+ */
+
+:root {
+  --apple-ios-font: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; /* @kind font */
+  --apple-ios-font-rounded: ui-rounded, -apple-system, BlinkMacSystemFont, system-ui, sans-serif; /* @kind font */
+  --apple-ios-font-mono: ui-monospace, Menlo, "Courier New", monospace; /* @kind font */
+
+  /* ---- Neutral / shared swatches ---- */
+  --apple-ios-x-kit-nested-symbol-bg-dark: rgb(54, 103, 153); /* @kind color */
+  --apple-ios-x-kit-nested-symbol-bg-light: rgb(204, 230, 255); /* @kind color */
+  --apple-ios-x-kit-symbol-bg-dark: rgb(51, 51, 51); /* @kind color */
+  --apple-ios-x-kit-symbol-bg-light: rgb(204, 204, 204); /* @kind color */
+  --apple-ios-x-kit-canvas-color: rgb(191, 191, 191); /* @kind color */
+
+  /* ---- Light appearance (default) ---- */
+  --apple-ios-system-colors-8-blue: rgb(0, 136, 255); /* @kind color */
+  --apple-ios-system-colors-4-green: rgb(52, 199, 89); /* @kind color */
+  --apple-ios-fills-3-tertiary: rgba(118, 118, 128, 0.12); /* @kind color */
+  --apple-ios-labels-3-tertiary: rgba(60, 60, 67, 0.3); /* @kind color */
+  --apple-ios-labels-2-secondary: rgba(60, 60, 67, 0.6); /* @kind color */
+  --apple-ios-labels-4-quaternary: rgba(60, 60, 67, 0.18); /* @kind color */
+  --apple-ios-labels-1-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-fills-4-quaternary: rgba(116, 116, 128, 0.08); /* @kind color */
+  --apple-ios-fills-2-secondary: rgba(120, 120, 128, 0.16); /* @kind color */
+  --apple-ios-fills-1-primary: rgba(120, 120, 120, 0.2); /* @kind color */
+  --apple-ios-system-colors-10-purple: rgb(203, 48, 224); /* @kind color */
+  --apple-ios-system-colors-12-brown: rgb(172, 127, 94); /* @kind color */
+  --apple-ios-system-colors-3-yellow: rgb(255, 204, 0); /* @kind color */
+  --apple-ios-system-colors-6-teal: rgb(0, 195, 208); /* @kind color */
+  --apple-ios-system-colors-2-orange: rgb(255, 141, 40); /* @kind color */
+  --apple-ios-system-colors-5-mint: rgb(0, 200, 179); /* @kind color */
+  --apple-ios-system-colors-11-pink: rgb(255, 45, 85); /* @kind color */
+  --apple-ios-system-colors-1-red: rgb(255, 56, 60); /* @kind color */
+  --apple-ios-system-colors-7-cyan: rgb(0, 192, 232); /* @kind color */
+  --apple-ios-system-colors-9-indigo: rgb(97, 85, 245); /* @kind color */
+  --apple-ios-grays-gray: rgb(142, 142, 147); /* @kind color */
+  --apple-ios-grays-gray-5: rgb(229, 229, 234); /* @kind color */
+  --apple-ios-grays-gray-3: rgb(199, 199, 204); /* @kind color */
+  --apple-ios-grays-gray-4: rgb(209, 209, 214); /* @kind color */
+  --apple-ios-grays-gray-6: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-grays-gray-2: rgb(174, 174, 178); /* @kind color */
+  --apple-ios-backgrounds-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-backgrounds-tertiary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-backgrounds-secondary: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-backgrounds-grouped-primary: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-backgrounds-grouped-secondary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-backgrounds-grouped-tertiary: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-fills-light-vibrant-3-tertiary: rgb(237, 237, 237); /* @kind color */
+  --apple-ios-fills-light-vibrant-1-primary: rgb(204, 204, 204); /* @kind color */
+  --apple-ios-fills-light-vibrant-2-secondary: rgb(224, 224, 224); /* @kind color */
+  --apple-ios-separators-vibrant: rgb(230, 230, 230); /* @kind color */
+  --apple-ios-separators-non-opaque: rgba(0, 0, 0, 0.12); /* @kind color */
+  --apple-ios-separators-opaque: rgb(198, 198, 200); /* @kind color */
+  --apple-ios-labels-light-vibrant-1-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-labels-light-vibrant-2-secondary: rgb(153, 153, 153); /* @kind color */
+  --apple-ios-labels-light-vibrant-4-quaternary: rgb(217, 217, 217); /* @kind color */
+  --apple-ios-labels-light-vibrant-3-tertiary: rgb(191, 191, 191); /* @kind color */
+  --apple-ios-labels-liquid-glass-1-primary: rgb(26, 26, 26); /* @kind color */
+  --apple-ios-labels-liquid-glass-2-secondary: rgb(114, 114, 114); /* @kind color */
+  --apple-ios-labels-liquid-glass-3-tertiary: rgb(191, 191, 191); /* @kind color */
+  --apple-ios-labels-liquid-glass-4-quaternary: rgb(217, 217, 217); /* @kind color */
+  --apple-ios-fills-5-quinary: rgba(0, 0, 0, 0.02); /* @kind color */
+  --apple-ios-labels-5-quinary: rgba(60, 60, 67, 0.09); /* @kind color */
+
+  /* ---- SF Pro type ramp (size + family per style) ---- */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --apple-ios-labels-4-quaternary: rgba(235, 235, 245, 0.16); /* @kind color */
+    --apple-ios-labels-3-tertiary: rgba(235, 235, 245, 0.3); /* @kind color */
+    --apple-ios-labels-2-secondary: rgba(235, 235, 245, 0.6); /* @kind color */
+    --apple-ios-labels-1-primary: rgb(255, 255, 255); /* @kind color */
+    --apple-ios-fills-1-primary: rgba(120, 120, 128, 0.36); /* @kind color */
+    --apple-ios-fills-3-tertiary: rgba(118, 118, 128, 0.24); /* @kind color */
+    --apple-ios-fills-2-secondary: rgba(120, 120, 128, 0.32); /* @kind color */
+    --apple-ios-fills-4-quaternary: rgba(118, 118, 128, 0.18); /* @kind color */
+    --apple-ios-system-colors-6-teal: rgb(0, 210, 224); /* @kind color */
+    --apple-ios-system-colors-8-blue: rgb(0, 145, 255); /* @kind color */
+    --apple-ios-system-colors-4-green: rgb(48, 209, 88); /* @kind color */
+    --apple-ios-system-colors-1-red: rgb(255, 66, 69); /* @kind color */
+    --apple-ios-system-colors-12-brown: rgb(183, 138, 102); /* @kind color */
+    --apple-ios-system-colors-11-pink: rgb(255, 55, 95); /* @kind color */
+    --apple-ios-system-colors-10-purple: rgb(219, 52, 242); /* @kind color */
+    --apple-ios-system-colors-9-indigo: rgb(109, 124, 255); /* @kind color */
+    --apple-ios-system-colors-3-yellow: rgb(255, 214, 0); /* @kind color */
+    --apple-ios-system-colors-7-cyan: rgb(60, 211, 254); /* @kind color */
+    --apple-ios-system-colors-2-orange: rgb(255, 146, 48); /* @kind color */
+    --apple-ios-system-colors-5-mint: rgb(0, 218, 195); /* @kind color */
+    --apple-ios-grays-gray-3: rgb(72, 72, 74); /* @kind color */
+    --apple-ios-grays-gray-4: rgb(58, 58, 60); /* @kind color */
+    --apple-ios-grays-gray-2: rgb(99, 99, 102); /* @kind color */
+    --apple-ios-grays-gray-5: rgb(44, 44, 46); /* @kind color */
+    --apple-ios-grays-gray-6: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-dark-elevated-primary: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-dark-base-primary: rgb(0, 0, 0); /* @kind color */
+    --apple-ios-backgrounds-dark-elevated-secondary: rgb(44, 44, 46); /* @kind color */
+    --apple-ios-backgrounds-dark-base-secondary: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-dark-elevated-tertiary: rgb(58, 58, 60); /* @kind color */
+    --apple-ios-backgrounds-dark-base-tertiary: rgb(44, 44, 46); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-base-primary: rgb(0, 0, 0); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-base-secondary: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-base-tertiary: rgb(44, 44, 46); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-elevated-primary: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-elevated-secondary: rgb(44, 44, 46); /* @kind color */
+    --apple-ios-backgrounds-grouped-dark-elevated-tertiary: rgb(58, 58, 60); /* @kind color */
+    --apple-ios-grays-gray: rgb(142, 142, 147); /* @kind color */
+    --apple-ios-fills-dark-vibrant-1-primary: rgb(51, 51, 51); /* @kind color */
+    --apple-ios-fills-dark-vibrant-2-secondary: rgb(31, 31, 31); /* @kind color */
+    --apple-ios-fills-dark-vibrant-3-tertiary: rgb(18, 18, 18); /* @kind color */
+    --apple-ios-separators-opaque: rgb(56, 56, 58); /* @kind color */
+    --apple-ios-separators-vibrant: rgb(26, 26, 26); /* @kind color */
+    --apple-ios-separators-non-opaque: rgba(255, 255, 255, 0.12); /* @kind color */
+    --apple-ios-labels-dark-vibrant-2-secondary: rgb(153, 153, 153); /* @kind color */
+    --apple-ios-labels-dark-vibrant-4-quaternary: rgb(38, 38, 38); /* @kind color */
+    --apple-ios-labels-dark-vibrant-3-tertiary: rgb(64, 64, 64); /* @kind color */
+    --apple-ios-labels-dark-vibrant-1-primary: rgb(255, 255, 255); /* @kind color */
+    --apple-ios-labels-liquid-glass-1-primary: rgb(237, 237, 237); /* @kind color */
+    --apple-ios-labels-liquid-glass-2-secondary: rgb(138, 138, 138); /* @kind color */
+    --apple-ios-labels-liquid-glass-3-tertiary: rgb(64, 64, 64); /* @kind color */
+    --apple-ios-labels-liquid-glass-4-quaternary: rgb(38, 38, 38); /* @kind color */
+    --apple-ios-labels-5-quinary: rgba(235, 235, 245, 0.09); /* @kind color */
+    --apple-ios-fills-5-quinary: rgba(118, 118, 128, 0.02); /* @kind color */
+  }
+}
+
+[data-apple-ios-appearance="dark"] {
+  --apple-ios-labels-4-quaternary: rgba(235, 235, 245, 0.16); /* @kind color */
+  --apple-ios-labels-3-tertiary: rgba(235, 235, 245, 0.3); /* @kind color */
+  --apple-ios-labels-2-secondary: rgba(235, 235, 245, 0.6); /* @kind color */
+  --apple-ios-labels-1-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-fills-1-primary: rgba(120, 120, 128, 0.36); /* @kind color */
+  --apple-ios-fills-3-tertiary: rgba(118, 118, 128, 0.24); /* @kind color */
+  --apple-ios-fills-2-secondary: rgba(120, 120, 128, 0.32); /* @kind color */
+  --apple-ios-fills-4-quaternary: rgba(118, 118, 128, 0.18); /* @kind color */
+  --apple-ios-system-colors-6-teal: rgb(0, 210, 224); /* @kind color */
+  --apple-ios-system-colors-8-blue: rgb(0, 145, 255); /* @kind color */
+  --apple-ios-system-colors-4-green: rgb(48, 209, 88); /* @kind color */
+  --apple-ios-system-colors-1-red: rgb(255, 66, 69); /* @kind color */
+  --apple-ios-system-colors-12-brown: rgb(183, 138, 102); /* @kind color */
+  --apple-ios-system-colors-11-pink: rgb(255, 55, 95); /* @kind color */
+  --apple-ios-system-colors-10-purple: rgb(219, 52, 242); /* @kind color */
+  --apple-ios-system-colors-9-indigo: rgb(109, 124, 255); /* @kind color */
+  --apple-ios-system-colors-3-yellow: rgb(255, 214, 0); /* @kind color */
+  --apple-ios-system-colors-7-cyan: rgb(60, 211, 254); /* @kind color */
+  --apple-ios-system-colors-2-orange: rgb(255, 146, 48); /* @kind color */
+  --apple-ios-system-colors-5-mint: rgb(0, 218, 195); /* @kind color */
+  --apple-ios-grays-gray-3: rgb(72, 72, 74); /* @kind color */
+  --apple-ios-grays-gray-4: rgb(58, 58, 60); /* @kind color */
+  --apple-ios-grays-gray-2: rgb(99, 99, 102); /* @kind color */
+  --apple-ios-grays-gray-5: rgb(44, 44, 46); /* @kind color */
+  --apple-ios-grays-gray-6: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-dark-elevated-primary: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-dark-base-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-backgrounds-dark-elevated-secondary: rgb(44, 44, 46); /* @kind color */
+  --apple-ios-backgrounds-dark-base-secondary: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-dark-elevated-tertiary: rgb(58, 58, 60); /* @kind color */
+  --apple-ios-backgrounds-dark-base-tertiary: rgb(44, 44, 46); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-base-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-base-secondary: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-base-tertiary: rgb(44, 44, 46); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-elevated-primary: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-elevated-secondary: rgb(44, 44, 46); /* @kind color */
+  --apple-ios-backgrounds-grouped-dark-elevated-tertiary: rgb(58, 58, 60); /* @kind color */
+  --apple-ios-grays-gray: rgb(142, 142, 147); /* @kind color */
+  --apple-ios-fills-dark-vibrant-1-primary: rgb(51, 51, 51); /* @kind color */
+  --apple-ios-fills-dark-vibrant-2-secondary: rgb(31, 31, 31); /* @kind color */
+  --apple-ios-fills-dark-vibrant-3-tertiary: rgb(18, 18, 18); /* @kind color */
+  --apple-ios-separators-opaque: rgb(56, 56, 58); /* @kind color */
+  --apple-ios-separators-vibrant: rgb(26, 26, 26); /* @kind color */
+  --apple-ios-separators-non-opaque: rgba(255, 255, 255, 0.12); /* @kind color */
+  --apple-ios-labels-dark-vibrant-2-secondary: rgb(153, 153, 153); /* @kind color */
+  --apple-ios-labels-dark-vibrant-4-quaternary: rgb(38, 38, 38); /* @kind color */
+  --apple-ios-labels-dark-vibrant-3-tertiary: rgb(64, 64, 64); /* @kind color */
+  --apple-ios-labels-dark-vibrant-1-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-labels-liquid-glass-1-primary: rgb(237, 237, 237); /* @kind color */
+  --apple-ios-labels-liquid-glass-2-secondary: rgb(138, 138, 138); /* @kind color */
+  --apple-ios-labels-liquid-glass-3-tertiary: rgb(64, 64, 64); /* @kind color */
+  --apple-ios-labels-liquid-glass-4-quaternary: rgb(38, 38, 38); /* @kind color */
+  --apple-ios-labels-5-quinary: rgba(235, 235, 245, 0.09); /* @kind color */
+  --apple-ios-fills-5-quinary: rgba(118, 118, 128, 0.02); /* @kind color */
+}
+
+/* ---- Curated semantic aliases (the everyday set) ---- */
+:root {
+  --apple-ios-tint: var(--apple-ios-system-colors-8-blue);           /* @kind color */
+  --apple-ios-label: var(--apple-ios-labels-1-primary);              /* @kind color */
+  --apple-ios-label-secondary: var(--apple-ios-labels-2-secondary); /* @kind color */
+  --apple-ios-label-tertiary: var(--apple-ios-labels-3-tertiary);   /* @kind color */
+  --apple-ios-bg: var(--apple-ios-backgrounds-primary);             /* @kind color */
+  --apple-ios-bg-secondary: var(--apple-ios-backgrounds-secondary); /* @kind color */
+  --apple-ios-bg-grouped: var(--apple-ios-backgrounds-grouped-primary); /* @kind color */
+  --apple-ios-fill: var(--apple-ios-fills-1-primary);               /* @kind color */
+  --apple-ios-separator: var(--apple-ios-separators-opaque);        /* @kind color */
+  --apple-ios-radius-card: 10px;   /* @kind radius */
+  --apple-ios-radius-sheet: 12px;  /* @kind radius */
+  --apple-ios-radius-continuous: 22px; /* @kind radius */
+}
+
+/* ---- SF Pro text sizes (canonical iOS styles) ---- */
+:root {
+  --apple-ios-text-large-title: 34px; /* @kind spacing */
+  --apple-ios-text-title1: 28px;      /* @kind spacing */
+  --apple-ios-text-title2: 22px;      /* @kind spacing */
+  --apple-ios-text-title3: 20px;      /* @kind spacing */
+  --apple-ios-text-headline: 17px;    /* @kind spacing */
+  --apple-ios-text-body: 17px;        /* @kind spacing */
+  --apple-ios-text-callout: 16px;     /* @kind spacing */
+  --apple-ios-text-subheadline: 15px; /* @kind spacing */
+  --apple-ios-text-footnote: 13px;    /* @kind spacing */
+  --apple-ios-text-caption1: 12px;    /* @kind spacing */
+  --apple-ios-text-caption2: 11px;    /* @kind spacing */
+}
+
+/* ---- Dark/light consistency for semantic aliases ----
+ * The raw dark swatches slug to -base-/-elevated- names, so the plain
+ * background aliases need explicit dark values to stay paired with the
+ * label ladder (which does flip). Aliases resolve via var(), so overriding
+ * the raw token cascades to --apple-ios-bg / -bg-secondary / -bg-grouped. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --apple-ios-backgrounds-primary: rgb(0, 0, 0); /* @kind color */
+    --apple-ios-backgrounds-secondary: rgb(28, 28, 30); /* @kind color */
+    --apple-ios-backgrounds-grouped-primary: rgb(0, 0, 0); /* @kind color */
+  }
+}
+[data-apple-ios-appearance="dark"] {
+  --apple-ios-backgrounds-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-backgrounds-secondary: rgb(28, 28, 30); /* @kind color */
+  --apple-ios-backgrounds-grouped-primary: rgb(0, 0, 0); /* @kind color */
+}
+[data-apple-ios-appearance="light"] {
+  --apple-ios-backgrounds-primary: rgb(255, 255, 255); /* @kind color */
+  --apple-ios-backgrounds-secondary: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-backgrounds-grouped-primary: rgb(242, 242, 247); /* @kind color */
+  --apple-ios-labels-1-primary: rgb(0, 0, 0); /* @kind color */
+  --apple-ios-labels-2-secondary: rgba(60, 60, 67, 0.6); /* @kind color */
+  --apple-ios-labels-3-tertiary: rgba(60, 60, 67, 0.3); /* @kind color */
+}

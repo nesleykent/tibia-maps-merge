@@ -1,0 +1,163 @@
+/*
+ * Instagram brand & semantic colour tokens.
+ * Extracted from Instagram's production CSS (see README "Sources").
+ *
+ * Semantic tokens store bare "R, G, B" triplets so callers compose
+ * rgb()/rgba() themselves, e.g.: color: rgb(var(--ig-primary-text));
+ * This lets one token carry any opacity: rgba(var(--ig-primary-text), .5).
+ */
+
+:root {
+  /* ============================================================
+     BRAND GRADIENT — one loud gradient, everything else quiet.
+     Five fully-saturated stops sliced into different crops.
+     ============================================================ */
+  --ig-gradient-stop-yellow:  #FFD600;
+  --ig-gradient-stop-orange:  #FF7A00;
+  --ig-gradient-stop-rose:    #FF0169;
+  --ig-gradient-stop-magenta: #D300C5;
+  --ig-gradient-stop-purple:  #7638FA;
+
+  /* The canonical about-page hero gradient (rose → magenta → purple crop) */
+  --ig-gradient-hero: linear-gradient(72.44deg,
+    var(--ig-gradient-stop-rose) 4.69%,
+    var(--ig-gradient-stop-magenta) 48.96%,
+    var(--ig-gradient-stop-purple) 92.19%);
+
+  /* Full five-stop spectrum */
+  --ig-gradient-spectrum: linear-gradient(125deg,
+    var(--ig-gradient-stop-yellow) 15%,
+    var(--ig-gradient-stop-orange) 30%,
+    var(--ig-gradient-stop-rose),
+    var(--ig-gradient-stop-magenta) 70%,
+    var(--ig-gradient-stop-purple) 85%);
+
+  /* Warm crops */
+  --ig-gradient-warm: linear-gradient(72.44deg,
+    var(--ig-gradient-stop-yellow) 9.9%,
+    var(--ig-gradient-stop-orange) 41%,
+    var(--ig-gradient-stop-rose) 89.43%);
+
+  /* Text-gradient treatment (-webkit-background-clip: text) */
+  --ig-gradient-text-warm: linear-gradient(to right,
+    var(--ig-gradient-stop-magenta), var(--ig-gradient-stop-orange), var(--ig-gradient-stop-yellow));
+
+  /* Small secondary accent — nav-link underline (yellow → red, vertical) */
+  --ig-underline-accent: linear-gradient(#F7D440, #ED1F1F); /* @kind color */
+
+  /* ============================================================
+     SEMANTIC TOKENS — light mode (default). R,G,B triplets.
+     ============================================================ */
+  --ig-primary-background: 255, 255, 255; /* @kind color */
+  --ig-secondary-background: 243, 245, 247; /* @kind color */
+  --ig-elevated-background: 255, 255, 255; /* @kind color */
+  --ig-secondary-elevated-background: 243, 245, 247; /* @kind color */
+  --ig-primary-text: 0, 0, 0; /* @kind color */
+  --ig-secondary-text: 115, 115, 115; /* @kind color */
+  --ig-tertiary-text: 115, 115, 115; /* @kind color */
+  --ig-primary-icon: 38, 38, 38; /* @kind color */
+  --ig-secondary-icon: 142, 142, 142; /* @kind color */
+  --ig-highlight-background: 239, 239, 239; /* @kind color */
+  --ig-separator: 219, 219, 219; /* @kind color */
+  --post-separator: 239, 239, 239; /* @kind color */
+  --ig-stroke: 219, 219, 219; /* @kind color */
+  --ig-focus-stroke: 168, 168, 168; /* @kind color */
+  --ig-hover-overlay-rgb: 0, 0, 0; /* @kind color */
+  --ig-hover-overlay-alpha: .05; /* @kind other */
+
+  /* Buttons */
+  --ig-secondary-button: 250, 250, 250; /* @kind color */
+  --ig-secondary-button-hover: 219, 219, 219; /* @kind color */
+  --ig-tertiary-button-background: 255, 255, 255; /* @kind color */
+  --ig-tertiary-button-border: 219, 219, 219; /* @kind color */
+  --ig-tertiary-button-hover: 245, 245, 245; /* @kind color */
+  --ig-tertiary-button-text: 38, 38, 38; /* @kind color */
+
+  /* Messaging */
+  --ig-incoming-message-bubble: 243, 245, 247; /* @kind color */
+
+  /* ---- Fixed / theme-independent semantic colours ----
+     Meaning depends on consistency, so these never theme-swap. */
+  --ig-primary-button: 0, 149, 246;       /* @kind color */
+  --ig-primary-button-hover: 24, 119, 242; /* @kind color */
+  --ig-error-or-destructive: 237, 73, 86; /* @kind color */
+  --ig-success: 88, 195, 34; /* @kind color */
+  --ig-live-badge: 255, 1, 105; /* @kind color */
+  --ig-close-friends-refreshed: 28, 209, 79; /* @kind color */
+  --ig-subscribers-only: 118, 56, 250; /* @kind color */
+  --ig-outgoing-message-bubble: 74, 93, 249; /* @kind color */
+  --web-always-white: 255, 255, 255; /* @kind color */
+  --web-always-black: 0, 0, 0; /* @kind color */
+  --gradient-yellow: 255, 214, 0; /* @kind color */
+  --gradient-purple: 118, 56, 250; /* @kind color */
+
+  /* ---- Overlay & scrim gradients (photo legibility) ---- */
+  --ig-scrim-bottom: linear-gradient(to bottom, rgba(0,0,0,.6), transparent); /* @kind color */
+  --ig-scrim-top: linear-gradient(0deg, transparent 80%, rgba(0,0,0,.35)); /* @kind color */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ig-primary-background: 12, 16, 20;      /* @kind color */
+    --ig-secondary-background: 37, 41, 46; /* @kind color */
+    --ig-elevated-background: 33, 35, 40; /* @kind color */
+    --ig-secondary-elevated-background: 43, 48, 54; /* @kind color */
+    --ig-primary-text: 245, 245, 245;          /* @kind color */
+    --ig-secondary-text: 168, 168, 168; /* @kind color */
+    --ig-tertiary-text: 199, 199, 199; /* @kind color */
+    --ig-primary-icon: 245, 245, 245; /* @kind color */
+    --ig-highlight-background: 38, 38, 38; /* @kind color */
+    --ig-separator: 38, 38, 38; /* @kind color */
+    --post-separator: 38, 38, 38; /* @kind color */
+    --ig-stroke: 85, 85, 85; /* @kind color */
+    --ig-focus-stroke: 85, 85, 85; /* @kind color */
+    --ig-hover-overlay-rgb: 255, 255, 255; /* @kind color */
+    --ig-hover-overlay-alpha: .1; /* @kind other */
+
+    --ig-secondary-button: 38, 38, 38; /* @kind color */
+    --ig-secondary-button-hover: 38, 38, 38; /* @kind color */
+    --ig-tertiary-button-background: 33, 35, 40; /* @kind color */
+    --ig-tertiary-button-border: 54, 54, 54; /* @kind color */
+    --ig-tertiary-button-hover: 38, 38, 38; /* @kind color */
+    --ig-tertiary-button-text: 245, 245, 245; /* @kind color */
+
+    --ig-incoming-message-bubble: 37, 41, 46; /* @kind color */
+  }
+}
+
+/* Force a theme regardless of OS setting (used by cards / kits) */
+[data-ig-theme="dark"] {
+  --ig-primary-background: 12, 16, 20; /* @kind color */
+  --ig-secondary-background: 37, 41, 46; /* @kind color */
+  --ig-elevated-background: 33, 35, 40; /* @kind color */
+  --ig-secondary-elevated-background: 43, 48, 54; /* @kind color */
+  --ig-primary-text: 245, 245, 245; /* @kind color */
+  --ig-secondary-text: 168, 168, 168; /* @kind color */
+  --ig-tertiary-text: 199, 199, 199; /* @kind color */
+  --ig-primary-icon: 245, 245, 245; /* @kind color */
+  --ig-highlight-background: 38, 38, 38; /* @kind color */
+  --ig-separator: 38, 38, 38; /* @kind color */
+  --post-separator: 38, 38, 38; /* @kind color */
+  --ig-stroke: 85, 85, 85; /* @kind color */
+  --ig-focus-stroke: 85, 85, 85; /* @kind color */
+  --ig-hover-overlay-rgb: 255, 255, 255; /* @kind color */
+  --ig-hover-overlay-alpha: .1; /* @kind other */
+  --ig-secondary-button: 38, 38, 38; /* @kind color */
+  --ig-secondary-button-hover: 38, 38, 38; /* @kind color */
+  --ig-tertiary-button-background: 33, 35, 40; /* @kind color */
+  --ig-tertiary-button-border: 54, 54, 54; /* @kind color */
+  --ig-tertiary-button-hover: 38, 38, 38; /* @kind color */
+  --ig-tertiary-button-text: 245, 245, 245; /* @kind color */
+  --ig-incoming-message-bubble: 37, 41, 46; /* @kind color */
+}
+[data-ig-theme="light"] {
+  --ig-primary-background: 255, 255, 255; /* @kind color */
+  --ig-secondary-background: 243, 245, 247; /* @kind color */
+  --ig-elevated-background: 255, 255, 255; /* @kind color */
+  --ig-primary-text: 0, 0, 0; /* @kind color */
+  --ig-secondary-text: 115, 115, 115; /* @kind color */
+  --ig-primary-icon: 38, 38, 38; /* @kind color */
+  --ig-highlight-background: 239, 239, 239; /* @kind color */
+  --ig-separator: 219, 219, 219; /* @kind color */
+  --ig-stroke: 219, 219, 219; /* @kind color */
+}

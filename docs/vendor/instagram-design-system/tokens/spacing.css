@@ -1,0 +1,73 @@
+/*
+ * Layout, grid, shape, and spacing tokens.
+ */
+
+:root {
+  /* ---- 14-unit fluid grid — base unit is 7.142vw (100/14) ---- */
+  --ig-grid-unit: 7.142vw;
+  --ig-grid-unit-2: 14.285vw;
+  --ig-grid-unit-3: 21.428vw;
+  --ig-grid-unit-4: 28.571vw;
+  --ig-grid-unit-5: 35.714vw;
+  --ig-grid-unit-8: 57.142vw;
+  --ig-grid-unit-9: 64.285vw;
+  --ig-grid-unit-10: 71.428vw;
+  --ig-grid-unit-12: 85.714vw;
+
+  --ig-max-canvas: 1600px;
+
+  /* ---- Spacing scale (product UI, 4px base) ---- */
+  --ig-space-1: 4px;
+  --ig-space-2: 8px;
+  --ig-space-3: 12px;
+  --ig-space-4: 16px;
+  --ig-space-5: 20px;
+  --ig-space-6: 24px;
+  --ig-space-8: 32px;
+  --ig-space-10: 40px;
+  --ig-space-12: 48px;
+  --ig-space-16: 64px;
+
+  /* ---- Radius scale ---- */
+  --ig-radius-xs: 2px;
+  --ig-radius-sm: 4px;
+  --ig-radius-md: 8px;
+  --ig-radius-lg: 12px;
+  --ig-radius-xl: 16px;
+  --ig-radius-pill: 1000px;
+  --ig-radius-circle: 50%;
+
+  /* Tokenized references confirmed directly in source */
+  --input-border-radius: 6px;
+  --modal-border-radius: 12px;
+
+  /* ---- Elevation / shadow (utility-card layered soft shadow) ---- */
+  --ig-shadow-card: 0 2px 4px rgba(0,0,0,.1), 0 8px 16px rgba(0,0,0,.1);
+  --ig-shadow-dropdown: 0 3px 8px rgba(0,0,0,.3);
+  --ig-shadow-float: 0 4px 12px rgba(0,0,0,.15);
+
+  /* ---- Section rhythm ---- */
+  --ig-section-min-height: 512px;
+  --ig-section-gap: 120px;       /* 80px on the squeezed max-aspect-ratio: 8/7 variant */
+}
+
+/* Past 1920px the fluid grid locks to fixed pixel values against the 1600px canvas */
+@media (min-width: 1920px) {
+  :root {
+    --ig-grid-unit: 114.272px;
+    --ig-grid-unit-2: 228.56px;
+    --ig-grid-unit-3: 342.848px;
+    --ig-grid-unit-5: 571.424px;
+    --ig-grid-unit-9: 1028.56px;
+  }
+}
+
+/*
+ * Breakpoint tiers (reference only — media queries can't be custom properties):
+ *   small mobile      375 / 400 / 430 / 450 / 480
+ *   mobile / tablet    600 / 650 / 735 / 736 / 750 / 768
+ *   small desktop      900 / 1000 / 1023 / 1024 / 1050 / 1100 / 1200
+ *   desktop            1264 / 1300 / 1350 / 1380 / 1400
+ *   large desktop      1440 / 1600 / 1730 / 1800 / 1920
+ *   ultra-wide         2700 / 3000  (about-page hero type only)
+ */

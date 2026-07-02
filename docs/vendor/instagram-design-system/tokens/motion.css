@@ -1,0 +1,50 @@
+/*
+ * Motion tokens.
+ * Motion is purposeful and infrequent — deliberate wipes, settles, and one
+ * recurring signature micro-interaction (the "rolling" chevron).
+ */
+
+:root {
+  /* ---- Named easing curves ---- */
+  --ig-ease-standard: cubic-bezier(.33, 0, .67, 1);    /* @kind other */
+  --ig-ease-confident: cubic-bezier(.7, 0, .3, 1);     /* @kind other */
+  --ig-ease-glide: cubic-bezier(0, 0, .1, 1);          /* @kind other */
+  --ig-ease-settle: cubic-bezier(0, .61, .28, .92);    /* @kind other */
+  --ig-ease-anticipate: cubic-bezier(.4, 0, .1, 1);    /* @kind other */
+
+  /* ---- Duration scale ---- */
+  --ig-duration-micro: 150ms;     /* @kind other */
+  --ig-duration-reveal: 666ms;    /* @kind other */
+  --ig-duration-narrative: 2s;    /* @kind other */
+}
+
+/* The signature "rolling" hover affordance (nav links, type tester, cards) */
+@keyframes ig-rolling {
+  0%   { transform: translate(-100%); }
+  50%  { transform: translate(0); }
+  100% { transform: translate(125%); }
+}
+.ig-rolling-trigger:hover .ig-rolling-element {
+  animation: ig-rolling 2s infinite var(--ig-ease-glide);
+}
+
+/* Stories-style progress segment fill */
+@keyframes ig-fill-progress-bar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Lightbox / media viewer zoom-settle */
+@keyframes ig-zoom-settle {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ig-rolling-trigger:hover .ig-rolling-element,
+  [class*="rolling"] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  * { scroll-behavior: auto !important; }
+}

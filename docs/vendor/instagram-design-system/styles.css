@@ -1,0 +1,11 @@
+/*
+ * Instagram Design System — global stylesheet entry point.
+ * Consumers link THIS one file. It is an @import manifest only.
+ */
+@import "tokens/fonts.css";
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/motion.css";
+@import "tokens/apple-ios.css";
+@import "tokens/apple-macos.css";

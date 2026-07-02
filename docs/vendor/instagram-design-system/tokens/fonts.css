@@ -1,0 +1,107 @@
+/*
+ * @font-face declarations for the Instagram brand typefaces.
+ *
+ * Two families ship as real binaries in this project:
+ *   - Optimistic  → product/UI typeface (variable font, weights 200–800)
+ *   - Instagram Sans (+ Headline) → brand/marketing typeface
+ *
+ * Note (font substitution): Optimistic ships as a variable font
+ * (optimistic-vf.ttf); Instagram Sans as Regular / Light / Medium / Bold +
+ * a Headline OTF + a Condensed pair + a Script pair (Regular / Bold). All
+ * brand cuts are now self-hosted. Montserrat is the deliberate second-choice
+ * fallback for Optimistic — load it if you want exact fallback fidelity.
+ */
+
+/* ---- Optimistic (product) — variable font, 200..800 ---- */
+@font-face {
+  font-family: "Optimistic";
+  src: url("../assets/fonts/optimistic-vf.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Optimistic Display";
+  src: url("../assets/fonts/optimistic-vf.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Optimistic Text";
+  src: url("../assets/fonts/optimistic-vf.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Instagram Sans (brand) ---- */
+@font-face {
+  font-family: "Instagram Sans";
+  src: url("../assets/fonts/instagram-sans-light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instagram Sans";
+  src: url("../assets/fonts/instagram-sans-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instagram Sans";
+  src: url("../assets/fonts/instagram-sans-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instagram Sans";
+  src: url("../assets/fonts/instagram-sans-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Condensed cut — tall, tight display headlines */
+@font-face {
+  font-family: "Instagram Sans Condensed";
+  src: url("../assets/fonts/Instagram_Sans_Condensed.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instagram Sans Condensed";
+  src: url("../assets/fonts/Instagram_Sans_Condensed_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Script cut — expressive, handwritten brand moments */
+@font-face {
+  font-family: "Instagram Sans Script";
+  src: url("../assets/fonts/Instagram_Sans_Script.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instagram Sans Script";
+  src: url("../assets/fonts/Instagram_Sans_Script_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Headline cut — reserved for the largest display moments */
+@font-face {
+  font-family: "Instagram Sans Headline";
+  src: url("../assets/fonts/instagram-sans-headline.otf") format("opentype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
