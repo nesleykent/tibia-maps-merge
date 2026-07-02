@@ -1,7 +1,31 @@
 @import "./vendor/instagram-design-system/styles.css";
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
+  /* Keep the product UI in the Instagram light token set regardless of OS theme. */
+  --ig-primary-background: 255, 255, 255;
+  --ig-secondary-background: 243, 245, 247;
+  --ig-elevated-background: 255, 255, 255;
+  --ig-secondary-elevated-background: 243, 245, 247;
+  --ig-primary-text: 0, 0, 0;
+  --ig-secondary-text: 115, 115, 115;
+  --ig-tertiary-text: 115, 115, 115;
+  --ig-primary-icon: 38, 38, 38;
+  --ig-secondary-icon: 142, 142, 142;
+  --ig-highlight-background: 239, 239, 239;
+  --ig-separator: 219, 219, 219;
+  --post-separator: 239, 239, 239;
+  --ig-stroke: 219, 219, 219;
+  --ig-focus-stroke: 168, 168, 168;
+  --ig-hover-overlay-rgb: 0, 0, 0;
+  --ig-hover-overlay-alpha: .05;
+  --ig-secondary-button: 250, 250, 250;
+  --ig-secondary-button-hover: 219, 219, 219;
+  --ig-tertiary-button-background: 255, 255, 255;
+  --ig-tertiary-button-border: 219, 219, 219;
+  --ig-tertiary-button-hover: 245, 245, 245;
+  --ig-tertiary-button-text: 38, 38, 38;
+  --ig-incoming-message-bubble: 243, 245, 247;
   --bg: rgb(var(--ig-secondary-background));
   --surface: rgb(var(--ig-primary-background));
   --surface-raised: rgb(var(--ig-elevated-background));
