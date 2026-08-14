@@ -18,7 +18,7 @@ A static page, hosted on GitHub Pages -- no install, no server. It fetches
 the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 ["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
 download (the same file the site itself distributes -- so it's always current
-with the latest game update). Two modes:
+with the latest game update). Three modes:
 
 - **Merge Mode** -- pick your own marker file(s) (`minimapmarkers.bin` from
   your Tibia client, or `markers.json`); they're merged with the live
@@ -34,6 +34,27 @@ with the latest game update). Two modes:
   straight to `community-markers.json`. Downloads a `.zip` with the
   converted file and `conversion-log.txt` (source/output format, marker
   count, and a real round-trip validation check).
+- **Add Marks** -- write markers by hand instead of uploading them. One
+  path, top to bottom: **1** your marker file, **2** define marks, **3**
+  review, then download. Step 1 is optional -- load your own
+  `minimapmarkers.bin`/`markers.json` and the new marks are merged into it
+  by coordinate, yours winning on a clash, so the download is your whole
+  marker file rather than just the new marks; leave it empty and you get a
+  file containing only what you typed. Step 2 is a single form for one mark
+  or a hundred: a coordinate field taking one mark per line (`x, y, z`),
+  plus a label and icon applied to the batch, either of which a line can
+  override by appending its own (`32250, 31385, 5, Depot, flag`).
+  Unparseable lines are reported and skipped rather than failing the batch.
+  Step 3 is a table with Edit/Delete per row, kept across reloads in
+  `localStorage`. Downloads a `.zip` with the new `minimapmarkers.bin`, a
+  backup of any file you loaded, and `add-marks-log.txt`.
+
+  The icon picker covers all 20 marker types the binary format defines --
+  the list is derived from the same `ICONS_BY_ID` table the parser and
+  encoder use ([`docs/lib/constants.js`](docs/lib/constants.js)), so it
+  can't drift from the format, and each is drawn as a small inline SVG
+  alongside its numeric type byte
+  ([`docs/lib/icons.js`](docs/lib/icons.js)).
 
 Everything runs client-side (vanilla JS: a ZIP reader + native
 `DecompressionStream` to unpack tibiamaps.io's download, a ZIP writer for
@@ -45,6 +66,13 @@ Also available in [Brazilian Portuguese](https://nesleykent.github.io/tibia-maps
 text lives directly in each language's HTML file; the handful of strings
 `app.js` generates dynamically (status/result messages) go through
 [`docs/lib/i18n.js`](docs/lib/i18n.js), keyed off each page's `<html lang>`.
+
+All three modes share one structure, so they read and behave the same way:
+numbered steps, one prominent action per panel, and a primary action that
+names what it produces (in Conversion Mode the label follows the chosen
+conversion). Temporary contexts -- editing a mark, confirming a removal,
+picking an icon -- are sheets with `Cancel` and the completing action
+trailing, per the macOS convention.
 
 Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
 `lib/` has the actual fetch/parse/merge logic, framework-free.

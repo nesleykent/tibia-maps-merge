@@ -24,6 +24,29 @@ const STRINGS = {
     labelIdentical: 'Unchanged (already matched community)',
     labelConflicts: 'Conflicts, resolved in your favor',
     chooseConversionFile: 'Choose a file to convert first.',
+    downloadFile: (name) => `Download ${name}`,
+
+    markerErrorNumber: (axis) => `${axis} must be a whole number.`,
+    markerErrorRange: (axis, max) => `${axis} is out of range (0-${localeNumber(max, 'en')}).`,
+    markerErrorFloor: (max) => `Z must be a floor between 0 and ${max}.`,
+    markerErrorLabel: (bytes, max) => `Label is too long (${bytes} bytes; the client allows ${max}).`,
+    iconPickerLabel: 'Choose a marker icon',
+    close: 'Close',
+    editAction: 'Edit',
+    deleteAction: 'Delete',
+    addNoMarkers: 'Add at least one marker to the list first.',
+    existingLoaded: (count, files) => `Loaded ${localeNumber(count, 'en')} markers from ${files}`,
+    markerErrorFields: 'Expected at least three values: x, y, z.',
+    markerLine: (n) => `Line ${n}`,
+    marksAdded: (n) => `Added ${localeNumber(n, 'en')} mark(s).`,
+    marksReplaced: (n) => `${localeNumber(n, 'en')} replaced a mark already at the same coordinate.`,
+    addMarksCount: (n) => (n === 1 ? 'Add Mark' : n === 0 ? 'Add Marks' : `Add ${localeNumber(n, 'en')} Marks`),
+    marksNothing: 'No usable coordinates found.',
+    marksSkippedIntro: 'Skipped these lines:',
+    marksCreatedZip: (name) => `Marker file created -- <strong>${name}</strong> downloaded.`,
+    labelExisting: 'Markers loaded from your file(s)',
+    labelYouAdded: 'Markers you added',
+    labelReplacedByYours: 'Replaced at the same coordinate',
 
     formatBin: 'Tibia binary marker format (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -55,6 +78,12 @@ const STRINGS = {
     logPolicyText: 'Your markers always take priority over community markers at the same coordinate.',
     logConflictsListHeader: 'Detected conflicts (coordinate: community marker -> your marker):',
     logConflictsListEmpty: '(none)',
+    logTitleAddMarks: 'Tibia Maps Merge -- Add Marks Log',
+    logNoFile: 'none -- a new marker file was created from scratch',
+    logExistingLoaded: 'Markers loaded from your file(s)',
+    logMarkersCreated: 'Markers you added by hand',
+    logReplaced: 'Replaced at the same coordinate (your new marker wins)',
+    logAddedListHeader: 'Markers you added (coordinate: icon, label):',
   },
   'pt-BR': {
     loading: 'Carregando…',
@@ -78,6 +107,29 @@ const STRINGS = {
     labelIdentical: 'Sem alteração (já igual à comunidade)',
     labelConflicts: 'Conflitos, resolvidos a seu favor',
     chooseConversionFile: 'Escolha um arquivo para converter primeiro.',
+    downloadFile: (name) => `Baixar ${name}`,
+
+    markerErrorNumber: (axis) => `${axis} deve ser um número inteiro.`,
+    markerErrorRange: (axis, max) => `${axis} está fora do intervalo (0-${localeNumber(max, 'pt-BR')}).`,
+    markerErrorFloor: (max) => `Z deve ser um andar entre 0 e ${max}.`,
+    markerErrorLabel: (bytes, max) => `Rótulo longo demais (${bytes} bytes; o cliente permite ${max}).`,
+    iconPickerLabel: 'Escolher um ícone de marcação',
+    close: 'Fechar',
+    editAction: 'Editar',
+    deleteAction: 'Excluir',
+    addNoMarkers: 'Adicione pelo menos uma marcação à lista primeiro.',
+    existingLoaded: (count, files) => `${localeNumber(count, 'pt-BR')} marcações carregadas de ${files}`,
+    markerErrorFields: 'Esperados pelo menos três valores: x, y, z.',
+    markerLine: (n) => `Linha ${n}`,
+    marksAdded: (n) => `${localeNumber(n, 'pt-BR')} marcação(ões) adicionada(s).`,
+    marksReplaced: (n) => `${localeNumber(n, 'pt-BR')} substituiu(ram) uma marcação já existente na mesma coordenada.`,
+    addMarksCount: (n) => (n === 1 ? 'Adicionar Marcação' : n === 0 ? 'Adicionar Marcações' : `Adicionar ${localeNumber(n, 'pt-BR')} Marcações`),
+    marksNothing: 'Nenhuma coordenada utilizável foi encontrada.',
+    marksSkippedIntro: 'Linhas ignoradas:',
+    marksCreatedZip: (name) => `Arquivo de marcações criado -- <strong>${name}</strong> baixado.`,
+    labelExisting: 'Marcações carregadas do(s) seu(s) arquivo(s)',
+    labelYouAdded: 'Marcações que você adicionou',
+    labelReplacedByYours: 'Substituídas na mesma coordenada',
 
     formatBin: 'Formato binário de marcações do Tibia (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -109,6 +161,62 @@ const STRINGS = {
     logPolicyText: 'Suas marcações sempre têm prioridade sobre as da comunidade na mesma coordenada.',
     logConflictsListHeader: 'Conflitos detectados (coordenada: marcação da comunidade -> sua marcação):',
     logConflictsListEmpty: '(nenhum)',
+    logTitleAddMarks: 'Tibia Maps Merge -- Log de Marcações Adicionadas',
+    logNoFile: 'nenhum -- um novo arquivo de marcações foi criado do zero',
+    logExistingLoaded: 'Marcações carregadas do(s) seu(s) arquivo(s)',
+    logMarkersCreated: 'Marcações adicionadas manualmente',
+    logReplaced: 'Substituídas na mesma coordenada (sua nova marcação prevalece)',
+    logAddedListHeader: 'Marcações adicionadas (coordenada: ícone, rótulo):',
+  },
+};
+
+// Human-readable names for the marker icons, keyed by the canonical icon name
+// from constants.js. The canonical name is what gets stored in markers.json;
+// these are display-only.
+const ICON_LABELS = {
+  en: {
+    checkmark: 'Green checkmark',
+    '?': 'Blue question mark',
+    '!': 'Red exclamation mark',
+    star: 'Orange star',
+    crossmark: 'Bright red crossmark',
+    cross: 'Dark red cross',
+    mouth: 'Mouth',
+    spear: 'Spear',
+    sword: 'Sword',
+    flag: 'Blue flag',
+    lock: 'Golden lock',
+    bag: 'Brown bag',
+    skull: 'Skull',
+    $: 'Green dollar sign',
+    'red up': 'Red arrow up',
+    'red down': 'Red arrow down',
+    'red right': 'Red arrow right',
+    'red left': 'Red arrow left',
+    up: 'Green arrow up',
+    down: 'Green arrow down',
+  },
+  'pt-BR': {
+    checkmark: 'Marca de confirmação verde',
+    '?': 'Ponto de interrogação azul',
+    '!': 'Ponto de exclamação vermelho',
+    star: 'Estrela laranja',
+    crossmark: 'X vermelho vivo',
+    cross: 'Cruz vermelho-escura',
+    mouth: 'Boca',
+    spear: 'Lança',
+    sword: 'Espada',
+    flag: 'Bandeira azul',
+    lock: 'Cadeado dourado',
+    bag: 'Bolsa marrom',
+    skull: 'Caveira',
+    $: 'Cifrão verde',
+    'red up': 'Seta vermelha para cima',
+    'red down': 'Seta vermelha para baixo',
+    'red right': 'Seta vermelha para a direita',
+    'red left': 'Seta vermelha para a esquerda',
+    up: 'Seta verde para cima',
+    down: 'Seta verde para baixo',
   },
 };
 
@@ -125,6 +233,12 @@ export function tFor(lang, key, ...args) {
 
 export function t(key, ...args) {
   return tFor(currentLang(), key, ...args);
+}
+
+/** Display name for a marker icon; falls back to its canonical format name. */
+export function iconLabel(name, lang) {
+  const table = ICON_LABELS[lang ?? currentLang()] ?? ICON_LABELS.en;
+  return table[name] ?? ICON_LABELS.en[name] ?? name;
 }
 
 export function localeNumber(n, lang) {

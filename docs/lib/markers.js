@@ -4,6 +4,13 @@
 
 import { ICONS_BY_ID, ICONS_BY_NAME } from './constants.js';
 
+// An x/y coordinate is stored as three bytes decoded by the formula below, so
+// the widest value the format can round-trip is 0xFF + 0x80*0xFF + 0x4000*0xFF
+// - 0x4080. A description is length-prefixed by a single byte, but the client
+// itself caps marker text at 100 bytes.
+export const MAX_COORDINATE = 0x3FFFFF;
+export const MAX_DESCRIPTION_BYTES = 100;
+
 function minimapBytesToCoordinate(x1, x2, x3) {
   return x1 + 0x80 * x2 + 0x4000 * x3 - 0x4080;
 }
@@ -95,7 +102,7 @@ export function writeMarkersBin(markers) {
   const chunks = [];
   for (const marker of sortMarkers([...markers])) {
     const description = new TextEncoder().encode(marker.description || '');
-    if (description.length > 100) {
+    if (description.length > MAX_DESCRIPTION_BYTES) {
       throw new Error(`marker description too long (${description.length} bytes): ${JSON.stringify(marker)}`);
     }
     const iconByte = ICONS_BY_NAME.get(marker.icon);

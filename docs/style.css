@@ -313,10 +313,16 @@ code {
 }
 
 input[type="text"],
-select {
+select,
+textarea {
   width: 100%;
   min-height: 42px;
   padding: 0 var(--ig-space-3);
+  /* Safari otherwise keeps the native control bezel and ignores most of the
+     styling below, so the same markup renders differently there than in
+     Chromium/Firefox. */
+  appearance: none;
+  -webkit-appearance: none;
   border: 1px solid var(--border);
   border-radius: var(--input-border-radius);
   background: var(--surface);
@@ -327,10 +333,27 @@ select {
   letter-spacing: 0;
 }
 
-select { cursor: pointer; }
+/* With the native pull-down indicator suppressed, draw our own so every
+   engine shows the same control. Inline data URI -- no external asset. */
+select {
+  padding-right: calc(var(--ig-space-3) + 18px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%238e8e8e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--ig-space-3) center;
+  background-size: 12px 12px;
+  cursor: pointer;
+}
+
+textarea {
+  padding: var(--ig-space-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-height: 1.6;
+  resize: vertical;
+}
 
 input[type="text"]:focus,
-select:focus {
+select:focus,
+textarea:focus {
   border-color: rgb(var(--ig-focus-stroke));
   outline: none;
 }
@@ -408,10 +431,14 @@ select:focus {
 button { font-family: inherit; }
 
 .primary-btn,
-.secondary-btn {
+.secondary-btn,
+.tertiary-btn,
+.destructive-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
   border-radius: var(--input-border-radius);
   cursor: pointer;
   font-weight: var(--font-weight-system-semibold);
@@ -452,6 +479,36 @@ button { font-family: inherit; }
 
 .secondary-btn:hover { background: rgb(var(--ig-secondary-button-hover)); }
 
+/* Sits between the two: a real action, but never the one a panel is about. */
+.tertiary-btn {
+  min-height: 40px;
+  padding: 0 var(--ig-space-5);
+  border: 1px solid rgb(var(--ig-tertiary-button-border));
+  background: rgb(var(--ig-tertiary-button-background));
+  color: rgb(var(--ig-tertiary-button-text));
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-14-line-height);
+}
+
+.tertiary-btn:hover { background: rgb(var(--ig-tertiary-button-hover)); }
+
+/* The emphasized action of a destructive confirmation. */
+.destructive-btn {
+  min-height: 40px;
+  padding: 0 var(--ig-space-5);
+  border: 1px solid transparent;
+  background: var(--err);
+  color: rgb(var(--web-always-white));
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-14-line-height);
+}
+
+.destructive-btn:hover { background: rgba(var(--ig-error-or-destructive), .85); }
+
+.secondary-btn.destructive { color: var(--err); }
+
+.secondary-btn.destructive:hover { background: rgba(var(--ig-error-or-destructive), .12); }
+
 .status-line {
   display: flex;
   flex-wrap: wrap;
@@ -464,6 +521,357 @@ button { font-family: inherit; }
 }
 
 .status-line.error { color: var(--err); }
+
+/* ---------- Add Marks ---------- */
+
+.marker-form {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--ig-space-4);
+  margin-bottom: var(--ig-space-5);
+}
+
+.marker-form .field {
+  grid-column: span 2;
+  margin-bottom: 0;
+}
+
+.marker-form .field-wide { grid-column: span 3; }
+.marker-form .field-full { grid-column: 1 / -1; }
+
+/* The action that completes the form sits trailing, after any message. */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ig-space-3);
+  margin-bottom: var(--ig-space-6);
+}
+
+.form-row .form-message { margin-right: auto; }
+
+.form-message {
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  line-height: var(--system-12-line-height);
+}
+
+.form-message.error { color: var(--err); }
+
+.icon-field {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--ig-space-2);
+  align-items: center;
+}
+
+/* The swatch is the picker: clicking the current icon opens the sheet. */
+.icon-preview {
+  display: inline-flex;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 42px;
+  align-items: center;
+  gap: var(--ig-space-1);
+  padding: 0 var(--ig-space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background var(--ig-duration-micro) var(--ig-ease-standard),
+    border-color var(--ig-duration-micro) var(--ig-ease-standard);
+}
+
+.icon-preview:hover {
+  border-color: var(--accent);
+  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
+}
+
+.icon-preview-glyph { display: inline-flex; }
+
+.icon-caret { display: block; }
+
+.marker-icon { display: block; }
+
+/* Sheets -- temporary, cancellable contexts (edit, confirm, icon picker).
+   A centred modal on desktop, a bottom sheet on small screens. This is the
+   only place a Cancel button belongs; the mode panels themselves are
+   workspaces, where each section just has its own primary action. */
+.sheet {
+  width: min(100%, 560px);
+  max-width: none;
+  max-height: min(80vh, 680px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--ig-radius-lg);
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: var(--ig-shadow-card);
+}
+
+/* Never on the bare element -- a dialog is display:none until it's open. */
+.sheet[open],
+.sheet[open] > form {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.sheet::backdrop { background: rgba(0, 0, 0, .5); }
+
+.sheet-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--ig-space-3);
+  padding: var(--ig-space-4) var(--ig-space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.sheet-head h3 {
+  margin: 0;
+  margin-right: auto;
+  font-family: var(--font-family-brand);
+  font-size: var(--system-16-font-size);
+  font-weight: var(--font-weight-system-bold);
+  line-height: var(--system-16-line-height);
+}
+
+.sheet-body,
+.icon-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ig-space-5);
+}
+
+.sheet-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-16-line-height);
+}
+
+.sheet-body .marker-form { margin-bottom: 0; }
+
+.sheet-body .form-message { margin-top: var(--ig-space-4); }
+
+/* Cancel first, the action that completes the task trailing (macOS order). */
+.sheet-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ig-space-2);
+  padding: var(--ig-space-4) var(--ig-space-5);
+  border-top: 1px solid var(--border);
+}
+
+.sheet-confirm .sheet-head { border-bottom: 0; padding-bottom: 0; }
+
+.sheet-close {
+  display: inline-flex;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ig-radius-circle);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sheet-close:hover {
+  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
+  color: var(--text);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--ig-space-2);
+}
+
+.icon-chip {
+  display: grid;
+  appearance: none;
+  -webkit-appearance: none;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: var(--ig-space-2);
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--ig-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--system-12-font-size);
+  line-height: var(--system-12-line-height);
+  text-align: left;
+}
+
+.icon-chip:hover { background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha)); }
+
+.icon-chip.active {
+  border-color: var(--accent);
+  background: rgba(var(--ig-primary-button), .08);
+}
+
+.icon-chip-text { min-width: 0; overflow-wrap: anywhere; }
+
+.icon-chip-id {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* The task reads top to bottom: marker file -> define marks -> review, with
+   one prominent action (the download) at the end. */
+.steps {
+  margin: 0 0 var(--ig-space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding-bottom: var(--ig-space-6);
+  margin-bottom: var(--ig-space-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ig-space-2) var(--ig-space-3);
+  margin-bottom: var(--ig-space-4);
+}
+
+.step-head h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--ig-space-3);
+  margin: 0;
+  margin-right: auto;
+  font-family: var(--font-family-brand);
+  font-size: var(--system-16-font-size);
+  font-weight: var(--font-weight-system-bold);
+  line-height: var(--system-16-line-height);
+}
+
+.step-number {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ig-radius-circle);
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-family: var(--font-family-product);
+  font-size: var(--system-12-font-size);
+  font-weight: var(--font-weight-system-semibold);
+}
+
+.step-note {
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  line-height: var(--system-12-line-height);
+}
+
+.step-head .secondary-btn { margin-left: 0; }
+
+.step .status-line:empty { display: none; }
+
+.step-feedback:empty { display: none; }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--ig-radius-md);
+  background: var(--surface-raised);
+}
+
+.marker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-14-line-height);
+}
+
+.marker-table th,
+.marker-table td {
+  padding: var(--ig-space-3) var(--ig-space-4);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.marker-table tbody tr:last-child td { border-bottom: 0; }
+
+.marker-table th {
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  font-weight: var(--font-weight-system-semibold);
+  line-height: var(--system-12-line-height);
+}
+
+.marker-table td:nth-child(-n+3) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.cell-label {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ig-space-2);
+}
+
+.cell-actions {
+  display: flex;
+  gap: var(--ig-space-2);
+}
+
+.row-btn {
+  min-height: 30px;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 var(--ig-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--system-12-font-size);
+  line-height: var(--system-12-line-height);
+}
+
+.row-btn:hover { background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha)); }
+
+.row-btn.destructive { color: var(--err); }
+
+.row-btn.destructive:hover {
+  border-color: rgba(var(--ig-error-or-destructive), .4);
+  background: rgba(var(--ig-error-or-destructive), .1);
+}
 
 .result { margin-top: var(--ig-space-6); }
 
@@ -601,4 +1009,40 @@ footer a:hover { color: var(--accent); }
   .secondary-btn {
     margin: var(--ig-space-2) 0 0;
   }
+
+  .marker-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .marker-form .field {
+    grid-column: span 3;
+  }
+
+  .marker-form .field-coord {
+    grid-column: span 1;
+  }
+
+  .sheet {
+    width: 100%;
+    max-height: 86vh;
+    margin: auto auto 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--ig-radius-xl) var(--ig-radius-xl) 0 0;
+  }
+
+  .sheet-actions > .tertiary-btn,
+  .sheet-actions > .primary-btn,
+  .sheet-actions > .destructive-btn {
+    flex: 1 1 0;
+  }
+
+  .form-row .tertiary-btn,
+  .form-row .secondary-btn {
+    flex: 1 0 auto;
+    margin: 0;
+  }
+
+  .cell-label { max-width: 180px; }
 }

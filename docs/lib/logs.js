@@ -48,6 +48,39 @@ function describeMarker(m) {
   return `icon=${m.icon ?? 'null'}, description="${m.description ?? ''}"`;
 }
 
+export function buildAddMarksLog({
+  generatedAt, userFilenames, backupFilenames, existingCount, addedCount,
+  replacedCount, totalCount, validationLine, addedMarkers,
+}, lang) {
+  const t = (key, ...args) => tFor(lang, key, ...args);
+  const n = (value) => localeNumber(value, lang);
+  const lines = [
+    t('logTitleAddMarks'),
+    `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
+    '',
+    line(t('logUserFile'), userFilenames.length ? userFilenames.join(', ') : t('logNoFile')),
+  ];
+  if (backupFilenames.length) {
+    lines.push(line(t('logBackupFile'), backupFilenames.join(', ')));
+  }
+  lines.push(
+    line(t('logOutputFormat'), t('formatBin')),
+    line(t('logExistingLoaded'), n(existingCount)),
+    line(t('logMarkersCreated'), n(addedCount)),
+    line(t('logReplaced'), n(replacedCount)),
+    line(t('logTotal'), n(totalCount)),
+    line(t('logValidation'), validationLine ?? t('logValidationOk')),
+    line(t('logProcessingLocation'), t('logProcessingLocal')),
+    '',
+    t('logAddedListHeader'),
+  );
+  for (const m of addedMarkers) {
+    lines.push(`  (${m.x}, ${m.y}, ${m.z}): ${describeMarker(m)}`);
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
 export function buildMergeLog({
   generatedAt, userFilenames, backupFilenames, communityCount, personalLoadedCount,
   addedCount, identicalCount, conflictCount, totalCount, conflicts,

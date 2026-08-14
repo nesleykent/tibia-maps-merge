@@ -26,7 +26,8 @@
       <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
       <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
     </ol>
-    <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>.</p>
+    <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>. And if you want to type markers in
+      by hand -- coordinates, a label and an icon -- use <strong>Add Marks</strong>.</p>
     <details>
       <summary>Where do I find my minimapmarkers.bin?</summary>
       <dl>
@@ -41,31 +42,39 @@
   <nav class="mode-tabs">
     <button class="mode-tab-button active" data-mode="merge">Merge Mode</button>
     <button class="mode-tab-button" data-mode="convert">Conversion Mode</button>
+    <button class="mode-tab-button" data-mode="add">Add Marks</button>
   </nav>
 
   <section class="mode-panel active" id="mode-merge">
     <p class="hint">For everyday use -- merges the latest community markers with yours and gives you a ready-to-install file, an automatic backup of what you uploaded, and a full audit log.</p>
 
-    <div class="field">
-      <label>Community markers (from tibiamaps.io)</label>
-      <div class="status-line" id="community-status">Loading…</div>
-    </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Community markers</h3>
+          <span class="step-note">Fetched from tibiamaps.io</span>
+        </div>
+        <div class="status-line" id="community-status">Loading…</div>
+      </li>
 
-    <div class="field">
-      <label>Your markers</label>
-      <label class="file-picker">
-        <input type="file" multiple accept=".bin,.json" id="personal-files">
-        <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
-      </label>
-      <p class="micro-hint">You can pick more than one file. If they disagree, the one picked last wins.</p>
-    </div>
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Your markers</h3>
+          <span class="step-note">Pick more than one and the last one wins</span>
+        </div>
+        <label class="file-picker">
+          <input type="file" multiple accept=".bin,.json" id="personal-files">
+          <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+        </label>
+      </li>
+    </ol>
 
     <label class="checkbox-row">
       <input type="checkbox" id="export-audit">
       <span>Also export audit files (<code>merged-markers.json</code> + <code>conflicts.json</code>)</span>
     </label>
 
-    <button class="primary-btn" id="merge-run" disabled>Merge &amp; Download</button>
+    <button class="primary-btn" id="merge-run" disabled>Download merged minimapmarkers.bin</button>
     <p class="micro-hint">Downloads a <code>.zip</code> with the merged <code>minimapmarkers.bin</code>, a backup of your original file(s), and <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
   </section>
@@ -73,27 +82,143 @@
   <section class="mode-panel" id="mode-convert">
     <p class="hint">For advanced users -- converts a marker file between formats, with no merging at all. Useful for manual editing, version control, or feeding other tools.</p>
 
-    <div class="field">
-      <label>Conversion</label>
-      <select id="conversion-type">
-        <option value="bin-to-json">minimapmarkers.bin → markers.json</option>
-        <option value="json-to-bin">markers.json → minimapmarkers.bin</option>
-        <option value="community-to-json">Community markers (live) → community-markers.json</option>
-      </select>
-    </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Choose a conversion</h3>
+        </div>
+        <select id="conversion-type" aria-label="Conversion">
+          <option value="bin-to-json">minimapmarkers.bin → markers.json</option>
+          <option value="json-to-bin">markers.json → minimapmarkers.bin</option>
+          <option value="community-to-json">Community markers (live) → community-markers.json</option>
+        </select>
+      </li>
 
-    <div class="field" id="conversion-file-field">
-      <label>File to convert</label>
-      <label class="file-picker">
-        <input type="file" accept=".bin" id="conversion-file">
-        <span class="file-picker-label" data-default="Choose a file…">Choose a file…</span>
-      </label>
-    </div>
+      <li class="step" id="conversion-file-field">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Choose a file</h3>
+        </div>
+        <label class="file-picker">
+          <input type="file" accept=".bin" id="conversion-file">
+          <span class="file-picker-label" data-default="Choose a file…">Choose a file…</span>
+        </label>
+      </li>
+    </ol>
 
-    <button class="primary-btn" id="convert-run">Convert &amp; Download</button>
+    <button class="primary-btn" id="convert-run">Download markers.json</button>
     <p class="micro-hint">Downloads a <code>.zip</code> with the converted file and <code>conversion-log.txt</code>.</p>
     <div class="result" id="convert-result"></div>
   </section>
+
+  <section class="mode-panel" id="mode-add">
+    <p class="hint">Type marks in by hand -- coordinates, a label and an icon -- and get a ready-to-install <code>minimapmarkers.bin</code> back.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Your marker file</h3>
+          <span class="step-note">Optional -- leave empty to start a new file</span>
+        </div>
+        <label class="file-picker">
+          <input type="file" multiple accept=".bin,.json" id="add-existing-files">
+          <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+        </label>
+        <div class="status-line" id="add-existing-status"></div>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Define marks</h3>
+        </div>
+        <div class="marker-form">
+          <div class="field field-full">
+            <label for="mark-coords">Coordinates</label>
+            <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
+31938, 31652, 10
+32057, 32792, 13"></textarea>
+            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below.</p>
+          </div>
+          <div class="field field-wide">
+            <label for="mark-label">Label</label>
+            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
+          </div>
+          <div class="field field-wide">
+            <label for="mark-icon">Marker icon</label>
+            <div class="icon-field" data-icon-field="mark-icon"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <button class="tertiary-btn" id="add-marks">Add Marks</button>
+        </div>
+        <div class="step-feedback" id="add-feedback"></div>
+      </li>
+
+      <li class="step hidden" id="review-step">
+        <div class="step-head">
+          <h3><span class="step-number">3</span>Review</h3>
+          <button class="secondary-btn destructive" id="add-clear">Remove All</button>
+        </div>
+        <div class="table-wrap">
+          <table class="marker-table">
+            <thead>
+              <tr><th>X</th><th>Y</th><th>Z</th><th>Label</th><th>Icon</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="add-rows"></tbody>
+          </table>
+        </div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="add-run" disabled>Download minimapmarkers.bin</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the new <code>minimapmarkers.bin</code>, a backup of any file you loaded, and <code>add-marks-log.txt</code>. Drop the new file into your Tibia client's <code>minimap</code> folder (replacing the old one) and restart the client.</p>
+    <div class="result" id="add-result"></div>
+  </section>
+
+  <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-sheet-title">
+    <form method="dialog">
+      <div class="sheet-head"><h3 id="edit-sheet-title">Edit Mark</h3></div>
+      <div class="sheet-body">
+        <div class="marker-form">
+          <div class="field field-coord">
+            <label for="edit-x">X</label>
+            <input type="text" inputmode="numeric" autocomplete="off" id="edit-x">
+          </div>
+          <div class="field field-coord">
+            <label for="edit-y">Y</label>
+            <input type="text" inputmode="numeric" autocomplete="off" id="edit-y">
+          </div>
+          <div class="field field-coord">
+            <label for="edit-z">Z (floor)</label>
+            <input type="text" inputmode="numeric" autocomplete="off" id="edit-z">
+          </div>
+          <div class="field field-full">
+            <label for="edit-label">Label</label>
+            <input type="text" id="edit-label" autocomplete="off">
+          </div>
+          <div class="field field-full">
+            <label for="edit-icon">Marker icon</label>
+            <div class="icon-field" data-icon-field="edit-icon"></div>
+          </div>
+        </div>
+        <p class="form-message error hidden" id="edit-message"></p>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="tertiary-btn" id="edit-cancel">Cancel</button>
+        <button type="submit" class="primary-btn" id="edit-save">Save Changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="sheet sheet-confirm" id="clear-sheet" aria-labelledby="clear-sheet-title">
+    <div class="sheet-head"><h3 id="clear-sheet-title">Remove all marks?</h3></div>
+    <div class="sheet-body">
+      <p>Every mark in the list will be removed. This can't be undone. Any marker file you loaded is untouched.</p>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="tertiary-btn" id="clear-cancel">Cancel</button>
+      <button type="button" class="destructive-btn" id="clear-confirm">Remove All Marks</button>
+    </div>
+  </dialog>
 
   <aside class="disclaimer">
     <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
