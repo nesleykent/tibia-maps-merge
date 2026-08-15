@@ -19,8 +19,9 @@
       têm prioridade se você tiver marcado o mesmo local de forma diferente.</p>
   </header>
 
-  <section class="how-it-works">
-    <h2>Como funciona</h2>
+  <details class="intro">
+    <summary>Como funciona</summary>
+    <div class="intro-body">
     <ol>
       <li>Buscamos as marcações mais recentes da comunidade direto do tibiamaps.io -- o mesmo arquivo usado pelo instalador de mapas deles, por isso está sempre atualizado com a versão mais recente do Tibia.</li>
       <li>Você envia suas próprias marcações -- o arquivo <code>minimapmarkers.bin</code> da pasta <code>minimap</code> do seu cliente Tibia (ou um <code>markers.json</code>, se você já tiver um).</li>
@@ -30,25 +31,24 @@
     <p class="micro-hint">Essa é a aba <strong>Mesclar</strong>, a primeira abaixo. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para <strong>Converter</strong>. E se você quiser montar sua própria lista de
       marcações -- digitadas manualmente, ou lidas de uma quest -- use <strong>Editar Marcações</strong>, que adiciona essa lista ao seu arquivo ou a remove de volta.
       <strong>Coleções</strong> faz o mesmo com uma coleção pronta.</p>
-    <details>
-      <summary>Onde encontro meu minimapmarkers.bin?</summary>
+    <h3 id="where-is-my-file">Onde encontro meu minimapmarkers.bin?</h3>
       <dl>
         <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
         <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
         <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
       </dl>
       <p class="micro-hint">Dos <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">guias de instalação do tibiamaps.io</a> -- consulte-os se a sua configuração for diferente (por exemplo, instalação em local não padrão, ou o cliente do Test Server).</p>
-    </details>
-  </section>
+    </div>
+  </details>
 
-  <nav class="mode-tabs">
-    <button class="mode-tab-button active" data-mode="merge">Mesclar</button>
-    <button class="mode-tab-button" data-mode="convert">Converter</button>
-    <button class="mode-tab-button" data-mode="add">Editar Marcações</button>
-    <button class="mode-tab-button" data-mode="sets">Coleções</button>
+  <nav class="mode-tabs" role="tablist" aria-label="Modo">
+    <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Mesclar</button>
+    <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Converter</button>
+    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Editar Marcações</button>
+    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Coleções</button>
   </nav>
 
-  <section class="mode-panel active" id="mode-merge">
+  <section class="mode-panel active" id="mode-merge" role="tabpanel" aria-labelledby="tab-merge">
     <p class="hint">Para uso do dia a dia -- mescla as marcações mais recentes da comunidade com as suas e entrega um arquivo pronto para instalar, um backup automático do que você enviou, e um log de auditoria completo.</p>
 
     <ol class="steps">
@@ -82,7 +82,7 @@
     <div class="result" id="merge-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-convert">
+  <section class="mode-panel" id="mode-convert" role="tabpanel" aria-labelledby="tab-convert">
     <p class="hint">Para usuários avançados -- converte um arquivo de marcações entre formatos, sem nenhuma mesclagem. Útil para edição manual, controle de versão ou alimentar outras ferramentas.</p>
 
     <ol class="steps">
@@ -113,7 +113,7 @@
     <div class="result" id="convert-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-add">
+  <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
     <p class="hint">Monte uma lista de marcações -- digitadas manualmente, ou lidas direto de uma quest do Tibia Wiki -- edite linha por linha, e então adicione essa lista ao seu arquivo de marcações ou remova de volta.</p>
 
     <ol class="steps">
@@ -201,7 +201,7 @@
     <div class="result" id="add-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-sets">
+  <section class="mode-panel" id="mode-sets" role="tabpanel" aria-labelledby="tab-sets">
     <p class="hint">Aplique uma coleção pronta de marcações ao seu arquivo -- ou tire uma de volta. Útil para marcações de eventos, achievements e respawns. Para marcações que você mesmo monta, use <strong>Editar Marcações</strong>.</p>
 
     <ol class="steps">

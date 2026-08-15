@@ -169,53 +169,84 @@ header h1 {
   line-height: var(--system-12-line-height);
 }
 
-.how-it-works {
-  margin-bottom: var(--ig-space-8);
-  padding: var(--ig-space-6);
+/* The mechanics, one click away rather than in the way. A first-time reader
+   wants them; everyone else has read them once and wants the tool, so this
+   collapses to a single line and the tabs start near the top of the page. */
+.intro {
+  margin-bottom: var(--ig-space-6);
   border: 1px solid var(--border);
   border-radius: var(--ig-radius-md);
   background: var(--surface-raised);
-  box-shadow: var(--ig-shadow-card);
 }
 
-.how-it-works h2 {
-  margin: 0 0 var(--ig-space-4);
-  font-family: var(--font-family-brand);
-  font-size: var(--system-22-font-size);
-  font-weight: var(--font-weight-system-bold);
-  line-height: var(--system-22-line-height);
-  letter-spacing: 0;
+.intro > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ig-space-3);
+  min-height: 44px;
+  padding: 0 var(--ig-space-5);
+  border-radius: var(--ig-radius-md);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: var(--system-14-font-size);
+  font-weight: var(--font-weight-system-semibold);
+  line-height: var(--system-14-line-height);
+  list-style: none;
 }
 
-.how-it-works ol {
+/* Safari draws its own triangle unless both of these are cleared. */
+.intro > summary::-webkit-details-marker { display: none; }
+
+.intro > summary::before {
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  content: "";
+  transform: rotate(-45deg);
+  transition: transform var(--ig-duration-micro) var(--ig-ease-standard);
+}
+
+.intro > summary:hover { color: var(--text); }
+
+.intro > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.intro[open] > summary {
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--ig-radius-md) var(--ig-radius-md) 0 0;
+  color: var(--text);
+}
+
+.intro[open] > summary::before { transform: rotate(45deg); }
+
+.intro-body {
+  padding: var(--ig-space-5) var(--ig-space-6) var(--ig-space-6);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-16-line-height);
+}
+
+.intro-body ol {
   margin: 0;
   padding-left: 1.25rem;
   color: var(--text);
-  font-size: var(--system-14-font-size);
-  line-height: var(--system-16-line-height);
 }
 
-.how-it-works li { margin-bottom: var(--ig-space-3); }
-.how-it-works li:last-child { margin-bottom: 0; }
+.intro-body li { margin-bottom: var(--ig-space-3); }
+.intro-body li:last-child { margin-bottom: 0; }
 
-.how-it-works details {
-  margin-top: var(--ig-space-5);
+.intro-body h3 {
+  margin: var(--ig-space-6) 0 0;
   padding-top: var(--ig-space-5);
   border-top: 1px solid var(--border);
   font-size: var(--system-14-font-size);
-  line-height: var(--system-16-line-height);
-}
-
-.how-it-works summary {
-  width: fit-content;
-  cursor: pointer;
-  color: var(--text);
   font-weight: var(--font-weight-system-semibold);
+  line-height: var(--system-14-line-height);
 }
 
-.how-it-works summary:hover { color: var(--accent); }
-
-.how-it-works details dl {
+.intro-body dl {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: var(--ig-space-2) var(--ig-space-4);
@@ -223,23 +254,37 @@ header h1 {
   margin: var(--ig-space-4) 0 0;
 }
 
-.how-it-works details dt {
+.intro-body dt {
   color: var(--muted);
   font-weight: var(--font-weight-system-semibold);
 }
 
-.how-it-works details dd {
+.intro-body dd {
   min-width: 0;
   margin: 0;
   overflow-wrap: anywhere;
 }
 
+/* Stays put while a panel scrolls: Edit Marks runs well past a screen, and
+   changing mode should not mean scrolling back to the top to do it. */
 .mode-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   gap: var(--ig-space-2);
   margin-bottom: var(--ig-space-6);
+  padding-top: var(--ig-space-2);
+  overflow-x: auto;
   border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  scrollbar-width: none;
 }
+
+.mode-tabs::-webkit-scrollbar { display: none; }
+
+/* Never squeeze a label; the bar scrolls instead on a narrow screen. */
+.mode-tab-button { flex: 0 0 auto; }
 
 .mode-tab-button {
   position: relative;
@@ -1190,23 +1235,20 @@ footer a:hover { color: var(--accent); }
     line-height: var(--system-16-line-height);
   }
 
-  .how-it-works {
-    padding: var(--ig-space-5);
-    box-shadow: none;
+  .intro-body {
+    padding: var(--ig-space-4) var(--ig-space-5) var(--ig-space-5);
   }
 
-  .how-it-works details dl,
+  .intro-body dl,
   .result-card dl {
     grid-template-columns: 1fr;
   }
 
   .mode-tabs {
     gap: 0;
-    overflow-x: auto;
   }
 
   .mode-tab-button {
-    flex: 1 0 auto;
     padding: 0 var(--ig-space-3);
   }
 

@@ -14,14 +14,48 @@ const markerKey = (m) => `${m.x},${m.y},${m.z}`;
 const sameContent = (a, b) => a.icon === b.icon && a.description === b.description;
 
 // ---------- Mode tabs ----------
-document.querySelectorAll('.mode-tab-button').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.mode-tab-button').forEach((b) => b.classList.remove('active'));
-    document.querySelectorAll('.mode-panel').forEach((p) => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(`mode-${btn.dataset.mode}`).classList.add('active');
-    if (btn.dataset.mode === 'sets') fillSetDates();
+// ---------- Modes ----------
+// A real tablist: one tab in the tab order at a time, arrow keys between them,
+// and each panel named by its tab. The mode also lives in the URL, so a mode
+// can be linked to and survives a reload -- replaceState rather than pushState,
+// since a tab is a view of one page and shouldn't cost a press of Back.
+const modeTabs = [...document.querySelectorAll('.mode-tab-button')];
+
+function selectMode(mode, { focus = false, updateUrl = true } = {}) {
+  const tab = modeTabs.find((b) => b.dataset.mode === mode);
+  if (!tab) return;
+  for (const other of modeTabs) {
+    const isCurrent = other === tab;
+    other.classList.toggle('active', isCurrent);
+    other.setAttribute('aria-selected', String(isCurrent));
+    other.tabIndex = isCurrent ? 0 : -1;
+    document.getElementById(`mode-${other.dataset.mode}`).classList.toggle('active', isCurrent);
+  }
+  if (focus) tab.focus();
+  if (updateUrl) history.replaceState(null, '', `#${tab.dataset.slug}`);
+  if (mode === 'sets') fillSetDates();
+}
+
+modeTabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectMode(tab.dataset.mode));
+  tab.addEventListener('keydown', (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1, Home: -index, End: modeTabs.length - 1 - index }[event.key];
+    if (step === undefined) return;
+    event.preventDefault();
+    // Wraps, the way a tablist is expected to.
+    selectMode(modeTabs[(index + step + modeTabs.length) % modeTabs.length].dataset.mode, { focus: true });
   });
+});
+
+const modeForHash = () => modeTabs.find((b) => b.dataset.slug === location.hash.slice(1))?.dataset.mode;
+
+// A link into a mode should open it, but an unrecognised hash is left alone --
+// it may well be meant for something else on the page. The initial restore
+// runs at the very end of this file: selecting Marker Sets asks for the set
+// dates, whose state is declared further down.
+window.addEventListener('hashchange', () => {
+  const mode = modeForHash();
+  if (mode) selectMode(mode, { updateUrl: false });
 });
 
 // ---------- Version footer ----------
@@ -1133,3 +1167,6 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
     </dl>
   `, false);
 }));
+
+// Last, so every mode is fully wired before one is restored from the URL.
+if (modeForHash()) selectMode(modeForHash(), { updateUrl: false });

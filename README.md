@@ -116,6 +116,17 @@ text lives directly in each language's HTML file; the handful of strings
 `app.js` generates dynamically (status/result messages) go through
 [`docs/lib/i18n.js`](docs/lib/i18n.js), keyed off each page's `<html lang>`.
 
+The four modes are a real tablist: `role="tablist"` with `aria-selected` and
+`aria-controls`, each panel a `tabpanel` named by its tab, a roving tabindex
+so the group is a single tab stop, and arrow keys (plus Home/End) moving
+between them. The bar is sticky, since Edit Marks runs well past a screen.
+The current mode lives in the URL (`#merge`, `#convert`, `#edit-marks`,
+`#marker-sets`) so it can be linked to and survives a reload -- the same slugs
+in both languages, set with `replaceState` so a tab does not cost a press of
+Back. An unrecognised fragment is left alone; `#where-is-my-file` is one, and
+points at the client's minimap folder paths inside the collapsed "How it
+works" disclosure above the tabs.
+
 All four modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that
 names what it produces (in Convert the label follows the chosen conversion).

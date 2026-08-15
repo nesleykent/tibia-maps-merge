@@ -18,8 +18,9 @@
       with your own winning if you've marked the same spot differently.</p>
   </header>
 
-  <section class="how-it-works">
-    <h2>How it works</h2>
+  <details class="intro">
+    <summary>How it works</summary>
+    <div class="intro-body">
     <ol>
       <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
       <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
@@ -28,25 +29,24 @@
     </ol>
     <p class="micro-hint">That's <strong>Merge</strong>, the first tab below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
       quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
-    <details>
-      <summary>Where do I find my minimapmarkers.bin?</summary>
+    <h3 id="where-is-my-file">Where do I find my minimapmarkers.bin?</h3>
       <dl>
         <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
         <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
         <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
       </dl>
       <p class="micro-hint">From <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">tibiamaps.io's installation guides</a> -- check there if your setup differs (e.g. a non-default install location, or the Test Server client).</p>
-    </details>
-  </section>
+    </div>
+  </details>
 
-  <nav class="mode-tabs">
-    <button class="mode-tab-button active" data-mode="merge">Merge</button>
-    <button class="mode-tab-button" data-mode="convert">Convert</button>
-    <button class="mode-tab-button" data-mode="add">Edit Marks</button>
-    <button class="mode-tab-button" data-mode="sets">Marker Sets</button>
+  <nav class="mode-tabs" role="tablist" aria-label="Mode">
+    <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Merge</button>
+    <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Convert</button>
+    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Edit Marks</button>
+    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Marker Sets</button>
   </nav>
 
-  <section class="mode-panel active" id="mode-merge">
+  <section class="mode-panel active" id="mode-merge" role="tabpanel" aria-labelledby="tab-merge">
     <p class="hint">For everyday use -- merges the latest community markers with yours and gives you a ready-to-install file, an automatic backup of what you uploaded, and a full audit log.</p>
 
     <ol class="steps">
@@ -80,7 +80,7 @@
     <div class="result" id="merge-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-convert">
+  <section class="mode-panel" id="mode-convert" role="tabpanel" aria-labelledby="tab-convert">
     <p class="hint">For advanced users -- converts a marker file between formats, with no merging at all. Useful for manual editing, version control, or feeding other tools.</p>
 
     <ol class="steps">
@@ -111,7 +111,7 @@
     <div class="result" id="convert-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-add">
+  <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
     <p class="hint">Put a list of marks together -- typed in by hand, or read straight out of a Tibia Wiki quest -- edit it row by row, then add it to your marker file or take it back out.</p>
 
     <ol class="steps">
@@ -199,7 +199,7 @@
     <div class="result" id="add-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-sets">
+  <section class="mode-panel" id="mode-sets" role="tabpanel" aria-labelledby="tab-sets">
     <p class="hint">Apply a ready-made collection of marks to your file -- or take one back out. Useful for event, achievement and respawn markers. For marks you put together yourself, use <strong>Edit Marks</strong>.</p>
 
     <ol class="steps">

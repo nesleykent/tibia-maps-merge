@@ -4,6 +4,38 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.11.0] - 2026-08-15
+
+### Changed
+
+- **"How it works" is a collapsed disclosure, not a card.** It was a block of
+  onboarding between the hero and the tabs that pushed the actual tool below
+  the fold -- useful once, in the way every time after. It is now one line
+  that opens on click, and the whole of Merge fits on a first screen.
+
+  The "Where do I find my minimapmarkers.bin?" paths moved out of the
+  disclosure that was nested inside it and became a plain section of the same
+  one. It has an id, so `#where-is-my-file` links to it and the browser opens
+  the disclosure on the way.
+
+- **The tab bar is a real tablist, and it stays put.** It was four buttons in
+  a `<nav>`: no roles, nothing announced, and every tab in the tab order.
+  Now `role="tablist"` with `aria-selected` and `aria-controls`, each panel a
+  `tabpanel` named by its tab, a roving tabindex so the group is one stop, and
+  arrow keys (plus Home and End) moving between tabs and wrapping.
+
+  It is also sticky, which Edit Marks in particular needed -- that panel runs
+  well past a screen, and changing mode meant scrolling back to the top first.
+
+### Added
+
+- **Modes are linkable.** The current mode lives in the URL -- `#merge`,
+  `#convert`, `#edit-marks`, `#marker-sets` -- so a mode can be linked to and
+  survives a reload. Both languages use the same slugs, so a link works
+  across them. `replaceState`, not `pushState`: a tab is a view of one page
+  and should not cost a press of Back. An unrecognised fragment is left
+  alone, since it may well be aimed at something else on the page.
+
 ## [1.10.0] - 2026-08-15
 
 ### Added
