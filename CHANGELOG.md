@@ -4,6 +4,30 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.8.0] - 2026-08-15
+
+### Added
+
+- **Marker Sets**, a fourth mode, and the first that can *remove* marks from
+  a file. One task: your marker file, plus a set of marks, added or taken
+  out. Downloads a `.zip` with the updated `minimapmarkers.bin`, a backup of
+  what you loaded, and `marker-sets-log.txt`.
+  - **Collections published by tibiamaps.io** -- achievements, rapid
+    respawn, points of interest, anniversary, lightbearer, devovorga and
+    ignore -- read fresh from
+    [its marker data](https://github.com/tibiamaps/tibia-map-data/tree/main/extra),
+    which is served with CORS headers, so no proxy and no server of ours is
+    involved. Each collection is fetched only when chosen; points of interest
+    alone is over 5,000 markers, 98% of them unlabelled, and is flagged as
+    the outlier it is.
+  - **A Tibia Wiki quest**, read exactly as Add Marks reads one -- which is
+    what makes "clear this quest's marks now that I'm done" a single action.
+  - Adding follows the rule the rest of the app already uses: markers are
+    keyed by coordinate and *yours* win, so a collection fills gaps rather
+    than overwriting marks you placed yourself. The step shows what will
+    happen -- added, skipped, removed, and the resulting total -- before
+    anything is downloaded.
+
 ## [1.7.0] - 2026-08-15
 
 ### Added

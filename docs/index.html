@@ -27,7 +27,7 @@
       <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
     </ol>
     <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>. And if you want to type markers in
-      by hand -- coordinates, a label and an icon -- use <strong>Add Marks</strong>.</p>
+      by hand -- coordinates, a label and an icon -- use <strong>Add Marks</strong>. <strong>Marker Sets</strong> applies a ready-made collection to your file, or takes one back out.</p>
     <details>
       <summary>Where do I find my minimapmarkers.bin?</summary>
       <dl>
@@ -43,6 +43,7 @@
     <button class="mode-tab-button active" data-mode="merge">Merge Mode</button>
     <button class="mode-tab-button" data-mode="convert">Conversion Mode</button>
     <button class="mode-tab-button" data-mode="add">Add Marks</button>
+    <button class="mode-tab-button" data-mode="sets">Marker Sets</button>
   </nav>
 
   <section class="mode-panel active" id="mode-merge">
@@ -183,6 +184,54 @@
     <button class="primary-btn" id="add-run" disabled>Download minimapmarkers.bin</button>
     <p class="micro-hint">Downloads a <code>.zip</code> with the new <code>minimapmarkers.bin</code>, a backup of any file you loaded, and <code>add-marks-log.txt</code>. Drop the new file into your Tibia client's <code>minimap</code> folder (replacing the old one) and restart the client.</p>
     <div class="result" id="add-result"></div>
+  </section>
+
+  <section class="mode-panel" id="mode-sets">
+    <p class="hint">Apply a ready-made collection of marks to your file -- or take one back out. Useful for event and achievement markers, and for clearing a quest's marks once you are done with it.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Your marker file</h3>
+          <span class="step-note">Required -- this changes the file you load</span>
+        </div>
+        <label class="file-picker">
+          <input type="file" multiple accept=".bin,.json" id="sets-files">
+          <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+        </label>
+        <div class="status-line" id="sets-file-status"></div>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Choose marks</h3>
+        </div>
+        <div class="set-choices" id="set-choices" role="radiogroup" aria-labelledby="set-choices-label"></div>
+        <span class="visually-hidden" id="set-choices-label">Marks to apply</span>
+        <div class="import-row set-quest-row hidden" id="set-quest-row">
+          <input type="text" inputmode="url" autocomplete="off" id="set-quest-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
+          <button type="button" class="tertiary-btn" id="set-quest-load">Load quest</button>
+        </div>
+        <div class="status-line" id="sets-source-status"></div>
+        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time. A quest is read the same way <strong>Add Marks</strong> reads one.</p>
+      </li>
+
+      <li class="step hidden" id="sets-apply-step">
+        <div class="step-head">
+          <h3><span class="step-number">3</span>Add or remove</h3>
+        </div>
+        <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
+          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Add to my file</span></label>
+          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remove from my file</span></label>
+        </div>
+        <span class="visually-hidden" id="direction-label">What to do with those marks</span>
+        <div class="result" id="sets-preview"></div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="sets-run" disabled>Download minimapmarkers.bin</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the updated <code>minimapmarkers.bin</code>, a backup of the file you loaded, and <code>marker-sets-log.txt</code>.</p>
+    <div class="result" id="sets-result"></div>
   </section>
 
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">

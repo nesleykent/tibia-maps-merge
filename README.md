@@ -18,7 +18,7 @@ A static page, hosted on GitHub Pages -- no install, no server. It fetches
 the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 ["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
 download (the same file the site itself distributes -- so it's always current
-with the latest game update). Three modes:
+with the latest game update). Four modes:
 
 - **Merge Mode** -- pick your own marker file(s) (`minimapmarkers.bin` from
   your Tibia client, or `markers.json`); they're merged with the live
@@ -66,6 +66,17 @@ with the latest game update). Three modes:
   sprite sheet the [TibiaWiki Mapper](https://tibia.fandom.com/wiki/Mapper)
   uses (`docs/assets/minimap-symbols.png`); its slot order is not the
   format's byte order, so the mapping is pinned by a test.
+- **Marker Sets** -- apply a ready-made collection of marks to your file, or
+  take one back out. This is the only mode that *removes* markers. The set is
+  either one of the collections tibiamaps.io publishes alongside its map data
+  ([`extra/`](https://github.com/tibiamaps/tibia-map-data/tree/main/extra) --
+  achievements, rapid respawn, points of interest, anniversary, lightbearer,
+  devovorga, ignore), read live from that repository, or the positions in a
+  Tibia Wiki quest article -- which is what makes "clear this quest's marks
+  now that I'm done" one action. Adding keeps the same policy as everywhere
+  else: markers are keyed by coordinate and yours win, so a collection fills
+  gaps rather than overwriting your own marks. The step shows what will
+  change before you download.
 
 ### Guides
 
@@ -87,7 +98,7 @@ text lives directly in each language's HTML file; the handful of strings
 `app.js` generates dynamically (status/result messages) go through
 [`docs/lib/i18n.js`](docs/lib/i18n.js), keyed off each page's `<html lang>`.
 
-All three modes share one structure, so they read and behave the same way:
+All four modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that
 names what it produces (in Conversion Mode the label follows the chosen
 conversion). Temporary contexts -- editing a mark, confirming a removal,

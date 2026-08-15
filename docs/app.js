@@ -1,9 +1,10 @@
 import { fetchCommunityMarkers } from './lib/community.js';
 import { DEFAULT_ICON, MARKER_ICONS, iconGlyph } from './lib/icons.js';
 import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
-import { buildAddMarksLog, buildConversionLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
+import { buildAddMarksLog, buildConversionLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
+import { MARKER_SETS, applyMarkerSet, fetchMarkerSet } from './lib/marker-sets.js';
 import { buildQuestPrompt } from './lib/prompt.js';
 import { fetchQuestCoordinates } from './lib/wiki.js';
 import { CHANGELOG_URL, VERSION } from './lib/version.js';
@@ -848,3 +849,234 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
 }));
 
 renderPending();
+
+// ================= Marker Sets =================
+// One task: your marker file, plus a set of marks, added or removed. The set
+// is either a collection tibiamaps.io publishes or the positions in a quest
+// article -- both arrive as ordinary marker objects, so the same arithmetic
+// and the same encoder handle either.
+
+const setsInput = document.getElementById('sets-files');
+const setsFileStatus = document.getElementById('sets-file-status');
+const setChoices = document.getElementById('set-choices');
+const setQuestRow = document.getElementById('set-quest-row');
+const setQuestUrl = document.getElementById('set-quest-url');
+const setsSourceStatus = document.getElementById('sets-source-status');
+const setsApplyStep = document.getElementById('sets-apply-step');
+const setsPreview = document.getElementById('sets-preview');
+const setsRunButton = document.getElementById('sets-run');
+
+const QUEST_CHOICE = 'quest';
+let setsBase = [];              // markers loaded from the user's file
+let setsBaseFiles = [];
+let chosenMarks = null;         // {label, markers}
+
+function setsDirection() {
+  return document.querySelector('input[name="set-direction"]:checked')?.value ?? 'add';
+}
+
+// ---------- the picker ----------
+for (const { id, name, large } of MARKER_SETS) {
+  const choice = document.createElement('label');
+  choice.className = 'set-choice';
+  choice.innerHTML = '<input type="radio" name="marker-set" class="visually-hidden">'
+    + '<span class="set-name"></span><span class="set-note"></span>';
+  const input = choice.querySelector('input');
+  input.value = id;
+  choice.querySelector('.set-name').textContent = name;
+  if (large) choice.querySelector('.set-note').textContent = t('setLarge');
+  input.addEventListener('change', () => selectSet(id, name));
+  setChoices.appendChild(choice);
+}
+
+const questChoice = document.createElement('label');
+questChoice.className = 'set-choice';
+questChoice.innerHTML = '<input type="radio" name="marker-set" class="visually-hidden">'
+  + '<span class="set-name"></span><span class="set-note"></span>';
+questChoice.querySelector('input').value = QUEST_CHOICE;
+questChoice.querySelector('.set-name').textContent = t('setFromQuest');
+questChoice.querySelector('input').addEventListener('change', () => {
+  setQuestRow.classList.remove('hidden');
+  chosenMarks = null;
+  setsSourceStatus.textContent = '';
+  setsSourceStatus.classList.remove('error');
+  refreshSetsPreview();
+  setQuestUrl.focus();
+});
+setChoices.appendChild(questChoice);
+
+async function selectSet(id, name) {
+  setQuestRow.classList.add('hidden');
+  chosenMarks = null;
+  refreshSetsPreview();
+  setsSourceStatus.classList.remove('error');
+  setsSourceStatus.textContent = t('setLoading');
+  try {
+    const markers = await fetchMarkerSet(id);
+    chosenMarks = { label: name, markers };
+    setsSourceStatus.textContent = t('setLoaded', name, markers.length);
+  } catch {
+    setsSourceStatus.textContent = t('setUnreachable');
+    setsSourceStatus.classList.add('error');
+  }
+  refreshSetsPreview();
+}
+
+document.getElementById('set-quest-load').addEventListener('click', withBusy(
+  document.getElementById('set-quest-load'),
+  async () => {
+    chosenMarks = null;
+    refreshSetsPreview();
+    setsSourceStatus.classList.remove('error');
+    setsSourceStatus.textContent = t('wikiReading');
+    let article;
+    try {
+      article = await fetchQuestCoordinates(setQuestUrl.value);
+    } catch (err) {
+      setsSourceStatus.textContent = t({ badUrl: 'wikiBadUrl', noArticle: 'wikiNoArticle' }[err.message] ?? 'wikiUnreachable');
+      setsSourceStatus.classList.add('error');
+      return;
+    }
+    if (article.coordinates.length === 0) {
+      setsSourceStatus.textContent = t('wikiNoCoordinates', article.title);
+      setsSourceStatus.classList.add('error');
+      return;
+    }
+    chosenMarks = {
+      label: article.title,
+      markers: article.coordinates.map((c) => ({
+        description: c.label, icon: DEFAULT_ICON, x: c.x, y: c.y, z: c.z,
+      })),
+    };
+    setsSourceStatus.textContent = t('setLoaded', article.title, chosenMarks.markers.length);
+    refreshSetsPreview();
+  },
+));
+
+// ---------- your file ----------
+let setsLoad = Promise.resolve();
+
+async function loadSetsBase() {
+  const files = Array.from(setsInput.files || []);
+  setsBase = [];
+  setsBaseFiles = files;
+  if (files.length === 0) {
+    setsFileStatus.textContent = '';
+    setsFileStatus.classList.remove('error');
+    refreshSetsPreview();
+    return;
+  }
+  setsFileStatus.classList.remove('error');
+  setsFileStatus.textContent = t('loading');
+  const groups = [];
+  for (const file of files) {
+    try {
+      groups.push(await loadMarkersFile(file));
+    } catch {
+      // reported below by the count, same as Merge Mode's skip behaviour
+    }
+  }
+  if (groups.length === 0) {
+    setsFileStatus.textContent = t('noneParsed');
+    setsFileStatus.classList.add('error');
+    refreshSetsPreview();
+    return;
+  }
+  setsBase = mergeMarkers(...groups);
+  setsFileStatus.textContent = t('existingLoaded', setsBase.length, files.map((f) => f.name).join(', '));
+  refreshSetsPreview();
+}
+
+setsInput.addEventListener('change', () => { setsLoad = loadSetsBase(); });
+document.querySelectorAll('input[name="set-direction"]').forEach((r) => r.addEventListener('change', refreshSetsPreview));
+
+// ---------- what it will do ----------
+function refreshSetsPreview() {
+  const ready = setsBase.length > 0 && chosenMarks !== null;
+  setsApplyStep.classList.toggle('hidden', !ready);
+  setsRunButton.disabled = !ready;
+  if (!ready) {
+    setsPreview.innerHTML = '';
+    return;
+  }
+  const mode = setsDirection();
+  const { added, kept, removed, total } = applyMarkerSet(setsBase, chosenMarks.markers, mode);
+  const rows = mode === 'remove'
+    ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
+    : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
+      + `<dt>${t('setLabelKept')}</dt><dd>${localeNumber(kept)}</dd>`;
+  setsPreview.innerHTML = `<div class="result-card ok">${t('setPreview', chosenMarks.label, chosenMarks.markers.length)}`
+    + `<dl>${rows}<dt>${t('labelTotal')}</dt><dd>${localeNumber(total)}</dd></dl></div>`;
+}
+
+// ---------- download ----------
+setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
+  await setsLoad;
+  if (setsBase.length === 0 || !chosenMarks) return;
+  const generatedAt = new Date();
+  const lang = currentLang();
+  const mode = setsDirection();
+
+  let outcome;
+  let outputBytes;
+  let validationLine;
+  const backupEntries = [];
+  try {
+    for (const file of setsBaseFiles) {
+      backupEntries.push({
+        name: `backup-${formatBackupTimestamp(generatedAt)}_${file.name}`,
+        data: new Uint8Array(await file.arrayBuffer()),
+      });
+    }
+    outcome = applyMarkerSet(setsBase, chosenMarks.markers, mode);
+    validateMarkers(outcome.result, { source: 'marker-sets' });
+    outputBytes = writeMarkersBin(outcome.result);
+    const reparsed = parseMarkersBin(
+      outputBytes.buffer.slice(outputBytes.byteOffset, outputBytes.byteOffset + outputBytes.byteLength),
+      { source: 'validation' },
+    );
+    const lost = outcome.result.length - reparsed.length;
+    validationLine = lost > 0 ? t('logValidationOkDedup', lost) : t('logValidationOk');
+  } catch (err) {
+    renderResult('sets-result', escapeHtml(err.message), true);
+    return;
+  }
+
+  const entries = [
+    { name: 'minimapmarkers.bin', data: outputBytes },
+    ...backupEntries,
+    {
+      name: 'marker-sets-log.txt',
+      data: new TextEncoder().encode(buildMarkerSetsLog({
+        generatedAt,
+        userFilenames: setsBaseFiles.map((f) => f.name),
+        backupFilenames: backupEntries.map((e) => e.name),
+        setName: chosenMarks.label,
+        setCount: chosenMarks.markers.length,
+        mode,
+        baseCount: setsBase.length,
+        addedCount: outcome.added,
+        keptCount: outcome.kept,
+        removedCount: outcome.removed,
+        totalCount: outcome.total,
+        validationLine,
+      }, lang)),
+    },
+  ];
+
+  const zipName = 'tibia-maps-merge-sets.zip';
+  downloadBlob(new Blob([buildZip(entries)]), zipName);
+
+  const rows = mode === 'remove'
+    ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(outcome.removed)}</dd>`
+    : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(outcome.added)}</dd>`
+      + `<dt>${t('setLabelKept')}</dt><dd>${localeNumber(outcome.kept)}</dd>`;
+  renderResult('sets-result', `
+    ${t('setsAppliedZip', zipName)}
+    <dl>
+      <dt>${t('labelExisting')}</dt><dd>${localeNumber(setsBase.length)}</dd>
+      ${rows}
+      <dt>${t('labelTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
+    </dl>
+  `, false);
+}));

@@ -786,6 +786,61 @@ button { font-family: inherit; }
 
 .sheet-confirm .sheet-head { border-bottom: 0; padding-bottom: 0; }
 
+/* Marker Sets: the collection picker and the add/remove choice. */
+.set-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--ig-space-2);
+}
+
+.set-choice,
+.direction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--ig-space-2);
+  align-items: center;
+  min-height: 46px;
+  padding: 0 var(--ig-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: var(--system-14-font-size);
+}
+
+.set-choice:hover,
+.direction:hover { background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha)); }
+
+.set-choice:has(input:checked),
+.direction:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(var(--ig-primary-button), .12);
+}
+
+.set-choice:has(input:focus-visible),
+.direction:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.set-name { font-weight: var(--font-weight-system-semibold); }
+
+.set-note {
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  text-align: right;
+}
+
+.direction-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--ig-space-2);
+}
+
+.direction { grid-template-columns: minmax(0, 1fr); }
+
+.set-quest-row { margin-top: var(--ig-space-3); }
+
 /* The task reads top to bottom: marker file -> define marks -> review, with
    one prominent action (the download) at the end. */
 .steps {

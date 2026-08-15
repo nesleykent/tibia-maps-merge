@@ -48,6 +48,40 @@ function describeMarker(m) {
   return `icon=${m.icon ?? 'null'}, description="${m.description ?? ''}"`;
 }
 
+export function buildMarkerSetsLog({
+  generatedAt, userFilenames, backupFilenames, setName, setCount, mode,
+  baseCount, addedCount, keptCount, removedCount, totalCount, validationLine,
+}, lang) {
+  const t = (key, ...args) => tFor(lang, key, ...args);
+  const n = (value) => localeNumber(value, lang);
+  const lines = [
+    t('logTitleSets'),
+    `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
+    '',
+    line(t('logUserFile'), userFilenames.join(', ')),
+  ];
+  if (backupFilenames.length) lines.push(line(t('logBackupFile'), backupFilenames.join(', ')));
+  lines.push(
+    line(t('logOutputFormat'), t('formatBin')),
+    line(t('logSetName'), setName),
+    line(t('logSetCount'), n(setCount)),
+    line(t('logSetAction'), t(mode === 'remove' ? 'logSetActionRemove' : 'logSetActionAdd')),
+    line(t('logExistingLoaded'), n(baseCount)),
+  );
+  if (mode === 'remove') {
+    lines.push(line(t('logSetRemoved'), n(removedCount)));
+  } else {
+    lines.push(line(t('logSetAdded'), n(addedCount)), line(t('logSetKept'), n(keptCount)));
+  }
+  lines.push(
+    line(t('logTotal'), n(totalCount)),
+    line(t('logValidation'), validationLine ?? t('logValidationOk')),
+    line(t('logProcessingLocation'), t('logProcessingLocal')),
+    '',
+  );
+  return lines.join('\n');
+}
+
 export function buildAddMarksLog({
   generatedAt, userFilenames, backupFilenames, existingCount, addedCount,
   replacedCount, totalCount, validationLine, addedMarkers,

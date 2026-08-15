@@ -29,7 +29,7 @@
     </ol>
     <p class="micro-hint">Esse é o <strong>Modo de Mesclagem</strong>, abaixo. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para o <strong>Modo de Conversão</strong>. E se você quiser digitar
       marcações manualmente -- coordenadas, rótulo e ícone -- use
-      <strong>Adicionar Marcações</strong>.</p>
+      <strong>Adicionar Marcações</strong>. <strong>Coleções</strong> aplica uma coleção pronta ao seu arquivo, ou remove uma de volta.</p>
     <details>
       <summary>Onde encontro meu minimapmarkers.bin?</summary>
       <dl>
@@ -45,6 +45,7 @@
     <button class="mode-tab-button active" data-mode="merge">Modo de Mesclagem</button>
     <button class="mode-tab-button" data-mode="convert">Modo de Conversão</button>
     <button class="mode-tab-button" data-mode="add">Adicionar Marcações</button>
+    <button class="mode-tab-button" data-mode="sets">Coleções</button>
   </nav>
 
   <section class="mode-panel active" id="mode-merge">
@@ -185,6 +186,54 @@
     <button class="primary-btn" id="add-run" disabled>Baixar minimapmarkers.bin</button>
     <p class="micro-hint">Baixa um <code>.zip</code> com o novo <code>minimapmarkers.bin</code>, um backup de qualquer arquivo que você carregar, e o <code>add-marks-log.txt</code>. Coloque o novo arquivo na pasta <code>minimap</code> do seu cliente Tibia (substituindo o antigo) e reinicie o cliente.</p>
     <div class="result" id="add-result"></div>
+  </section>
+
+  <section class="mode-panel" id="mode-sets">
+    <p class="hint">Aplique uma coleção pronta de marcações ao seu arquivo -- ou tire uma de volta. Útil para marcações de eventos e achievements, e para limpar as marcações de uma quest depois de concluí-la.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Seu arquivo de marcações</h3>
+          <span class="step-note">Obrigatório -- isto altera o arquivo que você carregar</span>
+        </div>
+        <label class="file-picker">
+          <input type="file" multiple accept=".bin,.json" id="sets-files">
+          <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
+        </label>
+        <div class="status-line" id="sets-file-status"></div>
+      </li>
+
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Escolher marcações</h3>
+        </div>
+        <div class="set-choices" id="set-choices" role="radiogroup" aria-labelledby="set-choices-label"></div>
+        <span class="visually-hidden" id="set-choices-label">Marcações a aplicar</span>
+        <div class="import-row set-quest-row hidden" id="set-quest-row">
+          <input type="text" inputmode="url" autocomplete="off" id="set-quest-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
+          <button type="button" class="tertiary-btn" id="set-quest-load">Carregar quest</button>
+        </div>
+        <div class="status-line" id="sets-source-status"></div>
+        <p class="micro-hint">As coleções vêm dos <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">dados de marcação publicados pelo tibiamaps.io</a>, lidos na hora. Uma quest é lida do mesmo jeito que em <strong>Adicionar Marcações</strong>.</p>
+      </li>
+
+      <li class="step hidden" id="sets-apply-step">
+        <div class="step-head">
+          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
+        </div>
+        <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
+          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
+          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remover do meu arquivo</span></label>
+        </div>
+        <span class="visually-hidden" id="direction-label">O que fazer com essas marcações</span>
+        <div class="result" id="sets-preview"></div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="sets-run" disabled>Baixar minimapmarkers.bin</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> atualizado, um backup do arquivo que você carregou, e o <code>marker-sets-log.txt</code>.</p>
+    <div class="result" id="sets-result"></div>
   </section>
 
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
