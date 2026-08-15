@@ -803,11 +803,17 @@ button { font-family: inherit; }
 .step-feedback:empty { display: none; }
 
 .import-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--ig-space-2);
   align-items: center;
 }
+
+/* The URL takes the room left over; the actions keep their natural width and
+   wrap underneath it when there isn't enough. */
+.import-row input[type="text"] { flex: 1 1 240px; width: auto; }
+
+.import-row .tertiary-btn { flex: 0 0 auto; }
 
 .table-wrap {
   overflow-x: auto;

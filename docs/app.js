@@ -4,6 +4,7 @@ import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.
 import { buildAddMarksLog, buildConversionLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
+import { buildQuestPrompt } from './lib/prompt.js';
 import { fetchQuestCoordinates } from './lib/wiki.js';
 import { CHANGELOG_URL, VERSION } from './lib/version.js';
 import { buildZip } from './lib/zip.js';
@@ -539,6 +540,49 @@ function syncAddButton() {
 }
 coordsField.addEventListener('input', syncAddButton);
 syncAddButton();
+
+// ---------- Quick prompt ----------
+// The importer can only read wikis that allow it; an assistant can read any of
+// them. These hand the same URL to the guide's extraction prompt, so a wiki
+// this app cannot fetch is still one paste away from a marker list.
+function questPromptFor(url) {
+  const trimmed = String(url ?? '').trim();
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
+  return buildQuestPrompt(trimmed);
+}
+
+function rejectMissingUrl() {
+  wikiStatus.textContent = t('wikiBadUrl');
+  wikiStatus.classList.add('error');
+}
+
+document.getElementById('prompt-copy').addEventListener('click', async () => {
+  const prompt = questPromptFor(wikiUrlField.value);
+  if (!prompt) return rejectMissingUrl();
+  try {
+    await navigator.clipboard.writeText(prompt);
+  } catch {
+    wikiStatus.textContent = t('promptCopyFailed');
+    wikiStatus.classList.add('error');
+    return;
+  }
+  wikiStatus.classList.remove('error');
+  wikiStatus.textContent = t('promptCopied');
+});
+
+document.getElementById('prompt-chatgpt').addEventListener('click', () => {
+  const prompt = questPromptFor(wikiUrlField.value);
+  if (!prompt) return rejectMissingUrl();
+  wikiStatus.classList.remove('error');
+  wikiStatus.textContent = t('promptOpened');
+  window.open(`https://chatgpt.com/?q=${encodeURIComponent(prompt)}`, '_blank', 'noopener');
+});
 
 // ---------- Import from a Tibia Wiki article ----------
 // Fills the coordinate field above rather than the list: the import is one way

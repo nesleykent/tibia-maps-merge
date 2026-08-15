@@ -4,6 +4,25 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.6.0] - 2026-08-15
+
+### Added
+
+- **Copy Prompt** and **Open in ChatGPT**, beside Import. Both take the URL
+  already in the field, drop it into the extraction prompt from the
+  [quest marks guide](guides/quest-marks-from-tibia-wiki.md), and hand the
+  result over -- one to the clipboard, the other straight to
+  `chatgpt.com/?q=`.
+  - This is the route to the accurate labels and per-location icons the
+    importer cannot produce on its own, without leaving the page to copy a
+    prompt out of the guide by hand.
+  - It also reaches wikis the importer cannot: an assistant can browse a site
+    that blocks cross-origin reads, so a tibiopedia.pl article -- unreadable
+    to the importer -- still turns into a marker list this way.
+  - The prompt now lives in `docs/lib/prompt.js` as well as in the guide, so
+    a test asserts the two are identical; editing one without the other fails
+    rather than leaving the app and the documentation disagreeing.
+
 ## [1.5.1] - 2026-08-15
 
 ### Changed
