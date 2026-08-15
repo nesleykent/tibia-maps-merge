@@ -17,6 +17,24 @@ const MAP_TEMPLATE = new RegExp(String.raw`\{\{\s*mapa\s*\|\s*${COORDINATE}`, 'g
 const BARE_COORDINATE = new RegExp(String.raw`\(\s*${COORDINATE}`, 'g');
 const HEADING = /^(={2,6})\s*(.+?)\s*\1\s*$/gm;
 
+// tibia.fandom.com writes positions in Mapper's "sector.offset" form instead:
+// {{Minimap|x=130.1|y=123.236|z=7|...|mark1=126.169,122.45,19,}} and
+// {{Mapper Coords|text=here|128.1|127.109|10|4|1|0.250.25}}.
+// A sector is one 256x256 minimap tile -- the same grid this project's own
+// Minimap_Color_<x>_<y>_<z>.png files are named after -- so the game
+// coordinate is simply sector * 256 + offset. Verified against the Mapper
+// page's own town links and against the same quest on tibiawiki.com.br.
+const SECTOR_SIZE = 256;
+const SECTOR = String.raw`(\d{1,3})\.(\d{1,3})`;
+const MINIMAP_TEMPLATE = /\{\{\s*Minimap\s*\|([^{}]*)\}\}/gi;
+const MINIMAP_CENTER = new RegExp(String.raw`x\s*=\s*${SECTOR}[\s\S]*?y\s*=\s*${SECTOR}[\s\S]*?z\s*=\s*(\d{1,2})`, 'i');
+const MINIMAP_MARK = new RegExp(String.raw`mark\d*\s*=\s*${SECTOR}\s*,\s*${SECTOR}\s*,\s*(\d{1,2})`, 'gi');
+const MAPPER_COORDS = /\{\{\s*Mapper[ _]Coords\s*\|([^{}]*)\}\}/gi;
+
+function fromSector(sector, offset) {
+  return Number(sector) * SECTOR_SIZE + Number(offset);
+}
+
 const MAX_LABEL_CHARS = 60;
 
 /**
@@ -88,11 +106,20 @@ function stripMarkup(text) {
  * section heading, then to the article title, so every mark gets something.
  */
 function labelFor(before, section, title) {
-  let clause = stripMarkup(before)
+  // The context window can start inside a template, leaving an unclosed "{{"
+  // whose parameters would otherwise read as prose. Cut back to it.
+  const opened = before.lastIndexOf('{{');
+  const context = opened >= 0 && before.indexOf('}}', opened) === -1
+    ? before.slice(0, opened)
+    : before;
+
+  let clause = stripMarkup(context)
     .split(/(?<=[.;:!?])\s+/).pop() ?? '';
   clause = clause
     .replace(/^=+\s*[^=]*=+\s*/, '')          // a heading fragment that leaked in
+    .replace(/\b[\w-]+\s*=\s*\S+/g, ' ')      // stray template parameters
     .replace(/^[\s*#:;|>,.\-–—0-9]+/, '')     // list markers, table cruft, step numbers
+    .replace(/\s+/g, ' ')
     .replace(/[\s,(:;\-–—]+$/, '')
     .trim();
 
@@ -122,6 +149,7 @@ export function extractCoordinates(wikitext, { title = '' } = {}) {
     while ((match = pattern.exec(text))) {
       const section = headings.filter((h) => h.at < match.index).pop()?.title ?? '';
       found.push({
+        at: match.index,
         x: Number(match[1]),
         y: Number(match[2]),
         z: Number(match[3]),
@@ -132,10 +160,54 @@ export function extractCoordinates(wikitext, { title = '' } = {}) {
     return found;
   };
 
+  // Mapper templates (tibia.fandom.com). A {{Minimap}} that carries a mark
+  // uses the mark's exact position; without one, its centre is the position.
+  const fromMapper = [];
+  const addMapper = (at, x, y, z) => {
+    const section = headings.filter((h) => h.at < at).pop()?.title ?? '';
+    fromMapper.push({
+      at, x, y, z, section,
+      label: labelFor(text.slice(Math.max(0, at - 300), at), section, title),
+    });
+  };
+
+  MINIMAP_TEMPLATE.lastIndex = 0;
+  let block;
+  while ((block = MINIMAP_TEMPLATE.exec(text))) {
+    const body = block[1];
+    const marks = [...body.matchAll(MINIMAP_MARK)];
+    if (marks.length > 0) {
+      for (const mark of marks) {
+        const z = body.match(/z\s*=\s*(\d{1,2})/i);
+        addMapper(block.index, fromSector(mark[1], mark[2]), fromSector(mark[3], mark[4]), Number(z?.[1] ?? 7));
+      }
+      continue;
+    }
+    const centre = body.match(MINIMAP_CENTER);
+    if (centre) {
+      addMapper(block.index, fromSector(centre[1], centre[2]), fromSector(centre[3], centre[4]), Number(centre[5]));
+    }
+  }
+
+  MAPPER_COORDS.lastIndex = 0;
+  while ((block = MAPPER_COORDS.exec(text))) {
+    // positional arguments only -- named ones like `text=here` are not coordinates
+    const parts = block[1].split('|').map((p) => p.trim()).filter((p) => !p.includes('='));
+    const [rawX, rawY, rawZ] = parts;
+    const x = /^\d{1,3}\.\d{1,3}$/.test(rawX ?? '') ? rawX.split('.') : null;
+    const y = /^\d{1,3}\.\d{1,3}$/.test(rawY ?? '') ? rawY.split('.') : null;
+    if (!x || !y || !/^\d{1,2}$/.test(rawZ ?? '')) continue;
+    addMapper(block.index, fromSector(x[0], x[1]), fromSector(y[0], y[1]), Number(rawZ));
+  }
+
   // Prefer the template: a bare "(x,y,z)" scan also picks up version numbers
   // and other incidental triples, so it only runs when nothing else matched.
   const fromTemplate = collect(MAP_TEMPLATE);
-  return fromTemplate.length > 0 ? fromTemplate : collect(BARE_COORDINATE);
+  const combined = [...fromTemplate, ...fromMapper];
+  const ordered = combined.length > 0 ? combined : collect(BARE_COORDINATE);
+  return ordered
+    .sort((a, b) => a.at - b.at)
+    .map(({ at, ...mark }) => mark);
 }
 
 /**
@@ -146,39 +218,55 @@ export async function fetchQuestCoordinates(input, { fetchImpl = fetch } = {}) {
   const target = parseWikiUrl(input);
   if (!target) throw new Error('badUrl');
 
-  const query = new URLSearchParams({
-    action: 'parse',
-    page: target.title,
-    prop: 'wikitext',
-    format: 'json',
-    formatversion: '2',
-    redirects: '1',
-    origin: '*', // ask MediaWiki for an anonymous CORS response
-  });
-
-  let response;
-  try {
-    response = await fetchImpl(`${target.api}?${query}`);
-  } catch {
-    throw new Error('unreachable');
+  async function readWikitext(pageTitle) {
+    const query = new URLSearchParams({
+      action: 'parse',
+      page: pageTitle,
+      prop: 'wikitext',
+      format: 'json',
+      formatversion: '2',
+      redirects: '1',
+      origin: '*', // ask MediaWiki for an anonymous CORS response
+    });
+    let response;
+    try {
+      response = await fetchImpl(`${target.api}?${query}`);
+    } catch {
+      throw new Error('unreachable');
+    }
+    if (!response.ok) throw new Error('unreachable');
+    let payload;
+    try {
+      payload = await response.json();
+    } catch {
+      throw new Error('unreachable');
+    }
+    if (payload.error) return null;
+    const wikitext = payload.parse?.wikitext;
+    return typeof wikitext === 'string'
+      ? { wikitext, title: payload.parse?.title ?? pageTitle }
+      : null;
   }
-  if (!response.ok) throw new Error('unreachable');
 
-  let payload;
-  try {
-    payload = await response.json();
-  } catch {
-    throw new Error('unreachable');
+  const article = await readWikitext(target.title);
+  if (!article) throw new Error('noArticle');
+
+  let best = { ...article, coordinates: extractCoordinates(article.wikitext, { title: article.title }) };
+
+  // tibia.fandom.com keeps the walkthrough on a "/Spoiler" subpage, so the
+  // quest article itself is just an infobox with no positions in it. Follow
+  // the subpage when the page the user pasted has nothing to offer.
+  if (best.coordinates.length === 0 && !/\/Spoiler$/i.test(target.title)) {
+    const spoiler = await readWikitext(`${target.title}/Spoiler`);
+    if (spoiler) {
+      const coordinates = extractCoordinates(spoiler.wikitext, { title: spoiler.title });
+      if (coordinates.length > 0) best = { ...spoiler, coordinates };
+    }
   }
-  if (payload.error) throw new Error('noArticle');
 
-  const wikitext = payload.parse?.wikitext;
-  if (typeof wikitext !== 'string') throw new Error('noArticle');
-
-  const pageTitle = payload.parse?.title ?? target.title;
   return {
-    title: pageTitle,
+    title: best.title,
     pageUrl: target.pageUrl,
-    coordinates: extractCoordinates(wikitext, { title: pageTitle }),
+    coordinates: best.coordinates,
   };
 }

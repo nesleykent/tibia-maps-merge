@@ -4,6 +4,30 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.3.1] - 2026-08-15
+
+### Fixed
+
+- The wiki importer returned nothing for **tibia.fandom.com** articles, even
+  though 1.3.0 claimed to support them. Two reasons, both now handled:
+  - Fandom keeps the walkthrough on a `/Spoiler` subpage, so the quest
+    article itself is only an infobox. The importer now follows the subpage
+    when the page you pasted has no positions of its own.
+  - Fandom writes positions in Mapper's `sector.offset` form
+    (`{{Minimap|x=130.1|y=123.236|z=7}}`, `{{Mapper Coords|...}}`) rather
+    than as plain coordinates. A sector is one 256x256 minimap tile -- the
+    same grid this project's own `Minimap_Color_<x>_<y>_<z>.png` files are
+    named after -- so the game coordinate is `sector * 256 + offset`.
+    Verified against the Mapper page's own town links and against the same
+    quest on tibiawiki.com.br, where 17 of the extracted positions land
+    within a few tiles of that wiki's coordinates for the same locations.
+  - A `{{Minimap}}` that carries a `mark1=` uses the mark's exact position;
+    without one, the map centre is used.
+- Template parameters could leak into a label when the text before a link
+  started inside an unclosed template, producing labels like
+  "width=1 height=1 centermark=yes". The label context is now cut back to
+  the unclosed `{{`.
+
 ## [1.3.0] - 2026-08-15
 
 ### Added

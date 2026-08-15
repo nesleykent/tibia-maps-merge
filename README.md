@@ -49,7 +49,10 @@ with the latest game update). Three modes:
   URL and it pulls every coordinate the article links to, labelled from the
   surrounding sentence, ready to edit. It reads the article's wikitext
   through the MediaWiki API (`origin=*`), so no proxy or server is involved
-  and only public article text is requested. Step 3 is a table with
+  and only public article text is requested. Both wiki styles are handled:
+  tibiawiki.com.br's plain `{{Mapa|x,y,z}}` links, and tibia.fandom.com's
+  Mapper `sector.offset` templates (following the `/Spoiler` subpage where
+  the walkthrough actually lives). Step 3 is a table with
   Edit/Delete per row, kept across reloads in `localStorage`. Downloads a
   `.zip` with the new `minimapmarkers.bin`, a backup of any file you loaded,
   and `add-marks-log.txt`.
