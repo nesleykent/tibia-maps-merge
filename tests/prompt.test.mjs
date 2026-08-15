@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { parseMarkerLines } from '../docs/lib/marker-input.js';
 
 const promptSourceUrl = new URL(
   '../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md',
@@ -43,4 +44,24 @@ test('boss destinations are not mislabeled as the teleport used to reach them', 
   assert.match(prompt, /even if the prose calls that lone coordinate a teleport or portal/);
   assert.match(prompt, /when separate coordinates exist.*Teleport to Sugar Daddy.*flag.*Sugar Daddy, sword/);
   assert.match(prompt, /Do not add `Teleport`.*unless the coordinate itself is evidenced as that feature/);
+});
+
+test('routine vertical transitions use native blank descriptions', async () => {
+  const prompt = await loadQuestPromptTemplate();
+
+  assert.match(prompt, /routine staircase.*leave the label empty/);
+  assert.match(prompt, /Do not emit redundant generic labels such as `Stairs Up`/);
+  assert.match(prompt, /routine unlabeled upward transition is `x, y, z, , up`/);
+  assert.match(prompt, /Do not borrow the identity of the next NPC, item, boss, or objective/);
+
+  const parsed = parseMarkerLines([
+    '33425, 32145, 6, , up',
+    '33430, 32142, 5, , up',
+  ].join('\n'));
+
+  assert.deepEqual(parsed.errors, []);
+  assert.deepEqual(parsed.markers.map(({ description, icon }) => ({ description, icon })), [
+    { description: '', icon: 'up' },
+    { description: '', icon: 'up' },
+  ]);
 });

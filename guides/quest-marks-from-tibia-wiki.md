@@ -132,6 +132,7 @@ sword       Boss, boss room or major battle
 bag         Quest item, collectible or chest
 lock        Locked door, key or access mechanism
 flag        Actual entrance, exit, teleport or transport point
+up/down     Ordinary floor transition
 red up      Transition to a higher floor
 red down    Transition to a lower floor
 checkmark   Interactive quest objective
@@ -156,6 +157,14 @@ provides only the access coordinate and immediately says the boss is inside,
 the prompt collapses that access into the more useful named boss mark. When
 separate access and encounter coordinates exist, it preserves both roles and
 classifies each independently.
+
+Ordinary floor arrows normally need no label. In the supplied default marker
+collection, 3,584 of 4,219 `up`/`down` marks have an empty description; named
+ones usually add a real destination or purpose such as `Dessert Dungeons` or
+`To exit`. The prompt therefore emits `x, y, z, , up` or `x, y, z, , down` for
+routine traversal instead of repeating what the icon already says with labels
+like `Stairs Up`. A nearby NPC, item, boss or objective keeps its own named
+marker rather than lending that identity to the stairs.
 
 ## Quest order is preserved
 

@@ -45,8 +45,9 @@ Inside the code block, output one mark per line in exactly this five-field forma
 Requirements:
 
 - `x`, `y`, and `z` must be the exact integers supplied by Tibia Wiki.
-- `Label` must be concise, descriptive English in APA-style title case and fewer than 100 characters.
-- `Label` must not contain a comma or a newline. Use a slash to join multiple functions.
+- `Label` may be empty for an ordinary `up` or `down` traversal mark when the transition has no useful destination or quest-specific identity. Represent an empty label as an empty fourth field: `x, y, z, , icon`.
+- Every non-empty `Label` must be concise, descriptive English in APA-style title case and fewer than 100 characters.
+- A non-empty `Label` must not contain a comma or a newline. Use a slash to join multiple functions.
 - Preserve official Tibia Wiki names and capitalization for NPCs, creatures, bosses, items, and places.
 - Every NPC label must be exactly `NPC <Name>` with no suffix or qualifier.
 - When a coordinate denotes a named boss encounter or general boss location, use the official boss name as the label. Do not append `Teleport`, `Location`, `Boss`, or `Boss Room` unless the coordinate explicitly denotes a separate teleport tile, access point, waiting room, or room rather than the named encounter.
@@ -102,7 +103,15 @@ Classification examples: a lone coordinate in a boss step that says to enter a t
 
 Mark both endpoints when Tibia Wiki supplies both coordinates. Classify each endpoint independently. Use these icons instead of `flag` for ordinary vertical passages.
 
-Examples: `Stairs Up -> up`; `Rope Spot -> up`; `Hole Down -> down`; `Underground Entrance -> down`.
+#### Native Label Style for Ordinary Transitions
+
+- For a routine staircase, ramp, ladder, rope spot, hole, or similar traversal whose only meaning is floor movement, leave the label empty. The `up` or `down` icon already communicates the direction.
+- Do not emit redundant generic labels such as `Stairs Up`, `Stairs Down`, `Ramp Up`, `Ramp Down`, `Ladder Up`, `Ladder Down`, `Hole Up`, `Hole Down`, `Go Up`, or `Go Down`.
+- Use a non-empty transition label only when it adds durable navigation or quest meaning beyond the arrow, such as an explicitly named destination, `To Exit`, `Shortcut`, or a special traversal mechanism that matters to the player.
+- Do not borrow the identity of the next NPC, item, boss, or objective for a routine transition when that destination has or should have its own separate mark. Keep the transition blank and label the meaningful destination itself.
+- In five-field output, a routine unlabeled upward transition is `x, y, z, , up`; a routine unlabeled downward transition is `x, y, z, , down`.
+
+Examples: a routine staircase to the next floor becomes an empty label with `up`; a routine hole to the next floor becomes an empty label with `down`; `Dessert Dungeons` on a passage may remain `Dessert Dungeons, down`; an explicitly described exit route may be `To Exit, up`. These examples distinguish naming roles only and do not supply coordinates.
 
 ### 2. Special Directional Movement
 
@@ -221,8 +230,8 @@ Correctly formatted lines:
 32345, 32100, 7, NPC Ferumbras, mouth
 32346, 32105, 7, Locked Quest Door, lock
 32350, 32110, 7, Lever That Opens the Boss Door, checkmark
-32355, 32120, 7, Stairs Down, down
-32355, 32120, 8, Stairs Up, up
+32355, 32120, 7, , down
+32355, 32120, 8, , up
 32360, 32130, 8, Teleport to the Boss Room, flag
 32370, 32140, 8, Boss Room, sword
 32372, 32142, 8, Exact Boss Spawn, crossmark
@@ -243,7 +252,9 @@ Before responding, confirm all of the following silently:
 - No coordinate was estimated or imported from prior knowledge.
 - Every quest mission, spoiler, collapsed section, and relevant link was checked twice.
 - No `(x, y, z)` tuple appears more than once.
-- Every label is concise, comma-free, under 100 characters, and correctly capitalized.
+- Every routine `up`/`down` transition without useful destination or quest-specific meaning has an empty fourth field and no redundant mechanism/direction label.
+- No transition uses a generic label such as `Stairs Up`, `Stairs Down`, `Ramp Up`, `Ladder Up`, `Hole Down`, `Go Up`, or `Go Down`.
+- Every non-empty label is concise, comma-free, under 100 characters, and correctly capitalized.
 - Every NPC label uses exactly `NPC <Name>`.
 - Every named boss encounter/general boss location keeps the official boss name and uses `sword`, unless the page explicitly evidences an exact spawn tile or a distinct room/access/transport feature.
 - Every single-coordinate boss-access step that immediately introduces the named boss is collapsed to `<Official Boss Name>, sword`; it is not reduced to the access mechanism.
