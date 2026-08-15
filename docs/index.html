@@ -145,14 +145,14 @@
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
-            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below.</p>
+            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" id="icon-names-open">See the icon names</button></p>
           </div>
           <div class="field field-wide">
             <label for="mark-label">Label</label>
             <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
           </div>
-          <div class="field field-wide">
-            <label for="mark-icon">Marker icon</label>
+          <div class="field field-full">
+            <span class="field-label" id="mark-icon-label">Marker icon</span>
             <div class="icon-field" data-icon-field="mark-icon"></div>
           </div>
         </div>
@@ -183,6 +183,17 @@
     <div class="result" id="add-result"></div>
   </section>
 
+  <dialog class="sheet" id="icon-names-sheet" aria-labelledby="icon-names-title">
+    <div class="sheet-head"><h3 id="icon-names-title">Icon names</h3></div>
+    <div class="sheet-body">
+      <p>Type one of these as the last value on a line to give that mark its own icon -- <code>32250, 31385, 5, Depot, flag</code>. Names are case-insensitive. Anything unrecognised is read as part of the label instead, so it has to match exactly. The byte on the right is what ends up in <code>minimapmarkers.bin</code>.</p>
+      <div class="icon-names" id="icon-names-list"></div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" id="icon-names-close">Done</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-sheet-title">
     <form method="dialog">
       <div class="sheet-head"><h3 id="edit-sheet-title">Edit Mark</h3></div>
@@ -205,7 +216,7 @@
             <input type="text" id="edit-label" autocomplete="off">
           </div>
           <div class="field field-full">
-            <label for="edit-icon">Marker icon</label>
+            <span class="field-label" id="edit-icon-label">Marker icon</span>
             <div class="icon-field" data-icon-field="edit-icon"></div>
           </div>
         </div>

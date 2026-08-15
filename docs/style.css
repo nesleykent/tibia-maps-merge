@@ -294,7 +294,8 @@ header h1 {
 
 .field { margin-bottom: var(--ig-space-6); }
 
-.field label {
+.field label,
+.field .field-label {
   display: block;
   margin-bottom: var(--ig-space-2);
   color: var(--text);
@@ -567,36 +568,89 @@ button { font-family: inherit; }
   align-items: center;
 }
 
-/* The swatch is the picker: clicking the current icon opens the sheet. */
-.icon-preview {
-  display: inline-flex;
-  appearance: none;
-  -webkit-appearance: none;
-  height: 42px;
-  align-items: center;
+/* The icon picker: every marker type laid out at once, picked in one click.
+   Radio inputs are visually hidden inside each choice, so the group keeps
+   native single-selection and arrow-key behaviour. */
+.icon-field {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--ig-space-1);
-  padding: 0 var(--ig-space-2);
-  border: 1px solid var(--border);
+}
+
+.icon-field .icon-choice {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
   border-radius: var(--input-border-radius);
-  background: var(--surface);
-  color: var(--muted);
   cursor: pointer;
   transition:
     background var(--ig-duration-micro) var(--ig-ease-standard),
     border-color var(--ig-duration-micro) var(--ig-ease-standard);
 }
 
-.icon-preview:hover {
+.icon-field .icon-choice:hover { background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha)); }
+
+.icon-field .icon-choice:has(input:checked) {
   border-color: var(--accent);
-  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
+  background: rgba(var(--ig-primary-button), .12);
 }
 
-.icon-preview-glyph { display: inline-flex; }
+.icon-field .icon-choice:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
-.icon-caret { display: block; }
+.icon-field .icon-choice-glyph { display: inline-flex; }
 
-/* The Tibia client's own minimap symbols, from the shared sprite sheet.
-   One square per icon; --icon-size scales the whole sheet with it. */
+/* Icon-name reference: only shown to people typing icons into a line. */
+.icon-names {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--ig-space-2);
+  margin-top: var(--ig-space-4);
+}
+
+.icon-name {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: var(--ig-space-2);
+  align-items: center;
+  min-height: 38px;
+  padding: 0 var(--ig-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+}
+
+.icon-name code {
+  min-width: 0;
+  background: none;
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+
+.icon-name-byte {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: var(--system-12-font-size);
+}
+
+/* A button that reads as a link -- used inside running hint text. */
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+
+.link-btn:hover { color: var(--accent-hover); }
+
 .marker-icon {
   display: inline-block;
   flex: 0 0 auto;
@@ -658,12 +712,6 @@ button { font-family: inherit; }
 }
 
 .sheet-body,
-.icon-grid {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding: var(--ig-space-5);
-}
 
 .sheet-body p {
   margin: 0;
@@ -688,67 +736,6 @@ button { font-family: inherit; }
 }
 
 .sheet-confirm .sheet-head { border-bottom: 0; padding-bottom: 0; }
-
-.sheet-close {
-  display: inline-flex;
-  appearance: none;
-  -webkit-appearance: none;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--ig-radius-circle);
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.sheet-close:hover {
-  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
-  color: var(--text);
-}
-
-.icon-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--ig-space-2);
-}
-
-.icon-chip {
-  display: grid;
-  appearance: none;
-  -webkit-appearance: none;
-  grid-template-columns: max-content minmax(0, 1fr) max-content;
-  gap: var(--ig-space-2);
-  align-items: center;
-  min-height: 40px;
-  padding: 0 var(--ig-space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--input-border-radius);
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--system-12-font-size);
-  line-height: var(--system-12-line-height);
-  text-align: left;
-}
-
-.icon-chip:hover { background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha)); }
-
-.icon-chip.active {
-  border-color: var(--accent);
-  background: rgba(var(--ig-primary-button), .08);
-}
-
-.icon-chip-text { min-width: 0; overflow-wrap: anywhere; }
-
-.icon-chip-id {
-  color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
 
 /* The task reads top to bottom: marker file -> define marks -> review, with
    one prominent action (the download) at the end. */

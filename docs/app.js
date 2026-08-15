@@ -352,119 +352,73 @@ const editFieldLabel = document.getElementById('edit-label');
 const editMessage = document.getElementById('edit-message');
 const clearSheet = document.getElementById('clear-sheet');
 
-const CARET_SVG = '<svg class="icon-caret" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" '
-  + 'focusable="false"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" '
-  + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
 /**
- * One shared modal sheet listing every marker type, opened from whichever
- * icon field was clicked. A native <dialog> so the backdrop, Escape, and
- * focus trapping come from the platform rather than hand-rolled.
- */
-const iconSheet = (() => {
-  const dialog = document.createElement('dialog');
-  dialog.className = 'sheet';
-  dialog.setAttribute('aria-labelledby', 'icon-sheet-title');
-
-  const head = document.createElement('div');
-  head.className = 'sheet-head';
-  const title = document.createElement('h3');
-  title.id = 'icon-sheet-title';
-  title.textContent = t('iconPickerLabel');
-  const close = document.createElement('button');
-  close.type = 'button';
-  close.className = 'sheet-close';
-  close.setAttribute('aria-label', t('close'));
-  close.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">'
-    + '<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.8" '
-    + 'stroke-linecap="round"/></svg>';
-  head.append(title, close);
-
-  const grid = document.createElement('div');
-  grid.className = 'icon-grid';
-
-  let target = null; // the <select> the open sheet is editing
-
-  for (const { id, name } of MARKER_ICONS) {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'icon-chip';
-    chip.dataset.icon = name;
-    chip.setAttribute('aria-label', iconLabel(name)); // the hex id is visual detail only
-    chip.innerHTML = `${iconGlyph(name, { size: 22 })}<span class="icon-chip-text"></span>`
-      + `<span class="icon-chip-id">0x${id.toString(16).toUpperCase().padStart(2, '0')}</span>`;
-    chip.querySelector('.icon-chip-text').textContent = iconLabel(name);
-    chip.addEventListener('click', () => {
-      target.value = name;
-      target.dispatchEvent(new Event('change'));
-      dialog.close();
-    });
-    grid.appendChild(chip);
-  }
-
-  close.addEventListener('click', () => dialog.close());
-  // A click that lands on the dialog element itself is a click on the backdrop.
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
-  });
-
-  dialog.append(head, grid);
-  document.body.appendChild(dialog);
-
-  return {
-    open(select) {
-      target = select;
-      grid.querySelectorAll('.icon-chip').forEach((chip) => {
-        chip.classList.toggle('active', chip.dataset.icon === select.value);
-      });
-      dialog.showModal();
-      grid.querySelector('.icon-chip.active')?.scrollIntoView({ block: 'nearest' });
-    },
-  };
-})();
-
-/**
- * Build an icon picker in `container`: the current icon, shown as a button
- * that opens the sheet above, plus a native <select> of the same list beside
- * it (so the field is still a plain, keyboard- and screen-reader-friendly
- * dropdown).
+ * Build the icon picker in `container`: every marker type the format supports,
+ * laid out as one grid you pick from directly. No dropdown and no sheet in
+ * between -- choosing an icon is a single click on the icon itself.
  *
- * Option values are the canonical icon names -- the numeric type byte is
- * looked up from those by the encoder, never stored in the UI.
+ * Backed by real radio inputs, so the group behaves the way a picker should:
+ * one selection, arrow keys move between options, and each option carries its
+ * icon's name for screen readers. The values are the canonical icon names --
+ * the numeric type byte is looked up from those by the encoder, never stored
+ * in the UI.
  */
 function mountIconField(container) {
-  const trigger = document.createElement('button');
-  trigger.type = 'button';
-  trigger.className = 'icon-preview';
-  trigger.title = t('iconPickerLabel');
-  trigger.setAttribute('aria-label', t('iconPickerLabel'));
-  trigger.setAttribute('aria-haspopup', 'dialog');
-  const glyph = document.createElement('span');
-  glyph.className = 'icon-preview-glyph';
-  trigger.append(glyph);
-  trigger.insertAdjacentHTML('beforeend', CARET_SVG);
+  const group = container.dataset.iconField;
+  container.setAttribute('role', 'radiogroup');
+  container.setAttribute('aria-labelledby', `${group}-label`);
 
-  const select = document.createElement('select');
-  select.id = container.dataset.iconField;
-  for (const { name } of MARKER_ICONS) {
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = iconLabel(name);
-    select.appendChild(option);
+  for (const { id, name } of MARKER_ICONS) {
+    const choice = document.createElement('label');
+    choice.className = 'icon-choice';
+    choice.title = `${iconLabel(name)} (0x${id.toString(16).toUpperCase().padStart(2, '0')})`;
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = group;
+    input.value = name;
+    input.className = 'visually-hidden';
+    input.checked = name === DEFAULT_ICON;
+
+    const glyph = document.createElement('span');
+    glyph.className = 'icon-choice-glyph';
+    glyph.innerHTML = iconGlyph(name, { size: 22 });
+
+    const label = document.createElement('span');
+    label.className = 'visually-hidden';
+    label.textContent = iconLabel(name);
+
+    choice.append(input, glyph, label);
+    container.appendChild(choice);
   }
-  select.value = DEFAULT_ICON;
 
-  function sync() {
-    glyph.innerHTML = iconGlyph(select.value, { size: 22 });
-  }
-
-  trigger.addEventListener('click', () => iconSheet.open(select));
-  select.addEventListener('change', sync);
-
-  container.append(trigger, select);
-  sync();
-  return select;
+  const inputs = [...container.querySelectorAll('input[type="radio"]')];
+  return {
+    get value() {
+      return (inputs.find((i) => i.checked) ?? inputs[0]).value;
+    },
+    set value(name) {
+      const match = inputs.find((i) => i.value === name);
+      if (match) match.checked = true;
+    },
+  };
 }
+
+// ---------- Icon name reference ----------
+// The picker itself shows icons only -- names would just be noise to anyone
+// who plays the game. They matter in one place: typing an icon at the end of
+// a coordinate line, so they live in a reference sheet opened from that hint.
+const iconNamesSheet = document.getElementById('icon-names-sheet');
+document.getElementById('icon-names-list').innerHTML = MARKER_ICONS.map(({ id, name }) => (
+  `<div class="icon-name">${iconGlyph(name, { size: 22 })}`
+  + `<code>${escapeHtml(name)}</code>`
+  + `<span class="icon-name-byte">0x${id.toString(16).toUpperCase().padStart(2, '0')}</span></div>`
+)).join('');
+document.getElementById('icon-names-open').addEventListener('click', () => iconNamesSheet.showModal());
+document.getElementById('icon-names-close').addEventListener('click', () => iconNamesSheet.close());
+iconNamesSheet.addEventListener('click', (event) => {
+  if (event.target === iconNamesSheet) iconNamesSheet.close();
+});
 
 const markIconSelect = mountIconField(document.querySelector('[data-icon-field="mark-icon"]'));
 const editIconSelect = mountIconField(document.querySelector('[data-icon-field="edit-icon"]'));
@@ -548,11 +502,6 @@ function renderPending() {
   reviewStep.classList.toggle('hidden', pending.length === 0);
   addRunButton.disabled = pending.length === 0;
   savePending();
-}
-
-function setIcon(select, icon) {
-  select.value = icon;
-  select.dispatchEvent(new Event('change'));
 }
 
 /**
@@ -657,7 +606,7 @@ function openEditSheet(index) {
   editFieldY.value = marker.y;
   editFieldZ.value = marker.z;
   editFieldLabel.value = marker.description;
-  setIcon(editIconSelect, marker.icon);
+  editIconSelect.value = marker.icon;
   editMessage.classList.add('hidden');
   editSheet.showModal();
 }

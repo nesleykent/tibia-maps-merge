@@ -4,6 +4,24 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.5.0] - 2026-08-15
+
+### Changed
+
+- **Picking a marker icon is now one click on the icon itself.** The dropdown
+  and the modal sheet that sat between you and the choice are both gone; all
+  twenty marker types are laid out at once, in a single row on desktop, and
+  you click the one you want.
+  - No names next to the icons -- anyone playing the game recognises them,
+    and twenty labels was just noise. Each icon still carries its name as a
+    tooltip and as text for screen readers, and the group is backed by real
+    radio inputs, so it keeps native single-selection and arrow-key movement.
+- The icon names moved to where they are actually needed: a reference sheet
+  opened from the coordinate-syntax hint, listing each icon with the exact
+  name to type at the end of a line and the byte it writes. That is the one
+  place the names matter -- typing `32250, 31385, 5, Depot, flag` by hand, or
+  checking what the AI-assisted guide should emit.
+
 ## [1.4.2] - 2026-08-15
 
 ### Added

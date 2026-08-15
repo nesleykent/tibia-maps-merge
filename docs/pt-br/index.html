@@ -147,14 +147,14 @@
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
-            <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo.</p>
+            <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo. <button type="button" class="link-btn" id="icon-names-open">Ver os nomes dos ícones</button></p>
           </div>
           <div class="field field-wide">
             <label for="mark-label">Rótulo</label>
             <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
           </div>
-          <div class="field field-wide">
-            <label for="mark-icon">Ícone da marcação</label>
+          <div class="field field-full">
+            <span class="field-label" id="mark-icon-label">Ícone da marcação</span>
             <div class="icon-field" data-icon-field="mark-icon"></div>
           </div>
         </div>
@@ -185,6 +185,17 @@
     <div class="result" id="add-result"></div>
   </section>
 
+  <dialog class="sheet" id="icon-names-sheet" aria-labelledby="icon-names-title">
+    <div class="sheet-head"><h3 id="icon-names-title">Nomes dos ícones</h3></div>
+    <div class="sheet-body">
+      <p>Digite um destes como último valor da linha para dar à marcação o seu próprio ícone -- <code>32250, 31385, 5, Depot, flag</code>. Não diferencia maiúsculas de minúsculas. Qualquer nome não reconhecido é lido como parte do rótulo, então precisa ser exato. O byte à direita é o que vai para o <code>minimapmarkers.bin</code>.</p>
+      <div class="icon-names" id="icon-names-list"></div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" id="icon-names-close">Concluído</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-sheet-title">
     <form method="dialog">
       <div class="sheet-head"><h3 id="edit-sheet-title">Editar Marcação</h3></div>
@@ -207,7 +218,7 @@
             <input type="text" id="edit-label" autocomplete="off">
           </div>
           <div class="field field-full">
-            <label for="edit-icon">Ícone da marcação</label>
+            <span class="field-label" id="edit-icon-label">Ícone da marcação</span>
             <div class="icon-field" data-icon-field="edit-icon"></div>
           </div>
         </div>
