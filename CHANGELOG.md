@@ -4,15 +4,23 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.1] - 2026-08-15
+
+### Fixed
+
+- **Restored the original branded header exactly.** The full rose-to-magenta-
+  to-purple `--ig-gradient-hero` surface, white Instagram Sans Headline
+  wordmark, white supporting copy, original spacing and original rounded hero
+  shape are back. The replacement warm-gradient wordmark treatment has been
+  removed.
+
 ## [1.18.0] - 2026-08-15
 
 ### Changed
 
 - **The web app now uses a quieter macOS-style utility hierarchy.** The
-  branded Tibia Maps Merge wordmark keeps its display typography and warm
-  gradient, while the surrounding hero and nested card treatment are replaced
-  by a compact header, a single content surface, precise separators, system
-  typography and consistent responsive spacing.
+  surrounding workspace uses a single content surface, precise separators,
+  system typography and consistent responsive spacing.
 - **Edit Marks has a clearer task flow.** Its form is compact, icon selection
   moves into a focused chooser, the reviewed-marker table combines X/Y/Z into
   one coordinate column, and phones render each marker as a complete row

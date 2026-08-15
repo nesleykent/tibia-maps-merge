@@ -42,7 +42,9 @@ for (const page of pages) {
 test('the utility shell preserves its branded wordmark and responsive review rows', async () => {
   const css = await readFile(new URL('../docs/style.css', import.meta.url), 'utf8');
 
-  assert.match(css, /header h1 \{[\s\S]*var\(--font-family-brand-headline\)[\s\S]*var\(--ig-gradient-warm\)/);
+  assert.match(css, /header \{[\s\S]*background: var\(--ig-gradient-hero\)/);
+  assert.match(css, /header h1 \{[\s\S]*font-family: var\(--font-family-brand-headline\)/);
+  assert.doesNotMatch(css, /header h1 \{[^}]*var\(--ig-gradient-warm\)/s);
   assert.match(css, /#mode-add \.marker-table tbody > tr:not\(\.marker-conflict-detail\) \{[\s\S]*grid-template-areas/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });

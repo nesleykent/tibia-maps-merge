@@ -169,11 +169,11 @@ The current mode lives in the URL (`#merge`, `#extract-own`, `#convert`,
 in both languages, set with `replaceState` so a tab does not cost a press of
 Back. An unrecognised fragment is left alone.
 
-The page is the tool: a compact branded header, one shared file source, tabs,
-and the active panel. The wordmark keeps its display typography and warm
-gradient; the surrounding workspace uses quiet macOS-style hierarchy,
-system typography, separators, and a single content surface rather than a
-stack of dashboard cards.
+The page is the tool: the original branded gradient header, one shared file
+source, tabs, and the active panel. The header keeps its full rose-to-magenta-
+to-purple surface and white display wordmark; the surrounding workspace uses
+quiet macOS-style hierarchy, system typography, separators, and a single
+content surface rather than a stack of dashboard cards.
 Everything read once or consulted in passing is a sheet instead. **How it
 works** is a compact header action beside the language switch;
 **where the client keeps `minimapmarkers.bin`** is its
