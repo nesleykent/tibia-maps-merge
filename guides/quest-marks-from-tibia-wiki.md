@@ -220,20 +220,26 @@ coverage on long quests.
 
 ## Make sure the assistant can actually read the article
 
-Two things can quietly starve the extraction, and both are worth checking
-before blaming the prompt:
+The canonical prompt does not ask the assistant to scrape a rendered wiki
+page. It gives the exact request used by the app's importer: the page title is
+sent to the same wiki origin's MediaWiki API with `action=parse`,
+`prop=wikitext`, redirects enabled and `origin=*`, then the raw source is read
+from `parse.wikitext`. This avoids rendered-page bot checks and exposes the
+templates that actually carry coordinates.
 
-- **The walkthrough may be behind a spoiler toggle.** On tibiawiki.com.br the
-  visible page is barely a summary — the entire guide sits in a collapsed
-  spoiler block. It *is* in the page source, so an assistant that reads the
-  HTML gets it, but one that only reads rendered text may see a few hundred
-  words and return almost nothing.
-- **The site may challenge automated fetches.** tibiawiki.com.br sits behind
-  Cloudflare, which answers plain HTTP fetches with an interstitial instead of
-  the article. If the assistant reports that it cannot open the URL, paste the
-  article text into the conversation instead of the link and keep the rest of
-  the prompt unchanged — that is exactly how the worked example below was
-  produced.
+The prompt teaches both supported encodings:
+
+- tibiawiki.com.br's `{{Mapa|x,y,z}}` values are already absolute Tibia
+  coordinates;
+- tibia.fandom.com's `Mapper Coords` and `Minimap` values use
+  `sector.offset`, converted with `sector * 256 + offset`. When the main
+  Fandom article has no coordinates, the prompt requests its `/Spoiler`
+  subpage, where the walkthrough commonly lives.
+
+Spoiler, collapsed and tabbed content is still inspected, but in raw wikitext
+rather than through visibility in a browser. If an assistant cannot call the
+MediaWiki API at all, paste the article's raw wikitext into the conversation
+and keep the extraction and classification instructions unchanged.
 
 A quick sanity check: if the returned list has only a handful of marks for a
 long quest, the assistant probably never saw the walkthrough.

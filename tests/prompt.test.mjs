@@ -34,6 +34,21 @@ test('prompt source is cached after its first load', async () => {
   );
 });
 
+test('prompt teaches raw MediaWiki retrieval and both coordinate encodings', async () => {
+  const prompt = await loadQuestPromptTemplate();
+
+  assert.match(prompt, /Do not scrape or depend on the rendered Fandom article/);
+  assert.match(prompt, /`action=parse`, `page=<page title>`, `prop=wikitext`/);
+  assert.match(prompt, /`format=json`, `formatversion=2`, `redirects=1`, and `origin=\*`/);
+  assert.match(prompt, /JSON response's `parse\.wikitext` field/);
+  assert.match(prompt, /`tibia\.fandom\.com`[\s\S]*`\/Spoiler`/);
+  assert.match(prompt, /TibiaWikiBR:[\s\S]*`\{\{Mapa\|32250,31385,5:2\|aqui\}\}`/);
+  assert.match(prompt, /Fandom `Mapper Coords`:[\s\S]*`absolute = sector \* 256 \+ offset`/);
+  assert.match(prompt, /`128\.1` becomes `32769` and `127\.109` becomes `32621`/);
+  assert.match(prompt, /Fandom `Minimap`:[\s\S]*numbered marks[\s\S]*template's `z` value/);
+  assert.match(prompt, /dot is a sector\/offset delimiter, not a decimal point/);
+});
+
 test('boss destinations are not mislabeled as the teleport used to reach them', async () => {
   const prompt = await loadQuestPromptTemplate();
 

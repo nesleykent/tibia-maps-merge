@@ -4,6 +4,17 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.2] - 2026-08-15
+
+### Fixed
+
+- **The assistant prompt now explains Fandom coordinate retrieval end to
+  end.** It requests raw `parse.wikitext` through MediaWiki's `action=parse`
+  API with redirects and CORS enabled, follows Fandom's `/Spoiler` subpage,
+  and decodes `Mapper Coords` and `Minimap` `sector.offset` values with
+  `sector * 256 + offset`. This avoids rendered-page bot checks and makes the
+  copied prompt support Fandom as well as TibiaWikiBR.
+
 ## [1.18.1] - 2026-08-15
 
 ### Fixed
