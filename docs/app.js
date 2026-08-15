@@ -648,7 +648,7 @@ syncAddButton();
 
 // ---------- Quick prompt ----------
 // The importer can only read wikis that allow it; an assistant can read any of
-// them. These hand the same URL to the guide's extraction prompt, so a wiki
+// them. These hand the same URL to the canonical Markdown prompt, so a wiki
 // this app cannot fetch is still one paste away from a marker list.
 function rejectMissingUrl() {
   wikiStatus.textContent = t('wikiBadUrl');
@@ -667,14 +667,20 @@ function currentPromptUrl() {
   }
 }
 
-function withPrompt(action) {
+async function withPrompt(action) {
   const url = currentPromptUrl();
   if (!url) return rejectMissingUrl();
-  action(buildQuestPrompt(url), url);
+  try {
+    const prompt = await buildQuestPrompt(url);
+    await action(prompt, url);
+  } catch {
+    wikiStatus.textContent = t('promptLoadFailed');
+    wikiStatus.classList.add('error');
+  }
 }
 
 function copyPrompt() {
-  withPrompt(async (prompt, url) => {
+  return withPrompt(async (prompt, url) => {
     try {
       await navigator.clipboard.writeText(prompt);
     } catch {
@@ -690,7 +696,7 @@ function copyPrompt() {
 }
 
 function openAssistant(name, base) {
-  withPrompt((prompt, questUrl) => {
+  return withPrompt((prompt, questUrl) => {
     wikiStatus.classList.remove('error');
     wikiStatus.textContent = t('promptOpened', name, questUrl);
     window.open(base + encodeURIComponent(prompt), '_blank', 'noopener');

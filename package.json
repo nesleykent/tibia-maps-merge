@@ -1,0 +1,8 @@
+{
+  "name": "tibia-maps-merge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

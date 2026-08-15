@@ -106,8 +106,33 @@ with the latest game update). Four modes:
   -- hand a Tibia Wiki quest URL to ChatGPT with an extraction prompt, get
   back `x, y, z, Label, icon` lines for every NPC, entrance, floor
   transition, item and boss in the walkthrough, and paste them straight into
-  Edit Marks. Includes the full prompt and the exact icon names the parser
-  accepts.
+  Edit Marks. The canonical prompt is maintained as a standalone Markdown
+  file in [`docs/prompts/`](docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md),
+  which is also the source used by every assistant button in the app.
+
+### Repository layout
+
+```text
+.
+├── .github/workflows/    Continuous integration checks
+├── docs/                 GitHub Pages application
+│   ├── assets/           Web UI images
+│   ├── lib/              Browser-side application modules
+│   ├── prompts/          Canonical AI-assistant prompts
+│   └── pt-br/            Brazilian Portuguese entry point
+├── guides/               User-facing workflows and screenshots
+├── tests/                Dependency-free browser-module tests
+├── tibiamaps/            Reusable Python package
+├── CHANGELOG.md          Web app release history
+├── cli.py                Python command-line entry point
+├── package.json          Web-module test command
+└── requirements.txt      Python runtime dependencies
+```
+
+Keeping deployable web assets under `docs/` lets GitHub Pages serve the app
+directly. Reusable Python logic stays isolated in `tibiamaps/`, while guides
+and prompt sources have dedicated directories instead of accumulating at the
+repository root.
 
 Everything runs client-side (vanilla JS: a ZIP reader + native
 `DecompressionStream` to unpack tibiamaps.io's download, a ZIP writer for

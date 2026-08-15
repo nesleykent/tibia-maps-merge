@@ -4,6 +4,29 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.15.0] - 2026-08-15
+
+### Changed
+
+- **Every assistant action now uses the new Tibia Wiki Quest Coordinate
+  Extractor system prompt.** The prompt supplied as Markdown is the single
+  source loaded by Copy Prompt, Open in ChatGPT, and every service under
+  Other Assistants. The current quest URL replaces its explicit placeholder
+  before the prompt leaves the page.
+- **Prompt and repository documentation are organized by purpose.** The
+  canonical prompt now lives under `docs/prompts/`, the guide links to it
+  instead of duplicating hundreds of lines, and the README includes a concise
+  repository map. This keeps the deployed prompt inspectable on GitHub while
+  preventing the app and documentation from drifting apart.
+- A dependency-free Node test now verifies the Markdown source, URL
+  substitution and prompt cache, with a small GitHub Actions workflow running
+  it alongside Python syntax compilation on pushes and pull requests.
+
+### Fixed
+
+- A failed prompt download now produces a localized error instead of passing
+  an invalid value to the clipboard or assistant link.
+
 ## [1.14.0] - 2026-08-15
 
 ### Added
