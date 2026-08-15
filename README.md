@@ -60,9 +60,12 @@ with the latest game update). Three modes:
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and
   encoder use ([`docs/lib/constants.js`](docs/lib/constants.js)), so it
-  can't drift from the format, and each is drawn as a small inline SVG
-  alongside its numeric type byte
-  ([`docs/lib/icons.js`](docs/lib/icons.js)).
+  can't drift from the format, and each is shown as the Tibia client's own
+  minimap symbol alongside its numeric type byte
+  ([`docs/lib/icons.js`](docs/lib/icons.js)). The artwork comes from the
+  sprite sheet the [TibiaWiki Mapper](https://tibia.fandom.com/wiki/Mapper)
+  uses (`docs/assets/minimap-symbols.png`); its slot order is not the
+  format's byte order, so the mapping is pinned by a test.
 
 ### Guides
 

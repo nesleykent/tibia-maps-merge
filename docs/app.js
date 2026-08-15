@@ -1,5 +1,5 @@
 import { fetchCommunityMarkers } from './lib/community.js';
-import { DEFAULT_ICON, MARKER_ICONS, iconSvg } from './lib/icons.js';
+import { DEFAULT_ICON, MARKER_ICONS, iconGlyph } from './lib/icons.js';
 import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
 import { buildAddMarksLog, buildConversionLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
@@ -391,7 +391,7 @@ const iconSheet = (() => {
     chip.className = 'icon-chip';
     chip.dataset.icon = name;
     chip.setAttribute('aria-label', iconLabel(name)); // the hex id is visual detail only
-    chip.innerHTML = `${iconSvg(name, { size: 22 })}<span class="icon-chip-text"></span>`
+    chip.innerHTML = `${iconGlyph(name, { size: 22 })}<span class="icon-chip-text"></span>`
       + `<span class="icon-chip-id">0x${id.toString(16).toUpperCase().padStart(2, '0')}</span>`;
     chip.querySelector('.icon-chip-text').textContent = iconLabel(name);
     chip.addEventListener('click', () => {
@@ -455,7 +455,7 @@ function mountIconField(container) {
   select.value = DEFAULT_ICON;
 
   function sync() {
-    glyph.innerHTML = iconSvg(select.value, { size: 22 });
+    glyph.innerHTML = iconGlyph(select.value, { size: 22 });
   }
 
   trigger.addEventListener('click', () => iconSheet.open(select));
@@ -505,7 +505,7 @@ function renderPending() {
       <td>${marker.y}</td>
       <td>${marker.z}</td>
       <td class="cell-label"></td>
-      <td><span class="icon-cell">${iconSvg(marker.icon, { size: 18 })}<span></span></span></td>
+      <td><span class="icon-cell">${iconGlyph(marker.icon, { size: 18 })}<span></span></span></td>
       <td class="cell-actions">
         <button type="button" class="row-btn" data-action="edit"></button>
         <button type="button" class="row-btn destructive" data-action="delete"></button>

@@ -595,7 +595,21 @@ button { font-family: inherit; }
 
 .icon-caret { display: block; }
 
-.marker-icon { display: block; }
+/* The Tibia client's own minimap symbols, from the shared sprite sheet.
+   One square per icon; --icon-size scales the whole sheet with it. */
+.marker-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: var(--icon-size, 22px);
+  height: var(--icon-size, 22px);
+  background-image: url("assets/minimap-symbols.png");
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size, 22px) * 11) calc(var(--icon-size, 22px) * 2);
+  background-position:
+    calc(var(--icon-col, 0) * var(--icon-size, 22px) * -1)
+    calc(var(--icon-row, 0) * var(--icon-size, 22px) * -1);
+  image-rendering: pixelated;
+}
 
 /* Sheets -- temporary, cancellable contexts (edit, confirm, icon picker).
    A centred modal on desktop, a bottom sheet on small screens. This is the

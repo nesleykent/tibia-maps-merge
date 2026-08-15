@@ -4,6 +4,25 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.4.0] - 2026-08-15
+
+### Changed
+
+- The icon picker now shows the **Tibia client's own minimap symbols**
+  instead of the hand-drawn SVG approximations that stood in for them. The
+  artwork is the sprite sheet the
+  [TibiaWiki Mapper](https://tibia.fandom.com/wiki/Mapper) uses, added as
+  `docs/assets/minimap-symbols.png` (121x22 -- eleven 11x11 symbols per row,
+  two rows) and positioned with CSS, so it costs one small request and stays
+  crisp via `image-rendering: pixelated`.
+  - The sheet's slot order is **not** the format's byte order: it follows the
+    Mapper's own picker layout, putting the four red arrows at slots 7, 8, 18
+    and 19 and the two green ones at 9 and 20, interleaved with the rest.
+    Slot 10 is a numbered badge and slot 21 is empty; neither exists in
+    `minimapmarkers.bin`. The mapping was read off the sheet, confirmed by
+    sampling each slot's glyph colours, and is now pinned by a test that also
+    asserts no icon points at a non-format slot.
+
 ## [1.3.1] - 2026-08-15
 
 ### Fixed
