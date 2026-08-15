@@ -141,7 +141,7 @@
               <button type="button" class="tertiary-btn" id="prompt-copy">Copiar Prompt</button>
               <button type="button" class="tertiary-btn" id="prompt-chatgpt">Abrir no ChatGPT</button>
             </div>
-            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copiar Prompt</strong> e <strong>Abrir no ChatGPT</strong> entregam o link a um assistente, que escreve rótulos melhores e escolhe um ícone por local; cole a resposta dele em Coordenadas. <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
+            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copiar Prompt</strong> e <strong>Abrir no ChatGPT</strong> entregam o link a um assistente, que escreve rótulos melhores e escolhe um ícone por local; cole a resposta dele em Coordenadas. <button type="button" class="link-btn" id="prompt-open">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
           <div class="field field-main">
@@ -186,6 +186,18 @@
     <p class="micro-hint">Baixa um <code>.zip</code> com o novo <code>minimapmarkers.bin</code>, um backup de qualquer arquivo que você carregar, e o <code>add-marks-log.txt</code>. Coloque o novo arquivo na pasta <code>minimap</code> do seu cliente Tibia (substituindo o antigo) e reinicie o cliente.</p>
     <div class="result" id="add-result"></div>
   </section>
+
+  <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
+    <div class="sheet-head"><h3 id="assistant-title">Outros assistentes</h3></div>
+    <div class="sheet-body">
+      <p>O mesmo prompt, enviado para outro lugar que não o ChatGPT. Ele pede que o assistente leia o artigo e devolva as marcações em texto; cole essa resposta em <strong>Coordenadas</strong> quando ela chegar.</p>
+      <p class="sheet-note">A maioria exige que você esteja conectado ao serviço, e alguns encurtam links longos. Se o prompt chegar incompleto ou vazio, use <strong>Copiar prompt</strong> e cole você mesmo -- isso sempre funciona.</p>
+      <div class="assistant-list" id="assistant-list"></div>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" id="assistant-close">Concluído</button>
+    </div>
+  </dialog>
 
   <dialog class="sheet" id="icon-names-sheet" aria-labelledby="icon-names-title">
     <div class="sheet-head"><h3 id="icon-names-title">Nomes dos ícones</h3></div>

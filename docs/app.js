@@ -562,28 +562,69 @@ function currentPromptUrl() {
   }
 }
 
-document.getElementById('prompt-copy').addEventListener('click', async () => {
+function withPrompt(action) {
   const url = currentPromptUrl();
   if (!url) return rejectMissingUrl();
-  try {
-    await navigator.clipboard.writeText(buildQuestPrompt(url));
-  } catch {
-    wikiStatus.textContent = t('promptCopyFailed');
-    wikiStatus.classList.add('error');
-    return;
-  }
-  wikiStatus.classList.remove('error');
-  wikiStatus.textContent = t('promptCopied', url);
-  // The answer comes back here, so put the cursor where it has to be pasted.
-  coordsField.focus();
-});
+  action(buildQuestPrompt(url), url);
+}
 
-document.getElementById('prompt-chatgpt').addEventListener('click', () => {
-  const url = currentPromptUrl();
-  if (!url) return rejectMissingUrl();
-  wikiStatus.classList.remove('error');
-  wikiStatus.textContent = t('promptOpened', url);
-  window.open(`https://chatgpt.com/?q=${encodeURIComponent(buildQuestPrompt(url))}`, '_blank', 'noopener');
+function copyPrompt() {
+  withPrompt(async (prompt, url) => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      wikiStatus.textContent = t('promptCopyFailed');
+      wikiStatus.classList.add('error');
+      return;
+    }
+    wikiStatus.classList.remove('error');
+    wikiStatus.textContent = t('promptCopied', url);
+    // The answer comes back here, so put the cursor where it has to be pasted.
+    coordsField.focus();
+  });
+}
+
+function openAssistant(name, base) {
+  withPrompt((prompt, questUrl) => {
+    wikiStatus.classList.remove('error');
+    wikiStatus.textContent = t('promptOpened', name, questUrl);
+    window.open(base + encodeURIComponent(prompt), '_blank', 'noopener');
+  });
+}
+
+document.getElementById('prompt-copy').addEventListener('click', copyPrompt);
+document.getElementById('prompt-chatgpt').addEventListener('click', () => openAssistant('ChatGPT', 'https://chatgpt.com/?q='));
+
+// ChatGPT and copying are the two in reach above; these are the rest, kept
+// behind a link so the row does not grow a button per service.
+const OTHER_ASSISTANTS = [
+  { name: 'Claude', url: 'https://claude.ai/new?q=' },
+  { name: 'Gemini', url: 'https://www.google.com/search?udm=50&source=searchlabs&q=' },
+  { name: 'Grok', url: 'https://grok.com/?q=' },
+  { name: 'Perplexity', url: 'https://www.perplexity.ai/search?q=' },
+];
+
+const assistantSheet = document.getElementById('assistant-sheet');
+const assistantList = document.getElementById('assistant-list');
+
+for (const { name, url } of OTHER_ASSISTANTS) {
+  const row = document.createElement('button');
+  row.type = 'button';
+  row.className = 'assistant';
+  row.innerHTML = '<span class="assistant-name"></span><span class="assistant-note"></span>';
+  row.querySelector('.assistant-name').textContent = name;
+  row.querySelector('.assistant-note').textContent = t('assistantOpens');
+  row.addEventListener('click', () => {
+    assistantSheet.close();
+    openAssistant(name, url);
+  });
+  assistantList.appendChild(row);
+}
+
+document.getElementById('prompt-open').addEventListener('click', () => assistantSheet.showModal());
+document.getElementById('assistant-close').addEventListener('click', () => assistantSheet.close());
+assistantSheet.addEventListener('click', (event) => {
+  if (event.target === assistantSheet) assistantSheet.close();
 });
 
 // ---------- Import from a Tibia Wiki article ----------

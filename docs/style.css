@@ -636,6 +636,46 @@ button { font-family: inherit; }
   padding: 0;
 }
 
+.sheet-note { margin-top: var(--ig-space-3) !important; }
+
+.assistant-list {
+  display: grid;
+  gap: var(--ig-space-2);
+  margin-top: var(--ig-space-5);
+}
+
+.assistant {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--ig-space-3);
+  align-items: center;
+  min-height: 46px;
+  padding: 0 var(--ig-space-4);
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--border);
+  border-radius: var(--input-border-radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--system-14-font-size);
+  text-align: left;
+}
+
+.assistant:hover {
+  border-color: var(--accent);
+  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
+}
+
+.assistant-name { font-weight: var(--font-weight-system-semibold); }
+
+.assistant-note {
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  text-align: right;
+}
+
 .icon-name-byte {
   color: var(--muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

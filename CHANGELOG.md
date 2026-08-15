@@ -4,6 +4,21 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.7.0] - 2026-08-15
+
+### Added
+
+- The prompt can now be sent to **Claude, Gemini, Grok or Perplexity** as
+  well as ChatGPT.
+  - **Copy Prompt** and **Open in ChatGPT** stay where they were: they are
+    the two that need no account and cover most use. The other four sit
+    behind an "Other assistants" link in the hint text, so four services were
+    added without the button row growing at all.
+  - Each option says it opens in a new tab and may need you to be signed in,
+    and the sheet notes that a service may shorten a long link -- the prompt
+    is about 4.5k characters, roughly 6.4k once encoded into a URL. Copying
+    is the fallback that cannot be truncated or refused.
+
 ## [1.6.4] - 2026-08-15
 
 ### Fixed
