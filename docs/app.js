@@ -562,23 +562,6 @@ function currentPromptUrl() {
   }
 }
 
-// Says which link the prompt buttons will use, and re-says it on every
-// keystroke. Without this the confirmation after copying reads the same
-// whether or not an edit was picked up, which makes a fresh prompt look
-// like a stale one.
-const promptTarget = document.getElementById('prompt-target');
-
-function syncPromptTarget() {
-  const url = currentPromptUrl();
-  const raw = wikiUrlField.value.trim();
-  promptTarget.classList.toggle('ready', Boolean(url));
-  // Nothing typed yet means nothing to report -- the line stays out of the way
-  // until it has something to confirm.
-  promptTarget.textContent = url ? t('promptTargetReady', url) : (raw ? t('promptTargetInvalid') : '');
-}
-wikiUrlField.addEventListener('input', syncPromptTarget);
-syncPromptTarget();
-
 document.getElementById('prompt-copy').addEventListener('click', async () => {
   const url = currentPromptUrl();
   if (!url) return rejectMissingUrl();

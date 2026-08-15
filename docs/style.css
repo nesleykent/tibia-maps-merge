@@ -614,16 +614,16 @@ button { font-family: inherit; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: var(--ig-space-2);
-  margin-top: var(--ig-space-4);
+  margin-top: var(--ig-space-5);
 }
 
 .icon-name {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr) max-content;
-  gap: var(--ig-space-2);
+  gap: var(--ig-space-3);
   align-items: center;
-  min-height: 38px;
-  padding: 0 var(--ig-space-3);
+  min-height: 42px;
+  padding: 0 var(--ig-space-4);
   border: 1px solid var(--border);
   border-radius: var(--input-border-radius);
   background: var(--surface);
@@ -650,10 +650,10 @@ button { font-family: inherit; }
   color: var(--accent);
   cursor: pointer;
   font: inherit;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
-.link-btn:hover { color: var(--accent-hover); }
+.link-btn:hover { text-decoration: underline; }
 
 .marker-icon {
   display: inline-block;
@@ -702,7 +702,7 @@ button { font-family: inherit; }
   flex: 0 0 auto;
   align-items: center;
   gap: var(--ig-space-3);
-  padding: var(--ig-space-4) var(--ig-space-5);
+  padding: var(--ig-space-5) var(--ig-space-6);
   border-bottom: 1px solid var(--border);
 }
 
@@ -715,7 +715,12 @@ button { font-family: inherit; }
   line-height: var(--system-16-line-height);
 }
 
-.sheet-body,
+.sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ig-space-6);
+}
 
 .sheet-body p {
   margin: 0;
@@ -735,7 +740,7 @@ button { font-family: inherit; }
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--ig-space-2);
-  padding: var(--ig-space-4) var(--ig-space-5);
+  padding: var(--ig-space-5) var(--ig-space-6);
   border-top: 1px solid var(--border);
 }
 
@@ -815,17 +820,6 @@ button { font-family: inherit; }
 
 .import-row .tertiary-btn { flex: 0 0 auto; }
 
-/* Echoes the link the prompt buttons will use, so an edit is visibly picked up. */
-.prompt-target {
-  overflow-wrap: anywhere;
-}
-
-.prompt-target:empty { display: none; }
-
-.prompt-target.ready {
-  color: var(--text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
 
 .table-wrap {
   overflow-x: auto;

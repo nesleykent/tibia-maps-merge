@@ -4,6 +4,27 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.6.4] - 2026-08-15
+
+### Fixed
+
+- Sheets had no body padding at all. An earlier cleanup regex, removing the
+  old modal icon picker, matched `.sheet-body, .icon-grid { ... }` and took
+  the whole rule with it, leaving a dangling selector that silently merged
+  into the one below. Restored, with roomier edges (24px) and taller rows in
+  the icon-name list.
+- "See the icon names" was underlined while every real link beside it was
+  not. The link-styled button now matches `<a>`: plain until hovered.
+
+### Changed
+
+- Step 2 stacked five blocks of text between the buttons and the Coordinates
+  field. The two explanation paragraphs became one, and the "Loaded into the
+  prompt" line is gone -- it echoed the URL that was already visible in the
+  field directly above it. Three blocks now, and the explanation is a third
+  shorter. Which link a prompt was built for is still confirmed after
+  copying, which is what made the URL question answerable in the first place.
+
 ## [1.6.3] - 2026-08-15
 
 ### Changed
