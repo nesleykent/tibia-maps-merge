@@ -26,12 +26,13 @@ If the URL is missing, inaccessible, or not a Tibia Wiki quest article, do not i
 
 1. Read the entire article once to understand the quest stages and progression.
 2. Traverse the article again from beginning to end and collect every exact coordinate from quest-relevant text and links, including hidden or collapsed sections.
-3. For each coordinate, determine its function from the link text, surrounding instructions, nearby heading, previous and next steps, destination, paired transition, and map context.
-4. Classify the coordinate using the icon rules below.
-5. Deduplicate by the exact `(x, y, z)` tuple. If one tuple has multiple quest functions, keep one line and combine the functions in one concise label.
-6. Preserve quest progression order. Place a deduplicated coordinate at its first relevant occurrence.
-7. Perform a final independent pass over the complete article and all quest-relevant location/map links.
-8. Validate every output line against the output contract before responding.
+3. For each coordinate, determine what exists or happens at the encoded coordinate from the link text, surrounding instructions, nearby heading, previous and next steps, source endpoint, destination endpoint, paired transition, and map context.
+4. Separate the coordinate's own function from the travel mechanism used to reach it. A sentence that says to teleport to a named boss does not make the boss's linked destination coordinate a teleport tile.
+5. Classify the coordinate using the icon rules below.
+6. Deduplicate by the exact `(x, y, z)` tuple. If one tuple has multiple quest functions, keep one line and combine the functions in one concise label.
+7. Preserve quest progression order. Place a deduplicated coordinate at its first relevant occurrence.
+8. Perform a final independent pass over the complete article and all quest-relevant location/map links.
+9. Validate every output line against the output contract before responding.
 
 ## Output Contract
 
@@ -48,6 +49,7 @@ Requirements:
 - `Label` must not contain a comma or a newline. Use a slash to join multiple functions.
 - Preserve official Tibia Wiki names and capitalization for NPCs, creatures, bosses, items, and places.
 - Every NPC label must be exactly `NPC <Name>` with no suffix or qualifier.
+- When a coordinate denotes a named boss encounter or general boss location, use the official boss name as the label. Do not append `Teleport`, `Location`, `Boss`, or `Boss Room` unless the coordinate explicitly denotes a separate teleport tile, access point, waiting room, or room rather than the named encounter.
 - `icon` must be one of the exact icon tokens listed below.
 - Output no headings, explanations, sources, comments, totals, bullets, numbering, blank commentary, or Markdown tables inside the code block.
 - Output each exact `(x, y, z)` tuple once only.
@@ -82,6 +84,17 @@ Use only these exact final-field values:
 
 Classify a coordinate by what the player needs to understand or do there, not merely by a word in its label.
 
+### Endpoint Before Mechanism
+
+- Classify what the encoded coordinate represents, not the verb used to reach it. `Go through the teleport to <Boss Name>` can link `<Boss Name>` to the boss encounter destination; that destination is combat, not a teleport.
+- A map/location link attached directly to an official boss name normally identifies the named boss encounter or general boss location. Use the official boss name with `sword`, unless Tibia Wiki explicitly says the coordinate is the boss's exact spawn tile, which uses `crossmark`.
+- When a boss step provides only one coordinate for access to a named boss and the walkthrough immediately says the boss is inside, beyond, or fought after that access, collapse the access and encounter into one useful boss mark: `<Official Boss Name>, sword`. This applies even if the prose calls that lone coordinate a teleport or portal. Do not replace the boss with a transport label when no separate boss coordinate is available.
+- Use `flag` only when the encoded coordinate itself is an explicitly evidenced teleport, portal, transport tile, boarding point, exit portal, navigation-only arrival point, or separate boss-area access/waiting-room point.
+- Never invent a physical object or transition from route prose. Do not add `Teleport`, `Portal`, `Entrance`, or `Exit` to a label unless the coordinate itself is evidenced as that feature.
+- When Tibia Wiki supplies separate access and encounter coordinates, classify them independently: the actual teleport/portal tile can be `flag`, while the named boss encounter destination is `<Official Boss Name>, sword`.
+
+Classification examples: a lone coordinate in a boss step that says to enter a teleport and then fight `Sugar Daddy` becomes `Sugar Daddy, sword`; a boss-name map link for `Timira the Many-Headed` becomes `Timira the Many-Headed, sword`; when separate coordinates exist, the physical `Teleport to Sugar Daddy` tile becomes `Teleport to Sugar Daddy, flag` and the encounter coordinate becomes `Sugar Daddy, sword`. These examples distinguish roles only and do not supply coordinates.
+
 ### 1. Normal Vertical Transitions
 
 - `up`: stairs, ladder, rope spot, ramp, lift, hole exit, or equivalent passage to a higher floor. In Tibia coordinates, this normally leads to a smaller `z` value.
@@ -104,7 +117,9 @@ Do not infer a direction without sufficient page or map evidence.
 
 ### 3. Teleports and Transport
 
-- `flag`: teleport, portal, boat, ship, carpet, minecart, transport elevator, significant arrival point, exit portal, or teleport-based quest-area/boss-area access.
+- `flag`: an actual teleport or portal tile, boat, ship, carpet, minecart, transport elevator, boarding point, exit portal, navigation-only arrival point, or separately evidenced teleport-based quest-area/boss-area access.
+
+Do not use `flag` for a named boss encounter merely because the player teleports there. If the boss step has only one coordinate and immediately leads into that named encounter, apply the boss-access collapse rule above. Use `flag` when the transport point has an independent navigation role or a separate boss encounter coordinate is available.
 
 ### 4. NPC Interaction
 
@@ -122,6 +137,8 @@ The label must be `NPC <Name>`, for example `NPC Ferumbras` or `NPC Tooth Fairy`
 - `sword`: a fight, boss room, arena, combat area, battle stage, or encounter rather than one exact spawn tile.
 
 When separate coordinates exist, classify a boss-room entrance by its transition function, the room as `sword`, and the exact boss spawn as `crossmark`.
+
+A coordinate linked from an official boss name in a boss step is normally the encounter/general boss location and therefore uses `sword`. Keep the official name alone as the label unless the page explicitly identifies a distinct room, waiting room, entrance, portal, or exact spawn tile.
 
 ### 7. Hazards
 
@@ -177,7 +194,7 @@ Do not use `?` merely because a description is brief. First infer the role from 
 
 ## Tie-Breaking Priority
 
-When a coordinate genuinely matches multiple categories, use the first applicable category in this order:
+First identify the role of the encoded coordinate using **Endpoint Before Mechanism**. Do not enter `flag` into the tie merely because the route to a boss uses a teleport. Only when the coordinate itself genuinely performs multiple evidenced roles should you use the first applicable category in this order:
 
 1. Normal vertical transition — `up` / `down`
 2. Special directional movement — `red up` / `red down` / `red right` / `red left`
@@ -228,5 +245,8 @@ Before responding, confirm all of the following silently:
 - No `(x, y, z)` tuple appears more than once.
 - Every label is concise, comma-free, under 100 characters, and correctly capitalized.
 - Every NPC label uses exactly `NPC <Name>`.
+- Every named boss encounter/general boss location keeps the official boss name and uses `sword`, unless the page explicitly evidences an exact spawn tile or a distinct room/access/transport feature.
+- Every single-coordinate boss-access step that immediately introduces the named boss is collapsed to `<Official Boss Name>, sword`; it is not reduced to the access mechanism.
+- No label invents `Teleport`, `Portal`, `Entrance`, `Exit`, `Location`, or `Boss Room` from route prose alone.
 - Every icon exactly matches an allowed token.
 - The line order follows quest progression.

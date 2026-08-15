@@ -131,7 +131,7 @@ mouth       NPC or required dialogue
 sword       Boss, boss room or major battle
 bag         Quest item, collectible or chest
 lock        Locked door, key or access mechanism
-flag        Entrance, exit, teleport or destination
+flag        Actual entrance, exit, teleport or transport point
 red up      Transition to a higher floor
 red down    Transition to a lower floor
 checkmark   Interactive quest objective
@@ -146,6 +146,16 @@ This produces something more useful than a pile of identical pins. A `mouth`
 is an NPC interaction, a `bag` is something to pick up, a `sword` is a boss,
 a `red down` is a floor transition — the minimap ends up communicating part of
 the quest structure visually.
+
+The coordinate's endpoint matters more than the verb in the walkthrough. If a
+sentence says to use a teleport and the map link is attached to a boss name,
+that link can identify the boss encounter destination: `Sugar Daddy` is then
+`Sugar Daddy, sword`, not an invented `Sugar Daddy Teleport, flag`. A separate
+map link for the physical teleport tile still uses `flag`. If the boss step
+provides only the access coordinate and immediately says the boss is inside,
+the prompt collapses that access into the more useful named boss mark. When
+separate access and encounter coordinates exist, it preserves both roles and
+classifies each independently.
 
 ## Quest order is preserved
 

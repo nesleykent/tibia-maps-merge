@@ -32,3 +32,15 @@ test('prompt source is cached after its first load', async () => {
     await loadQuestPromptTemplate(),
   );
 });
+
+test('boss destinations are not mislabeled as the teleport used to reach them', async () => {
+  const prompt = await loadQuestPromptTemplate();
+
+  assert.match(prompt, /Sugar Daddy` becomes `Sugar Daddy, sword`/);
+  assert.match(prompt, /Timira the Many-Headed` becomes `Timira the Many-Headed, sword`/);
+  assert.match(prompt, /Do not use `flag` for a named boss encounter merely because the player teleports there/);
+  assert.match(prompt, /provides only one coordinate.*collapse the access and encounter.*boss mark/);
+  assert.match(prompt, /even if the prose calls that lone coordinate a teleport or portal/);
+  assert.match(prompt, /when separate coordinates exist.*Teleport to Sugar Daddy.*flag.*Sugar Daddy, sword/);
+  assert.match(prompt, /Do not add `Teleport`.*unless the coordinate itself is evidenced as that feature/);
+});

@@ -4,6 +4,22 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.16.1] - 2026-08-15
+
+### Fixed
+
+- **The assistant prompt no longer turns a boss destination into a fictional
+  teleport mark.** It now separates the travel mechanism from the encoded
+  coordinate's own function before applying icon priority. When a boss step
+  supplies only one access coordinate and immediately introduces the named
+  boss, that coordinate becomes the useful boss mark with `sword`; separately
+  mapped physical teleport/portal/access tiles still use `flag`.
+- The supplied 8,795-mark collection exposed the regression directly:
+  `33398, 32200, 9` is `Sugar Daddy, sword`, consistent with named encounters
+  such as `Timira the Many-Headed, sword`, rather than `Sugar Daddy Teleport,
+  flag`. The canonical prompt, guide and regression test now pin that
+  distinction without importing the reference collection into the app.
+
 ## [1.16.0] - 2026-08-15
 
 ### Added
