@@ -25,4 +25,24 @@ for (const page of pages) {
     assert.doesNotMatch(html, /id="sets-files"/);
     assert.doesNotMatch(html, /id="conversion-file"/);
   });
+
+  test(`${page} follows the Edit Marks action hierarchy`, async () => {
+    const html = await readFile(new URL(page, import.meta.url), 'utf8');
+
+    assert.match(html, /class="tertiary-btn" id="add-draft-cancel"[\s\S]*class="primary-btn compact-primary" id="add-marks"/);
+    assert.match(html, /id="edit-cancel"[\s\S]*class="primary-btn" id="edit-save"/);
+    assert.match(html, /id="clear-cancel"[\s\S]*class="destructive-btn" id="clear-confirm"/);
+    assert.match(html, /id="icon-picker-sheet"/);
+    assert.match(html, /data-icon-field="icon-picker"/);
+    assert.match(html, /id="icon-picker-cancel"[\s\S]*id="icon-picker-confirm"/);
+    assert.match(html, /<th[^>]*>[^<]*(?:Coordinate|Coordenada)<\/th>/);
+  });
 }
+
+test('the utility shell preserves its branded wordmark and responsive review rows', async () => {
+  const css = await readFile(new URL('../docs/style.css', import.meta.url), 'utf8');
+
+  assert.match(css, /header h1 \{[\s\S]*var\(--font-family-brand-headline\)[\s\S]*var\(--ig-gradient-warm\)/);
+  assert.match(css, /#mode-add \.marker-table tbody > tr:not\(\.marker-conflict-detail\) \{[\s\S]*grid-template-areas/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});

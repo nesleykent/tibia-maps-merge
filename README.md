@@ -44,11 +44,12 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   count, and a real round-trip validation check).
 - **Edit Marks** -- put a list of marks together yourself, edit it, then add
   it to your marker file or take it back out. One path, top to bottom: **1**
-  define marks, **2** review, **3** add or remove, then download. The shared
+  define marks, **2** review, **3** apply changes, then download. The shared
   upload is optional when adding -- load your own `minimapmarkers.bin` or
   `markers.json` above the tools and the new marks are merged into it
-  by coordinate, yours winning on a clash, so the download is your whole
-  marker file rather than just the new marks; leave it empty and you get a
+  by coordinate, with any different label or icon resolved explicitly inside
+  Review, so the download is your whole marker file rather than just the new
+  marks; leave it empty and you get a
   file containing only what you typed. Step 1 is a single form for one mark
   or a hundred: a coordinate field taking one mark per line (`x, y, z`),
   plus a label and icon applied to the batch, either of which a line can
@@ -79,7 +80,7 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   you loaded, and `edit-marks-log.txt`. The log records every coordinate-level
   conflict decision and both versions of each conflicting mark.
 
-  The icon picker covers all 20 marker types the binary format defines --
+  The focused icon chooser covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and
   encoder use ([`docs/lib/constants.js`](docs/lib/constants.js)), so it
   can't drift from the format, and each is shown as the Tibia client's own
@@ -168,11 +169,14 @@ The current mode lives in the URL (`#merge`, `#extract-own`, `#convert`,
 in both languages, set with `replaceState` so a tab does not cost a press of
 Back. An unrecognised fragment is left alone.
 
-The page is the tool: hero, one shared file source, tabs, and the active panel.
+The page is the tool: a compact branded header, one shared file source, tabs,
+and the active panel. The wordmark keeps its display typography and warm
+gradient; the surrounding workspace uses quiet macOS-style hierarchy,
+system typography, separators, and a single content surface rather than a
+stack of dashboard cards.
 Everything read once or consulted in passing is a sheet instead. **How it
-works** is a pill in the header row
-beside the language switch, which the page was already paying for, so it
-costs no space at all; **where the client keeps `minimapmarkers.bin`** is its
+works** is a compact header action beside the language switch;
+**where the client keeps `minimapmarkers.bin`** is its
 own sheet, offered beside each picker that asks for your file, because that
 one is needed mid-task rather than read up front. Both are in the footer as
 well. Sheets are declared, not wired: `data-open-sheet`/`data-close-sheet` on
@@ -185,13 +189,12 @@ Temporary contexts -- editing a mark, confirming a removal, picking an icon
 -- are sheets with `Cancel` leading and the completing action trailing, per
 the macOS convention.
 
-The action hierarchy is one ladder, applied everywhere, and
-[a test enforces it](#versioning): filled accent for the single action a
-panel exists for; an accent *outline* for the action that completes a step
-without completing the view (`Add 6 Marks`); a plain outline for the
-alternatives beside it (`Import`, `Copy Prompt`); a small chip for step-head
-utilities (`Remove All`); filled red only ever as the confirming action of a
-destructive sheet. A standalone on/off setting is a switch (`role="switch"`
+The action hierarchy is one ladder, applied everywhere: filled accent for the
+action that completes the current task (`Add Mark`, `Add 6 Marks`, or the
+final download); quiet neutral controls for supporting actions (`Import`,
+`Copy Prompt`); text-weight utilities for step-head actions (`Remove All`);
+and filled red only for the confirming action of a destructive sheet. A
+standalone on/off setting is a switch (`role="switch"`
 over a checkbox, label leading and control trailing); checkboxes are for
 picking several things from a list, as the collection cards do. Destructive intent is a colour, not a rank -- a row's
 `Delete` keeps its row-button size and only changes colour. Labels name their

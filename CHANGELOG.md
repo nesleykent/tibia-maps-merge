@@ -4,6 +4,27 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.0] - 2026-08-15
+
+### Changed
+
+- **The web app now uses a quieter macOS-style utility hierarchy.** The
+  branded Tibia Maps Merge wordmark keeps its display typography and warm
+  gradient, while the surrounding hero and nested card treatment are replaced
+  by a compact header, a single content surface, precise separators, system
+  typography and consistent responsive spacing.
+- **Edit Marks has a clearer task flow.** Its form is compact, icon selection
+  moves into a focused chooser, the reviewed-marker table combines X/Y/Z into
+  one coordinate column, and phones render each marker as a complete row
+  instead of requiring horizontal table scrolling.
+- **Actions follow the same macOS order everywhere.** Cancel precedes the
+  trailing emphasized action, marker creation says `Add Mark` or
+  `Add N Marks`, supporting actions remain visually subordinate, and delete
+  confirmations retain an explicit destructive treatment.
+- **Conflict decisions remain part of Review.** Loaded-file and reviewed-list
+  versions stay side by side with per-coordinate and bulk choices, now in a
+  flatter comparison treatment that preserves the surrounding hierarchy.
+
 ## [1.17.1] - 2026-08-15
 
 ### Changed

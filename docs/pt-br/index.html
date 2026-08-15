@@ -14,29 +14,25 @@
       <a class="header-link" href="../">English</a>
     </div>
     <h1>Tibia Maps Merge</h1>
-    <p class="subtitle">O mapa do Tibia muda a cada atualização do jogo, e o
+    <p class="subtitle">Mantenha seu minimapa do Tibia atualizado com o
       <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
-      mantém as marcações da comunidade atualizadas para acompanhar. Esta
-      ferramenta mescla as <em>suas</em> marcações pessoais com as marcações
-      mais recentes da comunidade -- assim você fica com as duas, e as suas
-      têm prioridade se você tiver marcado o mesmo local de forma diferente.</p>
+      sem perder suas marcações pessoais.</p>
   </header>
 
   <section class="workspace-source" aria-labelledby="your-markers-title">
     <div class="workspace-source-head">
-      <div>
-        <span class="workspace-eyebrow">Entrada compartilhada</span>
-        <h2 id="your-markers-title">Suas marcações</h2>
-        <p>Carregue seu arquivo uma vez e use-o em qualquer ferramenta abaixo.</p>
-      </div>
-      <button type="button" class="secondary-btn hidden" id="your-markers-clear">Limpar arquivo</button>
+      <h2 id="your-markers-title">Suas marcações</h2>
+      <p>Usadas por todas as ferramentas abaixo</p>
     </div>
-    <label class="file-picker workspace-picker">
-      <input type="file" multiple accept=".bin,.json" id="your-marker-files">
-      <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
-    </label>
-    <div class="status-line" id="your-markers-status" aria-live="polite"></div>
-    <p class="micro-hint">Escolha mais de um arquivo para combiná-los na ordem do seletor; o último prevalece nas coordenadas compartilhadas. <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro?</button> Nada sai do seu navegador.</p>
+    <div class="workspace-file-control">
+      <label class="file-picker workspace-picker">
+        <input type="file" multiple accept=".bin,.json" id="your-marker-files">
+        <span class="file-picker-label" data-default="Escolha minimapmarkers.bin ou markers.json">Escolha minimapmarkers.bin ou markers.json</span>
+      </label>
+      <div class="status-line" id="your-markers-status" aria-live="polite"></div>
+    </div>
+    <button type="button" class="secondary-btn destructive hidden" id="your-markers-clear">Limpar Arquivo</button>
+    <p class="micro-hint workspace-source-note"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Encontrar seu arquivo</button> · Vários arquivos são combinados na ordem do seletor · Processado somente no navegador</p>
   </section>
 
   <nav class="mode-tabs" role="tablist" aria-label="Modo">
@@ -133,9 +129,12 @@
   </section>
 
   <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
-    <p class="hint">Monte uma lista de marcações -- digitadas manualmente, ou lidas direto de uma quest do Tibia Wiki -- edite linha por linha, e então adicione essa lista ao seu arquivo de marcações ou remova de volta.</p>
+    <div class="mode-intro">
+      <h2>Editar Marcações</h2>
+      <p>Monte uma lista revisada, compare conflitos e aplique-a ao seu arquivo.</p>
+    </div>
 
-    <ol class="steps">
+    <ol class="steps edit-workflow">
       <li class="step">
         <div class="step-head">
           <h3><span class="step-number">1</span>Definir marcações</h3>
@@ -149,27 +148,33 @@
               <button type="button" class="tertiary-btn" id="prompt-copy">Copiar Prompt</button>
               <button type="button" class="tertiary-btn" id="prompt-chatgpt">Abrir no ChatGPT</button>
             </div>
-            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copiar Prompt</strong> e <strong>Abrir no ChatGPT</strong> entregam o link a um assistente, que escreve rótulos melhores e escolhe um ícone por local; cole a resposta dele em Coordenadas. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
+            <p class="micro-hint">Importar lê o artigo. As ações de assistente preparam um prompt detalhado de extração. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a></p>
             <div class="status-line" id="wiki-status"></div>
           </div>
-          <div class="field field-main">
+          <div class="field field-full">
             <label for="mark-coords">Coordenadas</label>
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
-            <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">Ver os nomes dos ícones</button></p>
+            <p class="micro-hint">Uma por linha: <code>x, y, z</code> ou <code>x, y, z, rótulo, ícone</code>. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">Nomes dos ícones</button></p>
           </div>
-          <div class="field field-side">
+          <div class="field field-side compact-icon-field">
             <span class="field-label" id="mark-icon-label">Ícone da marcação</span>
-            <div class="icon-field" data-icon-field="mark-icon"></div>
+            <button type="button" class="icon-select-button" id="mark-icon-open" aria-haspopup="dialog" aria-controls="icon-picker-sheet">
+              <span class="icon-select-current" id="mark-icon-current"></span>
+              <span class="icon-select-copy"><strong>Escolher Ícone</strong><small id="mark-icon-name"></small></span>
+              <span class="icon-select-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="hidden" data-icon-field="mark-icon"></div>
           </div>
-          <div class="field field-full">
+          <div class="field field-default-label">
             <label for="mark-label">Rótulo</label>
             <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
           </div>
         </div>
         <div class="form-row">
-          <button class="tertiary-btn emphasized" id="add-marks">Adicionar à Lista</button>
+          <button type="button" class="tertiary-btn" id="add-draft-cancel">Cancelar</button>
+          <button class="primary-btn compact-primary" id="add-marks">Adicionar Marcação</button>
         </div>
         <div class="step-feedback" id="add-feedback"></div>
       </li>
@@ -183,7 +188,7 @@
         <div class="table-wrap">
           <table class="marker-table">
             <thead>
-              <tr><th class="col-map">Mapa</th><th>X</th><th>Y</th><th>Z</th><th>Rótulo</th><th>Ícone</th><th>Ações</th></tr>
+              <tr><th class="col-map">Mapa</th><th>Coordenada</th><th>Rótulo</th><th>Ícone</th><th class="col-actions">Ações</th></tr>
             </thead>
             <tbody id="add-rows"></tbody>
           </table>
@@ -192,7 +197,7 @@
 
       <li class="step hidden" id="mark-apply-step">
         <div class="step-head">
-          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
+          <h3><span class="step-number">3</span>Aplicar alterações</h3>
         </div>
         <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
           <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
@@ -204,8 +209,10 @@
       </li>
     </ol>
 
-    <button class="primary-btn" id="add-run" disabled>Baixar minimapmarkers.bin</button>
-    <p class="micro-hint">Baixa um <code>.zip</code> com o novo <code>minimapmarkers.bin</code>, um backup de qualquer arquivo que você carregar, e o <code>edit-marks-log.txt</code>. Coloque o novo arquivo na pasta <code>minimap</code> do seu cliente Tibia (substituindo o antigo) e reinicie o cliente.</p>
+    <div class="completion-row">
+      <p class="micro-hint">Inclui o arquivo atualizado, o backup original e um registro das alterações.</p>
+      <button class="primary-btn" id="add-run" disabled>Baixar Marcações Atualizadas</button>
+    </div>
     <div class="result" id="add-result"></div>
   </section>
 
@@ -252,7 +259,7 @@
       <div class="assistant-list" id="assistant-list"></div>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" data-close-sheet="assistant-sheet">Concluído</button>
+      <button type="button" class="tertiary-btn" data-close-sheet="assistant-sheet">Fechar Assistentes</button>
     </div>
   </dialog>
 
@@ -263,7 +270,7 @@
       <div class="icon-names" id="icon-names-list"></div>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" data-close-sheet="icon-names-sheet">Concluído</button>
+      <button type="button" class="tertiary-btn" data-close-sheet="icon-names-sheet">Fechar Nomes de Ícones</button>
     </div>
   </dialog>
 
@@ -290,7 +297,12 @@
           </div>
           <div class="field field-full">
             <span class="field-label" id="edit-icon-label">Ícone da marcação</span>
-            <div class="icon-field" data-icon-field="edit-icon"></div>
+            <button type="button" class="icon-select-button" id="edit-icon-open" aria-haspopup="dialog" aria-controls="icon-picker-sheet">
+              <span class="icon-select-current" id="edit-icon-current"></span>
+              <span class="icon-select-copy"><strong>Escolher Ícone</strong><small id="edit-icon-name"></small></span>
+              <span class="icon-select-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="hidden" data-icon-field="edit-icon"></div>
           </div>
         </div>
         <p class="form-message error hidden" id="edit-message"></p>
@@ -298,6 +310,19 @@
       <div class="sheet-actions">
         <button type="button" class="tertiary-btn" id="edit-cancel">Cancelar</button>
         <button type="submit" class="primary-btn" id="edit-save">Salvar Alterações</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="sheet icon-picker-sheet" id="icon-picker-sheet" aria-labelledby="icon-picker-title">
+    <form method="dialog">
+      <div class="sheet-head"><h3 id="icon-picker-title">Escolher Ícone da Marcação</h3></div>
+      <div class="sheet-body">
+        <div class="icon-field icon-field-sheet" data-icon-field="icon-picker"></div>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="tertiary-btn" id="icon-picker-cancel">Cancelar</button>
+        <button type="button" class="primary-btn compact-primary" id="icon-picker-confirm">Escolher Ícone</button>
       </div>
     </form>
   </dialog>
@@ -322,12 +347,12 @@
         <li>Nós mesclamos tudo, totalmente no seu navegador -- as marcações são combinadas pelas coordenadas do mapa. Se você e a comunidade marcaram o mesmo local, a sua marcação prevalece.</li>
         <li>Você recebe um novo <code>minimapmarkers.bin</code>, além de um backup do que você enviou e um log completo do que mudou. Coloque o novo arquivo na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
       </ol>
-      <p class="micro-hint">Essa é a aba <strong>Mesclar</strong>, a primeira das quatro. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para <strong>Converter</strong>. E se você quiser montar sua própria lista de
+      <p class="micro-hint">Essa é a ferramenta <strong>Mesclar</strong>, a primeira de cinco. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para <strong>Converter</strong>. E se você quiser montar sua própria lista de
         marcações -- digitadas manualmente, ou lidas de uma quest -- use <strong>Editar Marcações</strong>, que adiciona essa lista ao seu arquivo ou a remove de volta.
         <strong>Coleções</strong> faz o mesmo com uma coleção pronta.</p>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" data-close-sheet="how-it-works-sheet">Concluído</button>
+      <button type="button" class="tertiary-btn" data-close-sheet="how-it-works-sheet">Fechar Guia</button>
     </div>
   </dialog>
 
@@ -342,7 +367,7 @@
       <p class="micro-hint">Dos <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">guias de instalação do tibiamaps.io</a> -- consulte-os se a sua configuração for diferente (por exemplo, instalação em local não padrão, ou o cliente do Test Server).</p>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" data-close-sheet="file-location-sheet">Concluído</button>
+      <button type="button" class="tertiary-btn" data-close-sheet="file-location-sheet">Fechar Locais de Arquivo</button>
     </div>
   </dialog>
 
