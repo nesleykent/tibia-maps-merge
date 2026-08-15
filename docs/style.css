@@ -539,6 +539,9 @@ button { font-family: inherit; }
 
 .marker-form .field-wide { grid-column: span 3; }
 .marker-form .field-full { grid-column: 1 / -1; }
+/* Coordinates take the left of a row; the icon palette sits beside them. */
+.marker-form .field-main { grid-column: span 4; }
+.marker-form .field-side { grid-column: span 2; }
 
 /* The action that completes the form sits trailing, after any message. */
 .form-row {
@@ -572,9 +575,10 @@ button { font-family: inherit; }
    Radio inputs are visually hidden inside each choice, so the group keeps
    native single-selection and arrow-key behaviour. */
 .icon-field {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--ig-space-1);
+  justify-items: center;
 }
 
 .icon-field .icon-choice {
@@ -1059,6 +1063,11 @@ footer a:hover { color: var(--accent); }
 
   .marker-form .field-coord {
     grid-column: span 1;
+  }
+
+  .marker-form .field-main,
+  .marker-form .field-side {
+    grid-column: span 3;
   }
 
   .sheet {

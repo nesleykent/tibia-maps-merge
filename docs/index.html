@@ -140,20 +140,20 @@
             <p class="micro-hint">Optional. Reads the article straight from the wiki in your browser and fills the field below with every coordinate it links to. Works with <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> and <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a> quest articles.</p><p class="micro-hint">Labels are lifted from the text around each link, so check them before adding. For labels written for a player and an icon chosen per location, follow the <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">quest marks guide</a> -- it walks an AI assistant through the article and returns ready-to-paste lines.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
-          <div class="field field-full">
+          <div class="field field-main">
             <label for="mark-coords">Coordinates</label>
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
             <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" id="icon-names-open">See the icon names</button></p>
           </div>
-          <div class="field field-wide">
-            <label for="mark-label">Label</label>
-            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
-          </div>
-          <div class="field field-full">
+          <div class="field field-side">
             <span class="field-label" id="mark-icon-label">Marker icon</span>
             <div class="icon-field" data-icon-field="mark-icon"></div>
+          </div>
+          <div class="field field-full">
+            <label for="mark-label">Label</label>
+            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
           </div>
         </div>
         <div class="form-row">

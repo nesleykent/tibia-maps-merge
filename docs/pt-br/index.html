@@ -142,20 +142,20 @@
             <p class="micro-hint">Opcional. Lê o artigo direto do wiki no seu navegador e preenche o campo abaixo com todas as coordenadas que ele referencia. Funciona com artigos de quest do <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e do <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>.</p><p class="micro-hint">Os rótulos são extraídos do texto ao redor de cada link, então confira antes de adicionar. Para rótulos escritos para o jogador e um ícone escolhido por local, siga o <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">guia de marcações de quest</a> -- ele orienta um assistente de IA pelo artigo e devolve linhas prontas para colar.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
-          <div class="field field-full">
+          <div class="field field-main">
             <label for="mark-coords">Coordenadas</label>
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
             <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo. <button type="button" class="link-btn" id="icon-names-open">Ver os nomes dos ícones</button></p>
           </div>
-          <div class="field field-wide">
-            <label for="mark-label">Rótulo</label>
-            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
-          </div>
-          <div class="field field-full">
+          <div class="field field-side">
             <span class="field-label" id="mark-icon-label">Ícone da marcação</span>
             <div class="icon-field" data-icon-field="mark-icon"></div>
+          </div>
+          <div class="field field-full">
+            <label for="mark-label">Rótulo</label>
+            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
           </div>
         </div>
         <div class="form-row">

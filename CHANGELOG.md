@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.5.1] - 2026-08-15
+
+### Changed
+
+- The icon picker moved to the right of the coordinate field and became a
+  5x4 grid, so the twenty marks read as a palette beside the text you are
+  writing rather than as a long strip underneath it. The two line up at the
+  same height, and the label field now runs the full width below both. On a
+  phone the palette drops under the coordinates and keeps its 40px targets.
+
 ## [1.5.0] - 2026-08-15
 
 ### Changed
