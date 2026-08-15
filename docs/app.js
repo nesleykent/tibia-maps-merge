@@ -545,43 +545,60 @@ syncAddButton();
 // The importer can only read wikis that allow it; an assistant can read any of
 // them. These hand the same URL to the guide's extraction prompt, so a wiki
 // this app cannot fetch is still one paste away from a marker list.
-function questPromptFor(url) {
-  const trimmed = String(url ?? '').trim();
-  let parsed;
-  try {
-    parsed = new URL(trimmed);
-  } catch {
-    return null;
-  }
-  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
-  return buildQuestPrompt(trimmed);
-}
-
 function rejectMissingUrl() {
   wikiStatus.textContent = t('wikiBadUrl');
   wikiStatus.classList.add('error');
 }
 
-document.getElementById('prompt-copy').addEventListener('click', async () => {
-  const prompt = questPromptFor(wikiUrlField.value);
-  if (!prompt) return rejectMissingUrl();
+/** Normalized URL currently in the field, or null if it isn't one yet. */
+function currentPromptUrl() {
+  const trimmed = wikiUrlField.value.trim();
+  if (!trimmed) return null;
   try {
-    await navigator.clipboard.writeText(prompt);
+    const parsed = new URL(trimmed);
+    return (parsed.protocol === 'https:' || parsed.protocol === 'http:') ? trimmed : null;
+  } catch {
+    return null;
+  }
+}
+
+// Says which link the prompt buttons will use, and re-says it on every
+// keystroke. Without this the confirmation after copying reads the same
+// whether or not an edit was picked up, which makes a fresh prompt look
+// like a stale one.
+const promptTarget = document.getElementById('prompt-target');
+
+function syncPromptTarget() {
+  const url = currentPromptUrl();
+  const raw = wikiUrlField.value.trim();
+  promptTarget.classList.toggle('ready', Boolean(url));
+  promptTarget.textContent = url
+    ? t('promptTargetReady', url)
+    : (raw ? t('promptTargetInvalid') : t('promptTargetEmpty'));
+}
+wikiUrlField.addEventListener('input', syncPromptTarget);
+syncPromptTarget();
+
+document.getElementById('prompt-copy').addEventListener('click', async () => {
+  const url = currentPromptUrl();
+  if (!url) return rejectMissingUrl();
+  try {
+    await navigator.clipboard.writeText(buildQuestPrompt(url));
   } catch {
     wikiStatus.textContent = t('promptCopyFailed');
     wikiStatus.classList.add('error');
     return;
   }
   wikiStatus.classList.remove('error');
-  wikiStatus.textContent = t('promptCopied');
+  wikiStatus.textContent = t('promptCopied', url);
 });
 
 document.getElementById('prompt-chatgpt').addEventListener('click', () => {
-  const prompt = questPromptFor(wikiUrlField.value);
-  if (!prompt) return rejectMissingUrl();
+  const url = currentPromptUrl();
+  if (!url) return rejectMissingUrl();
   wikiStatus.classList.remove('error');
-  wikiStatus.textContent = t('promptOpened');
-  window.open(`https://chatgpt.com/?q=${encodeURIComponent(prompt)}`, '_blank', 'noopener');
+  wikiStatus.textContent = t('promptOpened', url);
+  window.open(`https://chatgpt.com/?q=${encodeURIComponent(buildQuestPrompt(url))}`, '_blank', 'noopener');
 });
 
 // ---------- Import from a Tibia Wiki article ----------

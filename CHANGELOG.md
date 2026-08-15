@@ -4,6 +4,20 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.6.2] - 2026-08-15
+
+### Fixed
+
+- Nothing showed which link the prompt buttons were about to use, and the
+  confirmation after copying read the same no matter what you typed -- so
+  editing the URL and copying again looked like it had kept the old one. It
+  had not; the prompt always used the current field. The problem was that the
+  interface gave no way to tell.
+  - A line under the field now names the link that is loaded into the prompt
+    and updates on every keystroke, so an edit is visibly picked up.
+  - "Prompt copied" and "Opened ChatGPT" now name the URL they used, so two
+    consecutive copies of different articles no longer read identically.
+
 ## [1.6.1] - 2026-08-15
 
 ### Fixed

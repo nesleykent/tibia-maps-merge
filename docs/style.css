@@ -815,6 +815,16 @@ button { font-family: inherit; }
 
 .import-row .tertiary-btn { flex: 0 0 auto; }
 
+/* Echoes the link the prompt buttons will use, so an edit is visibly picked up. */
+.prompt-target {
+  overflow-wrap: anywhere;
+}
+
+.prompt-target.ready {
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);
