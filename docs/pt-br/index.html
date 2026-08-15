@@ -22,8 +22,26 @@
       têm prioridade se você tiver marcado o mesmo local de forma diferente.</p>
   </header>
 
+  <section class="workspace-source" aria-labelledby="your-markers-title">
+    <div class="workspace-source-head">
+      <div>
+        <span class="workspace-eyebrow">Entrada compartilhada</span>
+        <h2 id="your-markers-title">Suas marcações</h2>
+        <p>Carregue seu arquivo uma vez e use-o em qualquer ferramenta abaixo.</p>
+      </div>
+      <button type="button" class="secondary-btn hidden" id="your-markers-clear">Limpar arquivo</button>
+    </div>
+    <label class="file-picker workspace-picker">
+      <input type="file" multiple accept=".bin,.json" id="your-marker-files">
+      <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
+    </label>
+    <div class="status-line" id="your-markers-status" aria-live="polite"></div>
+    <p class="micro-hint">Escolha mais de um arquivo para combiná-los na ordem do seletor; o último prevalece nas coordenadas compartilhadas. <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro?</button> Nada sai do seu navegador.</p>
+  </section>
+
   <nav class="mode-tabs" role="tablist" aria-label="Modo">
     <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Mesclar</button>
+    <button class="mode-tab-button" role="tab" id="tab-extract" aria-controls="mode-extract" aria-selected="false" tabindex="-1" data-mode="extract" data-slug="extract-own">Extrair Próprias</button>
     <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Converter</button>
     <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Editar Marcações</button>
     <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Coleções</button>
@@ -41,17 +59,6 @@
         <div class="status-line" id="community-status">Carregando…</div>
       </li>
 
-      <li class="step">
-        <div class="step-head">
-          <h3><span class="step-number">2</span>Suas marcações</h3>
-          <span class="step-note">Escolha mais de um e o último prevalece</span>
-        </div>
-        <label class="file-picker">
-          <input type="file" multiple accept=".bin,.json" id="personal-files">
-          <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
-        </label>
-        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro?</button></p>
-      </li>
     </ol>
 
     <label class="switch-row">
@@ -63,6 +70,38 @@
     <button class="primary-btn" id="merge-run" disabled>Baixar minimapmarkers.bin mesclado</button>
     <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> mesclado, um backup do(s) seu(s) arquivo(s) original(is), e o <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
+  </section>
+
+  <section class="mode-panel" id="mode-extract" role="tabpanel" aria-labelledby="tab-extract">
+    <p class="hint">Recupere somente as marcações que são suas de um arquivo que também contém marcações da Comunidade ou Coleções publicadas.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Escolha as fontes publicadas para subtrair</h3>
+          <button type="button" class="secondary-btn hidden" id="extract-sets-clear">Limpar Coleções</button>
+        </div>
+        <div class="direction-choices extract-source-choice">
+          <label class="direction"><input type="checkbox" id="extract-community" checked><span>Marcações da comunidade</span></label>
+        </div>
+        <span class="field-label extract-sets-label">Coleções <span class="step-note">Opcional — selecione todas que já estão no seu arquivo</span></span>
+        <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
+        <span class="visually-hidden" id="extract-set-choices-label">Coleções para subtrair</span>
+        <div class="status-line" id="extract-source-status" aria-live="polite"></div>
+        <p class="micro-hint">Somente cópias publicadas idênticas são removidas. Uma marcação na mesma coordenada com seu próprio rótulo ou ícone é mantida como uma substituição pessoal.</p>
+      </li>
+
+      <li class="step hidden" id="extract-preview-step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Revisar extração</h3>
+        </div>
+        <div class="result" id="extract-preview"></div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="extract-run" disabled>Baixar marcações próprias</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com <code>own-minimapmarkers.bin</code>, <code>own-markers.json</code>, backups dos arquivos carregados e <code>extract-own-log.txt</code>.</p>
+    <div class="result" id="extract-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-convert" role="tabpanel" aria-labelledby="tab-convert">
@@ -82,12 +121,9 @@
 
       <li class="step" id="conversion-file-field">
         <div class="step-head">
-          <h3><span class="step-number">2</span>Escolha um arquivo</h3>
+          <h3><span class="step-number">2</span>Escolha um dos arquivos carregados</h3>
         </div>
-        <label class="file-picker">
-          <input type="file" accept=".bin" id="conversion-file">
-          <span class="file-picker-label" data-default="Escolha um arquivo…">Escolha um arquivo…</span>
-        </label>
+        <select id="conversion-source" aria-label="Arquivo carregado para converter"></select>
       </li>
     </ol>
 
@@ -102,20 +138,7 @@
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Seu arquivo de marcações</h3>
-          <span class="step-note">Opcional para adicionar, obrigatório para remover</span>
-        </div>
-        <label class="file-picker">
-          <input type="file" multiple accept=".bin,.json" id="add-existing-files">
-          <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
-        </label>
-        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro?</button></p>
-        <div class="status-line" id="add-existing-status"></div>
-      </li>
-
-      <li class="step">
-        <div class="step-head">
-          <h3><span class="step-number">2</span>Definir marcações</h3>
+          <h3><span class="step-number">1</span>Definir marcações</h3>
         </div>
         <div class="marker-form">
           <div class="field field-full">
@@ -153,7 +176,7 @@
 
       <li class="step hidden" id="review-step">
         <div class="step-head">
-          <h3><span class="step-number">3</span>Revisar</h3>
+          <h3><span class="step-number">2</span>Revisar</h3>
           <button class="secondary-btn destructive" id="add-clear">Remover Tudo</button>
         </div>
         <div class="table-wrap">
@@ -168,7 +191,7 @@
 
       <li class="step hidden" id="mark-apply-step">
         <div class="step-head">
-          <h3><span class="step-number">4</span>Adicionar ou remover</h3>
+          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
         </div>
         <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
           <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
@@ -199,20 +222,7 @@
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Seu arquivo de marcações</h3>
-          <span class="step-note">Obrigatório -- isto altera o arquivo que você carregar</span>
-        </div>
-        <label class="file-picker">
-          <input type="file" multiple accept=".bin,.json" id="sets-files">
-          <span class="file-picker-label" data-default="Escolha seu minimapmarkers.bin ou markers.json…">Escolha seu minimapmarkers.bin ou markers.json…</span>
-        </label>
-        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro?</button></p>
-        <div class="status-line" id="sets-file-status"></div>
-      </li>
-
-      <li class="step">
-        <div class="step-head">
-          <h3><span class="step-number">2</span>Escolher marcações</h3>
+          <h3><span class="step-number">1</span>Escolher marcações</h3>
           <span class="step-note">Escolha uma ou mais</span>
           <button class="secondary-btn hidden" id="sets-clear">Limpar Seleção</button>
         </div>
@@ -225,7 +235,7 @@
 
       <li class="step hidden" id="sets-apply-step">
         <div class="step-head">
-          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
+          <h3><span class="step-number">2</span>Adicionar ou remover</h3>
         </div>
         <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
           <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>

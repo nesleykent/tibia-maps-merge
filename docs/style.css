@@ -160,6 +160,59 @@ header h1 {
 
 .subtitle em { font-style: normal; font-weight: var(--font-weight-system-semibold); }
 
+/* One source of truth for the user's file. It sits before the tool tabs so a
+   file chosen here follows the user through Merge, Convert, Edit Marks,
+   Marker Sets, and Extract Own without being picked again. */
+.workspace-source {
+  margin-bottom: var(--ig-space-8);
+  padding: var(--ig-space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--ig-radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--ig-shadow-card);
+}
+
+.workspace-source-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ig-space-5);
+  margin-bottom: var(--ig-space-4);
+}
+
+.workspace-source-head h2 {
+  margin: 2px 0 var(--ig-space-1);
+  font-family: var(--font-family-brand);
+  font-size: var(--system-20-font-size, 20px);
+  line-height: 1.2;
+}
+
+.workspace-source-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-14-line-height);
+}
+
+.workspace-source-head .secondary-btn {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.workspace-eyebrow {
+  display: block;
+  color: var(--accent);
+  font-size: var(--system-12-font-size);
+  font-weight: var(--font-weight-system-semibold);
+  line-height: var(--system-12-line-height);
+  text-transform: uppercase;
+}
+
+.workspace-picker { min-height: 56px; }
+
+.workspace-source .status-line { min-height: 0; margin-top: var(--ig-space-3); }
+.workspace-source .status-line:empty { display: none; }
+
 .hint,
 .micro-hint {
   color: var(--muted);
@@ -961,6 +1014,23 @@ button { font-family: inherit; }
 .conflict-control .direction { background: var(--surface); }
 .conflict-control .micro-hint { margin-bottom: 0; }
 
+.extract-source-choice {
+  max-width: 360px;
+  margin-bottom: var(--ig-space-5);
+}
+
+.extract-sets-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ig-space-2);
+  margin-bottom: var(--ig-space-3);
+  color: var(--text);
+  font-size: var(--system-14-font-size);
+  font-weight: var(--font-weight-system-semibold);
+  line-height: var(--system-14-line-height);
+}
+
 /* Shown only for the one collection that needs explaining before you take it. */
 .set-explainer {
   margin: var(--ig-space-3) 0 0;
@@ -1290,6 +1360,15 @@ footer .link-btn {
 
   .secondary-btn {
     margin: var(--ig-space-2) 0 0;
+  }
+
+  .workspace-source { padding: var(--ig-space-5); }
+
+  .workspace-source-head { align-items: center; }
+
+  .workspace-source-head .secondary-btn {
+    width: auto;
+    margin: 0;
   }
 
   .marker-form {

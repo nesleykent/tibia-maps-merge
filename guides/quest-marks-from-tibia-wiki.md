@@ -333,12 +333,12 @@ model to change behaviour over time.
 
 ## Using the result
 
-1. Open [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/) and
-   select **Edit Marks**.
-2. *Optional* — under **Your marker file**, load your existing
-   `minimapmarkers.bin` or `markers.json`. The new marks are merged into it by
-   coordinate, yours winning on a clash, so the download is your whole marker
-   file rather than just the quest marks. Leave it empty to start a new file.
+1. Open [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/).
+2. *Optional* — under the shared **Your markers** area above the tools, load
+   your existing `minimapmarkers.bin` or `markers.json`, then select **Edit
+   Marks**. The new marks are merged into it by coordinate, yours winning on a
+   clash, so the download is your whole marker file rather than just the quest
+   marks. Leave it empty to start a new file.
 3. Paste the generated lines into **Coordinates** under **Define marks**, then
    click **Add N Marks**. Lines that can't be parsed are reported and skipped
    rather than failing the batch, so a stray line of prose does no harm.
@@ -346,7 +346,7 @@ model to change behaviour over time.
    wrong label, coordinate or icon is fixable without regenerating anything.
 5. Click **Download minimapmarkers.bin**. You get a `.zip` containing the new
    `minimapmarkers.bin`, a backup of any file you loaded, and
-   `add-marks-log.txt` recording what was written.
+   `edit-marks-log.txt` recording what was written.
 6. Drop the new `minimapmarkers.bin` into your Tibia client's `minimap` folder,
    replacing the old one, and restart the client. (Paths are listed under
    "Where do I find my minimapmarkers.bin?" on the app page.)
@@ -372,6 +372,11 @@ Community markers          Existing personal markers
                      ↓
         Quest-ready minimapmarkers.bin
 ```
+
+If you later need to recover only your personal portion from that merged file,
+load it once under **Your markers** and use **Extract Own**. It subtracts exact
+Community/Marker Set copies while keeping your custom labels and icons at
+shared coordinates.
 
 ## Model compatibility
 

@@ -18,10 +18,12 @@ A static page, hosted on GitHub Pages -- no install, no server. It fetches
 the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 ["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
 download (the same file the site itself distributes -- so it's always current
-with the latest game update). Four modes:
+with the latest game update). **Your markers** is one shared upload above the
+tools: choose the file once and Merge, Extract Own, Convert, Edit Marks and
+Marker Sets all use it. Clear it there to switch files. Five modes:
 
-- **Merge** -- pick your own marker file(s) (`minimapmarkers.bin` from
-  your Tibia client, or `markers.json`); they're merged with the live
+- **Merge** -- your uploaded marker file(s) (`minimapmarkers.bin` from
+  your Tibia client, or `markers.json`) are merged with the live
   community markers, yours taking priority at any shared coordinate.
   Downloads a `.zip` containing the merged `minimapmarkers.bin`, an
   unmodified backup of whatever you uploaded, and `merge-log.txt` (a full
@@ -29,6 +31,12 @@ with the latest game update). Four modes:
   every detected conflict). An "export audit files" checkbox adds
   `merged-markers.json` and `conflicts.json` for manual editing or
   third-party tooling.
+- **Extract Own** -- recovers personal markers from a file that already mixes
+  them with Community markers and/or any combination of the nine published
+  Marker Sets. It subtracts exact published copies, while preserving a marker
+  at a shared coordinate when its label or icon differs -- that is a personal
+  override, not published data. The download contains both
+  `own-minimapmarkers.bin` and `own-markers.json`, backups, and an audit log.
 - **Convert** -- pure format conversion, no merging:
   `minimapmarkers.bin` ↔ `markers.json`, or the live community markers
   straight to `community-markers.json`. Downloads a `.zip` with the
@@ -36,25 +44,25 @@ with the latest game update). Four modes:
   count, and a real round-trip validation check).
 - **Edit Marks** -- put a list of marks together yourself, edit it, then add
   it to your marker file or take it back out. One path, top to bottom: **1**
-  your marker file, **2** define marks, **3** review, **4** add or remove,
-  then download. Step 1 is optional when adding -- load your own
-  `minimapmarkers.bin`/`markers.json` and the new marks are merged into it
+  define marks, **2** review, **3** add or remove, then download. The shared
+  upload is optional when adding -- load your own `minimapmarkers.bin` or
+  `markers.json` above the tools and the new marks are merged into it
   by coordinate, yours winning on a clash, so the download is your whole
   marker file rather than just the new marks; leave it empty and you get a
-  file containing only what you typed. Step 2 is a single form for one mark
+  file containing only what you typed. Step 1 is a single form for one mark
   or a hundred: a coordinate field taking one mark per line (`x, y, z`),
   plus a label and icon applied to the batch, either of which a line can
   override by appending its own (`32250, 31385, 5, Depot, flag`).
   Unparseable lines are reported and skipped rather than failing the batch.
-  Step 2 can also fill itself from a **Tibia Wiki quest article**: paste the
+  Step 1 can also fill itself from a **Tibia Wiki quest article**: paste the
   URL and it pulls every coordinate the article links to, labelled from the
   surrounding sentence, ready to edit. It reads the article's wikitext
   through the MediaWiki API (`origin=*`), so no proxy or server is involved
   and only public article text is requested. Both wiki styles are handled:
   tibiawiki.com.br's plain `{{Mapa|x,y,z}}` links, and tibia.fandom.com's
   Mapper `sector.offset` templates (following the `/Spoiler` subpage where
-  the walkthrough actually lives). Step 3 is a table with Edit/Delete per
-  row, kept across reloads in `localStorage`. Step 4 appears once a file is
+  the walkthrough actually lives). Step 2 is a table with Edit/Delete per
+  row, kept across reloads in `localStorage`. Step 3 appears once a file is
   loaded and asks which way to apply the reviewed list: **add** merges it in,
   while **remove** drops every coordinate in the list from the file, whatever
   it is labelled there. When adding, identical overlaps stay unchanged and
@@ -149,18 +157,18 @@ text lives directly in each language's HTML file; the handful of strings
 `app.js` generates dynamically (status/result messages) go through
 [`docs/lib/i18n.js`](docs/lib/i18n.js), keyed off each page's `<html lang>`.
 
-The four modes are a real tablist: `role="tablist"` with `aria-selected` and
+The five modes are a real tablist: `role="tablist"` with `aria-selected` and
 `aria-controls`, each panel a `tabpanel` named by its tab, a roving tabindex
 so the group is a single tab stop, and arrow keys (plus Home/End) moving
 between them. The bar is sticky, since Edit Marks runs well past a screen.
-The current mode lives in the URL (`#merge`, `#convert`, `#edit-marks`,
-`#marker-sets`) so it can be linked to and survives a reload -- the same slugs
+The current mode lives in the URL (`#merge`, `#extract-own`, `#convert`,
+`#edit-marks`, `#marker-sets`) so it can be linked to and survives a reload -- the same slugs
 in both languages, set with `replaceState` so a tab does not cost a press of
 Back. An unrecognised fragment is left alone.
 
-The page is the tool: hero, tabs, panel, and nothing else -- a test enforces
-that nothing creeps in above or below. Everything read once or consulted in
-passing is a sheet instead. **How it works** is a pill in the header row
+The page is the tool: hero, one shared file source, tabs, and the active panel.
+Everything read once or consulted in passing is a sheet instead. **How it
+works** is a pill in the header row
 beside the language switch, which the page was already paying for, so it
 costs no space at all; **where the client keeps `minimapmarkers.bin`** is its
 own sheet, offered beside each picker that asks for your file, because that
@@ -168,7 +176,7 @@ one is needed mid-task rather than read up front. Both are in the footer as
 well. Sheets are declared, not wired: `data-open-sheet`/`data-close-sheet` on
 the trigger, backdrop-click and Escape to dismiss.
 
-All four modes share one structure, so they read and behave the same way:
+All five modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that
 names what it produces (in Convert the label follows the chosen conversion).
 Temporary contexts -- editing a mark, confirming a removal, picking an icon

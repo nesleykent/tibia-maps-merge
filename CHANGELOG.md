@@ -4,6 +4,27 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.17.0] - 2026-08-15
+
+### Added
+
+- **One shared “Your markers” upload now sits above every tool.** Merge,
+  Convert, Edit Marks and Marker Sets reuse the same parsed file selection,
+  and a visible Clear file control resets every dependent preview so another
+  file can be loaded without refreshing the page.
+- **Extract Own recovers personal markers from a mixed client file.** Users can
+  subtract live Community markers and any combination of published Marker
+  Sets. Exact published copies are removed, while custom labels or icons at a
+  published coordinate remain as personal overrides. The preview explains the
+  split and the ZIP includes binary and JSON personal-marker files, source
+  backups, and an audit log.
+
+### Changed
+
+- Convert chooses a compatible file from the shared upload instead of opening
+  another file picker. Both English and Brazilian Portuguese layouts use the
+  same five-tool workflow and responsive shared-source card.
+
 ## [1.16.2] - 2026-08-15
 
 ### Fixed

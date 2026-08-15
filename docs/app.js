@@ -1,8 +1,9 @@
 import { fetchCommunityMarkers } from './lib/community.js';
 import { applyEditedMarks } from './lib/edit-marks.js';
+import { extractOwnMarkers } from './lib/extract-markers.js';
 import { DEFAULT_ICON, MARKER_ICONS, iconGlyph } from './lib/icons.js';
 import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
-import { buildAddMarksLog, buildConversionLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
+import { buildAddMarksLog, buildConversionLog, buildExtractOwnLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
 import { MARKER_SETS, applyMarkerSet, fetchMarkerSet, fetchSetDates } from './lib/marker-sets.js';
@@ -85,12 +86,24 @@ document.querySelectorAll('.version-link').forEach((el) => {
   el.href = CHANGELOG_URL;
 });
 
-// ---------- Community markers (shared by both modes) ----------
+// ---------- Your markers (one shared input for every tool) ----------
+const yourMarkersInput = document.getElementById('your-marker-files');
+const yourMarkersStatus = document.getElementById('your-markers-status');
+const yourMarkersClear = document.getElementById('your-markers-clear');
+
+let yourMarkerFiles = [];
+let yourMarkerGroups = [];
+let yourMarkers = [];
+let yourMarkersSkipped = [];
+let yourMarkersLoad = Promise.resolve();
+
+// ---------- Community markers (shared by Merge and Extract Own) ----------
 const runButton = document.getElementById('merge-run');
 const statusEl = document.getElementById('community-status');
-const personalInput = document.getElementById('personal-files');
 
 let community = null; // {markers, lastModified}
+let communityLoad = Promise.resolve();
+let communityError = null;
 
 async function loadCommunityMarkers(forceRefresh = false) {
   statusEl.textContent = t('loading');
@@ -98,26 +111,30 @@ async function loadCommunityMarkers(forceRefresh = false) {
   runButton.disabled = true;
   try {
     community = await fetchCommunityMarkers({ forceRefresh });
+    communityError = null;
     statusEl.textContent = t('loaded', community.markers.length, localeDate(community.lastModified));
-    runButton.disabled = false;
+    runButton.disabled = yourMarkers.length === 0;
     const refresh = document.createElement('button');
     refresh.className = 'secondary-btn';
     refresh.textContent = t('checkForUpdates');
-    refresh.addEventListener('click', () => loadCommunityMarkers(true));
+    refresh.addEventListener('click', () => { communityLoad = loadCommunityMarkers(true); });
     statusEl.appendChild(refresh);
+    refreshExtractPreview();
   } catch (err) {
     community = null;
+    communityError = err;
     statusEl.textContent = `${err.message} `;
     statusEl.classList.add('error');
     const retry = document.createElement('button');
     retry.className = 'secondary-btn';
     retry.textContent = t('retry');
-    retry.addEventListener('click', () => loadCommunityMarkers(true));
+    retry.addEventListener('click', () => { communityLoad = loadCommunityMarkers(true); });
     statusEl.appendChild(retry);
+    refreshExtractPreview();
   }
 }
 
-loadCommunityMarkers();
+communityLoad = loadCommunityMarkers();
 
 // ---------- File-picker labels (shared helper) ----------
 function wireFilePickerLabel(input) {
@@ -134,6 +151,75 @@ function wireFilePickerLabel(input) {
   });
 }
 document.querySelectorAll('.file-picker input[type="file"]').forEach(wireFilePickerLabel);
+
+function syncYourMarkersConsumers() {
+  runButton.disabled = !community || yourMarkers.length === 0;
+  updateConversionSourceOptions();
+  refreshApplyStep();
+  refreshSetsPreview();
+  refreshExtractPreview();
+}
+
+function clearYourMarkersResults() {
+  for (const id of ['merge-result', 'convert-result', 'add-result', 'sets-result', 'extract-result']) {
+    document.getElementById(id).textContent = '';
+  }
+}
+
+async function loadYourMarkers() {
+  clearYourMarkersResults();
+  const files = Array.from(yourMarkersInput.files || []);
+  yourMarkerFiles = files;
+  yourMarkerGroups = [];
+  yourMarkers = [];
+  yourMarkersSkipped = [];
+  yourMarkersStatus.classList.remove('error');
+  yourMarkersClear.classList.toggle('hidden', files.length === 0);
+
+  if (files.length === 0) {
+    yourMarkersStatus.textContent = '';
+    syncYourMarkersConsumers();
+    return;
+  }
+
+  yourMarkersStatus.textContent = t('loading');
+  for (const file of files) {
+    try {
+      yourMarkerGroups.push(await loadMarkersFile(file));
+    } catch (err) {
+      yourMarkersSkipped.push({ file: file.name, error: err.message });
+    }
+  }
+
+  if (yourMarkerGroups.length === 0) {
+    yourMarkersStatus.textContent = t('noneParsed');
+    yourMarkersStatus.classList.add('error');
+    syncYourMarkersConsumers();
+    return;
+  }
+
+  yourMarkers = mergeMarkers(...yourMarkerGroups);
+  yourMarkersStatus.textContent = t(
+    'yourMarkersLoaded',
+    yourMarkers.length,
+    files.map((file) => file.name).join(', '),
+    yourMarkersSkipped.length,
+  );
+  syncYourMarkersConsumers();
+}
+
+yourMarkersInput.addEventListener('change', () => {
+  yourMarkersLoad = loadYourMarkers();
+});
+
+yourMarkersClear.addEventListener('click', () => {
+  yourMarkersInput.value = '';
+  const label = yourMarkersInput.closest('.file-picker').querySelector('.file-picker-label');
+  label.textContent = label.dataset.default;
+  label.classList.remove('chosen');
+  yourMarkersLoad = loadYourMarkers();
+  yourMarkersInput.focus();
+});
 
 // ---------- Shared helpers ----------
 function downloadBlob(blob, filename) {
@@ -171,44 +257,30 @@ function withBusy(button, fn) {
   };
 }
 
+async function backupYourMarkerFiles(generatedAt) {
+  return Promise.all(yourMarkerFiles.map(async (file) => ({
+    name: `backup-${formatBackupTimestamp(generatedAt)}_${file.name}`,
+    data: new Uint8Array(await file.arrayBuffer()),
+  })));
+}
+
 // ================= Merge Mode =================
 runButton.addEventListener('click', withBusy(runButton, async () => {
+  await yourMarkersLoad;
   if (!community) {
     renderResult('merge-result', t('communityFailed'), true);
     return;
   }
-  if (!personalInput.files || personalInput.files.length === 0) {
+  if (yourMarkers.length === 0) {
     renderResult('merge-result', t('chooseFile'), true);
     return;
   }
   const generatedAt = new Date();
   const lang = currentLang();
-  const files = Array.from(personalInput.files);
-
-  const personalGroups = [];
-  const skipped = [];
-  const backupEntries = [];
-  for (const file of files) {
-    backupEntries.push({
-      name: `backup-${formatBackupTimestamp(generatedAt)}_${file.name}`,
-      data: new Uint8Array(await file.arrayBuffer()),
-    });
-    try {
-      personalGroups.push(await loadMarkersFile(file));
-    } catch (err) {
-      skipped.push({ file: file.name, error: err.message });
-    }
-  }
-  if (personalGroups.length === 0) {
-    renderResult('merge-result', t('noneParsed'), true);
-    return;
-  }
+  const backupEntries = await backupYourMarkerFiles(generatedAt);
 
   const communityByKey = new Map(community.markers.map((m) => [markerKey(m), m]));
-  const personalByKey = new Map();
-  for (const group of personalGroups) {
-    for (const m of group) personalByKey.set(markerKey(m), m);
-  }
+  const personalByKey = new Map(yourMarkers.map((marker) => [markerKey(marker), marker]));
 
   let identicalCount = 0;
   const conflicts = [];
@@ -224,8 +296,8 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
   const conflictCount = conflicts.length;
   const addedCount = personalByKey.size - identicalCount - conflictCount;
 
-  const merged = mergeMarkers(community.markers, ...personalGroups);
-  const personalLoadedCount = personalGroups.reduce((sum, g) => sum + g.length, 0);
+  const merged = mergeMarkers(community.markers, yourMarkers);
+  const personalLoadedCount = yourMarkerGroups.reduce((sum, group) => sum + group.length, 0);
 
   const entries = [
     { name: 'minimapmarkers.bin', data: writeMarkersBin(merged) },
@@ -234,7 +306,7 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
       name: 'merge-log.txt',
       data: new TextEncoder().encode(buildMergeLog({
         generatedAt,
-        userFilenames: files.map((f) => f.name),
+        userFilenames: yourMarkerFiles.map((file) => file.name),
         backupFilenames: backupEntries.map((e) => e.name),
         communityCount: community.markers.length,
         personalLoadedCount,
@@ -255,8 +327,8 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
   const zipName = 'tibia-maps-merge.zip';
   downloadBlob(new Blob([buildZip(entries)]), zipName);
 
-  const skippedHtml = skipped.length
-    ? `<p>${t('skippedIntro')}</p><ul class="warn-list">${skipped.map((s) => `<li>${s.file}: ${s.error}</li>`).join('')}</ul>`
+  const skippedHtml = yourMarkersSkipped.length
+    ? `<p>${t('skippedIntro')}</p><ul class="warn-list">${yourMarkersSkipped.map((s) => `<li>${escapeHtml(s.file)}: ${escapeHtml(s.error)}</li>`).join('')}</ul>`
     : '';
   renderResult('merge-result', `
     ${t('mergedSuccessZip', zipName)}
@@ -275,7 +347,7 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
 // ================= Conversion Mode =================
 const conversionType = document.getElementById('conversion-type');
 const conversionFileField = document.getElementById('conversion-file-field');
-const conversionFileInput = document.getElementById('conversion-file');
+const conversionSource = document.getElementById('conversion-source');
 const convertButton = document.getElementById('convert-run');
 
 const CONVERSION_CONFIG = {
@@ -284,10 +356,40 @@ const CONVERSION_CONFIG = {
   'community-to-json': { needsFile: false, accept: '', output: 'community-markers.json' },
 };
 
+function updateConversionSourceOptions() {
+  if (!conversionSource) return;
+  const config = CONVERSION_CONFIG[conversionType.value];
+  const previous = conversionSource.value;
+  const accepted = yourMarkerFiles
+    .map((file, index) => ({ file, index }))
+    .filter(({ file }) => file.name.toLowerCase().endsWith(config.accept));
+
+  conversionSource.textContent = '';
+  if (accepted.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = t('chooseConversionFile');
+    conversionSource.appendChild(option);
+    conversionSource.disabled = true;
+    return;
+  }
+
+  for (const { file, index } of accepted) {
+    const option = document.createElement('option');
+    option.value = String(index);
+    option.textContent = file.name;
+    conversionSource.appendChild(option);
+  }
+  conversionSource.disabled = false;
+  if ([...conversionSource.options].some((option) => option.value === previous)) {
+    conversionSource.value = previous;
+  }
+}
+
 function updateConversionFieldVisibility() {
   const config = CONVERSION_CONFIG[conversionType.value];
   conversionFileField.classList.toggle('hidden', !config.needsFile);
-  conversionFileInput.accept = config.accept;
+  updateConversionSourceOptions();
   // Every primary action in the app names what it produces, so this one
   // follows the chosen conversion.
   convertButton.textContent = t('downloadFile', config.output);
@@ -296,12 +398,15 @@ conversionType.addEventListener('change', updateConversionFieldVisibility);
 updateConversionFieldVisibility();
 
 convertButton.addEventListener('click', withBusy(convertButton, async () => {
+  await yourMarkersLoad;
   const generatedAt = new Date();
   const lang = currentLang();
   const type = conversionType.value;
   const config = CONVERSION_CONFIG[type];
 
-  if (config.needsFile && (!conversionFileInput.files || conversionFileInput.files.length === 0)) {
+  const sourceIndex = conversionSource.value === '' ? null : Number(conversionSource.value);
+  const sourceFile = config.needsFile && sourceIndex !== null ? yourMarkerFiles[sourceIndex] : null;
+  if (config.needsFile && !sourceFile) {
     renderResult('convert-result', t('chooseConversionFile'), true);
     return;
   }
@@ -316,7 +421,7 @@ convertButton.addEventListener('click', withBusy(convertButton, async () => {
 
   try {
     if (type === 'bin-to-json') {
-      const file = conversionFileInput.files[0];
+      const file = sourceFile;
       const bytes = await file.arrayBuffer();
       const markers = parseMarkersBin(bytes, { source: file.name });
       outputBytes = new TextEncoder().encode(JSON.stringify(markers, null, 4));
@@ -330,7 +435,7 @@ convertButton.addEventListener('click', withBusy(convertButton, async () => {
       // types -- so a successful parse already proves losslessness here.
       validationLine = t('logValidationOk');
     } else if (type === 'json-to-bin') {
-      const file = conversionFileInput.files[0];
+      const file = sourceFile;
       const markers = validateMarkers(JSON.parse(await file.text()), { source: file.name });
       outputBytes = writeMarkersBin(markers);
       outputName = 'minimapmarkers.bin';
@@ -389,8 +494,6 @@ convertButton.addEventListener('click', withBusy(convertButton, async () => {
 // is mirrored into localStorage -- best-effort, like the community cache.
 const PENDING_KEY = 'tibia-maps-merge:pending-markers:v1';
 
-const addExistingInput = document.getElementById('add-existing-files');
-const addExistingStatus = document.getElementById('add-existing-status');
 const wikiUrlField = document.getElementById('wiki-url');
 const wikiImportButton = document.getElementById('wiki-import');
 const wikiStatus = document.getElementById('wiki-status');
@@ -566,7 +669,7 @@ function renderPending() {
 // list can produce is a new file. Answering 'add' there keeps a stale radio
 // from emptying a file that was unloaded after it was picked.
 function markDirection() {
-  if (existingBase.length === 0) return 'add';
+  if (yourMarkers.length === 0) return 'add';
   return document.querySelector('input[name="mark-direction"]:checked')?.value ?? 'add';
 }
 
@@ -575,7 +678,7 @@ function markConflictPolicy() {
 }
 
 function refreshApplyStep() {
-  const ready = pending.length > 0 && existingBase.length > 0;
+  const ready = pending.length > 0 && yourMarkers.length > 0;
   markApplyStep.classList.toggle('hidden', !ready);
   if (!ready) {
     markPreview.innerHTML = '';
@@ -583,7 +686,7 @@ function refreshApplyStep() {
     return;
   }
   const mode = markDirection();
-  const outcome = applyEditedMarks(existingBase, pending, {
+  const outcome = applyEditedMarks(yourMarkers, pending, {
     mode,
     conflictPolicy: markConflictPolicy(),
   });
@@ -842,54 +945,15 @@ document.getElementById('clear-confirm').addEventListener('click', () => {
   clearSheet.close();
 });
 
-// ---------- Your existing marker file ----------
-let existingBase = [];
-let existingSkipped = [];
-let existingLoad = Promise.resolve();
-
-async function loadExistingMarkers() {
-  const files = Array.from(addExistingInput.files || []);
-  const groups = [];
-  existingBase = [];
-  existingSkipped = [];
-  if (files.length === 0) {
-    addExistingStatus.textContent = '';
-    addExistingStatus.classList.remove('error');
-    refreshApplyStep();
-    return;
-  }
-  addExistingStatus.textContent = t('loading');
-  addExistingStatus.classList.remove('error');
-  for (const file of files) {
-    try {
-      groups.push(await loadMarkersFile(file));
-    } catch (err) {
-      existingSkipped.push({ file: file.name, error: err.message });
-    }
-  }
-  if (groups.length === 0) {
-    addExistingStatus.textContent = t('noneParsed');
-    addExistingStatus.classList.add('error');
-    refreshApplyStep();
-    return;
-  }
-  existingBase = mergeMarkers(...groups);
-  addExistingStatus.textContent = t('existingLoaded', existingBase.length, files.map((f) => f.name).join(', '));
-  refreshApplyStep();
-}
-
-addExistingInput.addEventListener('change', () => { existingLoad = loadExistingMarkers(); });
-
 // ---------- Export ----------
 addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   if (pending.length === 0) {
     renderResult('add-result', t('addNoMarkers'), true);
     return;
   }
-  await existingLoad; // a file picked a moment ago may still be parsing
+  await yourMarkersLoad; // a file picked a moment ago may still be parsing
   const generatedAt = new Date();
   const lang = currentLang();
-  const files = Array.from(addExistingInput.files || []);
 
   const mode = markDirection();
   const conflictPolicy = markConflictPolicy();
@@ -897,15 +961,10 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   let outcome;
   let outputBytes;
   let validationLine;
-  const backupEntries = [];
+  let backupEntries = [];
   try {
-    for (const file of files) {
-      backupEntries.push({
-        name: `backup-${formatBackupTimestamp(generatedAt)}_${file.name}`,
-        data: new Uint8Array(await file.arrayBuffer()),
-      });
-    }
-    outcome = applyEditedMarks(existingBase, pending, { mode, conflictPolicy });
+    backupEntries = await backupYourMarkerFiles(generatedAt);
+    outcome = applyEditedMarks(yourMarkers, pending, { mode, conflictPolicy });
     validateMarkers(outcome.result, { source: 'edit-marks' });
     outputBytes = writeMarkersBin(outcome.result);
     const reparsed = parseMarkersBin(
@@ -926,11 +985,11 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
       name: 'edit-marks-log.txt',
       data: new TextEncoder().encode(buildAddMarksLog({
         generatedAt,
-        userFilenames: files.map((f) => f.name),
+        userFilenames: yourMarkerFiles.map((file) => file.name),
         backupFilenames: backupEntries.map((e) => e.name),
         mode,
         conflictPolicy,
-        existingCount: existingBase.length,
+        existingCount: yourMarkers.length,
         addedCount: outcome.added,
         identicalCount: outcome.identical,
         replacedCount: outcome.replaced,
@@ -947,8 +1006,8 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   const zipName = 'tibia-maps-merge-marks.zip';
   downloadBlob(new Blob([buildZip(entries)]), zipName);
 
-  const skippedHtml = existingSkipped.length
-    ? `<p>${t('skippedIntro')}</p><ul class="warn-list">${existingSkipped.map((s) => (
+  const skippedHtml = yourMarkersSkipped.length
+    ? `<p>${t('skippedIntro')}</p><ul class="warn-list">${yourMarkersSkipped.map((s) => (
       `<li>${escapeHtml(s.file)}: ${escapeHtml(s.error)}</li>`
     )).join('')}</ul>`
     : '';
@@ -963,7 +1022,7 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   renderResult('add-result', `
     ${t(mode === 'remove' ? 'marksUpdatedZip' : 'marksCreatedZip', zipName)}
     <dl>
-      <dt>${t('labelExisting')}</dt><dd>${localeNumber(existingBase.length)}</dd>
+      <dt>${t('labelExisting')}</dt><dd>${localeNumber(yourMarkers.length)}</dd>
       ${rows}
       <dt>${t('labelTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
     </dl>
@@ -980,16 +1039,11 @@ renderPending();
 // picker and a preview. Marks you assemble yourself go through Edit Marks,
 // which has the row-by-row table for exactly that.
 
-const setsInput = document.getElementById('sets-files');
-const setsFileStatus = document.getElementById('sets-file-status');
 const setChoices = document.getElementById('set-choices');
 const setsSourceStatus = document.getElementById('sets-source-status');
 const setsApplyStep = document.getElementById('sets-apply-step');
 const setsPreview = document.getElementById('sets-preview');
 const setsRunButton = document.getElementById('sets-run');
-
-let setsBase = [];              // markers loaded from the user's file
-let setsBaseFiles = [];
 
 // Collections are picked, not loaded one at a time: fetched on first tick and
 // kept, so unticking and re-ticking costs nothing. `selectedSets` holds the
@@ -1114,6 +1168,7 @@ function toggleSet(id, checked) {
       return;
     }
     syncSetSelection();
+    refreshExtractPreview();
   });
 }
 
@@ -1131,41 +1186,6 @@ function reportSetSelection() {
     : t('setsLoaded', chosen.length, total);
 }
 
-// ---------- your file ----------
-let setsLoad = Promise.resolve();
-
-async function loadSetsBase() {
-  const files = Array.from(setsInput.files || []);
-  setsBase = [];
-  setsBaseFiles = files;
-  if (files.length === 0) {
-    setsFileStatus.textContent = '';
-    setsFileStatus.classList.remove('error');
-    refreshSetsPreview();
-    return;
-  }
-  setsFileStatus.classList.remove('error');
-  setsFileStatus.textContent = t('loading');
-  const groups = [];
-  for (const file of files) {
-    try {
-      groups.push(await loadMarkersFile(file));
-    } catch {
-      // reported below by the count, same as Merge Mode's skip behaviour
-    }
-  }
-  if (groups.length === 0) {
-    setsFileStatus.textContent = t('noneParsed');
-    setsFileStatus.classList.add('error');
-    refreshSetsPreview();
-    return;
-  }
-  setsBase = mergeMarkers(...groups);
-  setsFileStatus.textContent = t('existingLoaded', setsBase.length, files.map((f) => f.name).join(', '));
-  refreshSetsPreview();
-}
-
-setsInput.addEventListener('change', () => { setsLoad = loadSetsBase(); });
 document.querySelectorAll('input[name="set-direction"]').forEach((r) => r.addEventListener('change', refreshSetsPreview));
 
 // ---------- what it will do ----------
@@ -1177,7 +1197,7 @@ function chosenLabel() {
 
 function refreshSetsPreview() {
   const chosen = chosenSets();
-  const ready = setsBase.length > 0 && chosen.length > 0 && setsReady();
+  const ready = yourMarkers.length > 0 && chosen.length > 0 && setsReady();
   setsApplyStep.classList.toggle('hidden', !ready);
   setsRunButton.disabled = !ready;
   if (!ready) {
@@ -1186,7 +1206,7 @@ function refreshSetsPreview() {
   }
   const marks = chosenMarkers();
   const mode = setsDirection();
-  const { added, kept, removed, total } = applyMarkerSet(setsBase, marks, mode);
+  const { added, kept, removed, total } = applyMarkerSet(yourMarkers, marks, mode);
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
     : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
@@ -1202,9 +1222,9 @@ function refreshSetsPreview() {
 
 // ---------- download ----------
 setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
-  await setsLoad;
+  await yourMarkersLoad;
   await setsFetch;
-  if (setsBase.length === 0 || chosenSets().length === 0 || !setsReady()) return;
+  if (yourMarkers.length === 0 || chosenSets().length === 0 || !setsReady()) return;
   const chosenMarks = { label: chosenLabel(), markers: chosenMarkers() };
   const generatedAt = new Date();
   const lang = currentLang();
@@ -1213,15 +1233,10 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
   let outcome;
   let outputBytes;
   let validationLine;
-  const backupEntries = [];
+  let backupEntries = [];
   try {
-    for (const file of setsBaseFiles) {
-      backupEntries.push({
-        name: `backup-${formatBackupTimestamp(generatedAt)}_${file.name}`,
-        data: new Uint8Array(await file.arrayBuffer()),
-      });
-    }
-    outcome = applyMarkerSet(setsBase, chosenMarks.markers, mode);
+    backupEntries = await backupYourMarkerFiles(generatedAt);
+    outcome = applyMarkerSet(yourMarkers, chosenMarks.markers, mode);
     validateMarkers(outcome.result, { source: 'marker-sets' });
     outputBytes = writeMarkersBin(outcome.result);
     const reparsed = parseMarkersBin(
@@ -1242,13 +1257,13 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
       name: 'marker-sets-log.txt',
       data: new TextEncoder().encode(buildMarkerSetsLog({
         generatedAt,
-        userFilenames: setsBaseFiles.map((f) => f.name),
+        userFilenames: yourMarkerFiles.map((file) => file.name),
         backupFilenames: backupEntries.map((e) => e.name),
         setName: chosenMarks.label,
         setCount: chosenMarks.markers.length,
         setCountsByName: chosenSets().map(({ id, name }) => [name, loadedSets.get(id).length]),
         mode,
-        baseCount: setsBase.length,
+        baseCount: yourMarkers.length,
         addedCount: outcome.added,
         keptCount: outcome.kept,
         removedCount: outcome.removed,
@@ -1269,9 +1284,232 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
     ${t('setsAppliedZip', zipName)}
     <dl>
       <dt>${t('labelCollections')}</dt><dd>${escapeHtml(chosenMarks.label)}</dd>
-      <dt>${t('labelExisting')}</dt><dd>${localeNumber(setsBase.length)}</dd>
+      <dt>${t('labelExisting')}</dt><dd>${localeNumber(yourMarkers.length)}</dd>
       ${rows}
       <dt>${t('labelTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
+    </dl>
+  `, false);
+}));
+
+// ================= Extract Own =================
+// A merged client file can contain three kinds of data: unchanged Community
+// markers, unchanged published Marker Sets, and personal markers. Exact
+// content matching separates them without deleting a personal label/icon that
+// intentionally overrides published data at the same coordinate.
+const extractCommunityInput = document.getElementById('extract-community');
+const extractSetChoices = document.getElementById('extract-set-choices');
+const extractSetsClear = document.getElementById('extract-sets-clear');
+const extractSourceStatus = document.getElementById('extract-source-status');
+const extractPreviewStep = document.getElementById('extract-preview-step');
+const extractPreview = document.getElementById('extract-preview');
+const extractRunButton = document.getElementById('extract-run');
+
+const extractSelectedSets = new Set();
+const extractFailedSets = new Set();
+let extractFetch = Promise.resolve();
+
+for (const { id, name, large } of MARKER_SETS) {
+  const choice = document.createElement('label');
+  choice.className = 'set-choice';
+  choice.innerHTML = '<input type="checkbox" name="extract-marker-set" class="visually-hidden">'
+    + `<span class="set-name">${CHECK_SVG}<span class="set-title"></span></span>`
+    + '<span class="set-note"></span>';
+  const input = choice.querySelector('input');
+  input.value = id;
+  choice.querySelector('.set-title').textContent = name;
+  if (large) choice.querySelector('.set-note').textContent = t('setLarge');
+  input.addEventListener('change', () => {
+    if (input.checked) {
+      extractSelectedSets.add(id);
+      extractFailedSets.delete(id);
+      queueExtractSetLoads([id]);
+    } else {
+      extractSelectedSets.delete(id);
+      extractFailedSets.delete(id);
+    }
+    extractSetsClear.classList.toggle('hidden', extractSelectedSets.size === 0);
+    refreshExtractPreview();
+  });
+  extractSetChoices.appendChild(choice);
+}
+
+function queueExtractSetLoads(ids) {
+  extractFetch = extractFetch.then(async () => {
+    for (const id of ids) {
+      if (!extractSelectedSets.has(id) || loadedSets.has(id)) continue;
+      try {
+        loadedSets.set(id, await fetchMarkerSet(id));
+        extractFailedSets.delete(id);
+      } catch {
+        extractFailedSets.add(id);
+      }
+      refreshExtractPreview();
+    }
+  });
+}
+
+extractSetsClear.addEventListener('click', () => {
+  for (const input of extractSetChoices.querySelectorAll('input')) input.checked = false;
+  extractSelectedSets.clear();
+  extractFailedSets.clear();
+  extractSetsClear.classList.add('hidden');
+  refreshExtractPreview();
+});
+
+extractCommunityInput.addEventListener('change', refreshExtractPreview);
+
+function selectedExtractSets() {
+  return MARKER_SETS.filter(({ id }) => extractSelectedSets.has(id));
+}
+
+function extractReferences() {
+  const references = [];
+  if (extractCommunityInput.checked && community) references.push(...community.markers);
+  for (const { id } of selectedExtractSets()) references.push(...(loadedSets.get(id) ?? []));
+  return references;
+}
+
+function extractSourceNames() {
+  const names = [];
+  if (extractCommunityInput.checked) names.push(t('extractCommunityName'));
+  names.push(...selectedExtractSets().map(({ name }) => name));
+  return names;
+}
+
+function renderExtractStatus(message, { error = false, retry = null } = {}) {
+  extractSourceStatus.textContent = message;
+  extractSourceStatus.classList.toggle('error', error);
+  if (!retry) return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary-btn';
+  button.textContent = t('retry');
+  button.addEventListener('click', retry);
+  extractSourceStatus.appendChild(button);
+}
+
+function refreshExtractPreview() {
+  // The first community request resolves after the module finishes loading,
+  // but this function can also be called synchronously while the elements are
+  // still being declared above. Guarding makes that harmless.
+  if (!extractPreviewStep) return;
+  const selectedSetsForExtraction = selectedExtractSets();
+  const hasSource = extractCommunityInput.checked || selectedSetsForExtraction.length > 0;
+  const communityReady = !extractCommunityInput.checked || community !== null;
+  const setsReadyForExtraction = selectedSetsForExtraction.every(({ id }) => loadedSets.has(id));
+  const ready = yourMarkers.length > 0 && hasSource && communityReady
+    && setsReadyForExtraction && extractFailedSets.size === 0;
+
+  extractPreviewStep.classList.toggle('hidden', !ready);
+  extractRunButton.disabled = !ready;
+  if (!ready) extractPreview.innerHTML = '';
+
+  if (yourMarkers.length === 0) {
+    renderExtractStatus(t('extractNeedsMarkers'));
+    return;
+  }
+  if (!hasSource) {
+    renderExtractStatus(t('extractChooseSource'));
+    return;
+  }
+  if (extractCommunityInput.checked && communityError) {
+    renderExtractStatus(communityError.message, {
+      error: true,
+      retry: () => { communityLoad = loadCommunityMarkers(true); },
+    });
+    return;
+  }
+  if (extractFailedSets.size > 0) {
+    renderExtractStatus(t('setUnreachable'), {
+      error: true,
+      retry: () => {
+        const retryIds = [...extractFailedSets];
+        extractFailedSets.clear();
+        queueExtractSetLoads(retryIds);
+        refreshExtractPreview();
+      },
+    });
+    return;
+  }
+  if (!communityReady || !setsReadyForExtraction) {
+    renderExtractStatus(t('extractLoading'));
+    return;
+  }
+
+  const references = extractReferences();
+  const outcome = extractOwnMarkers(yourMarkers, references);
+  renderExtractStatus(t('extractReady', references.length, extractSourceNames().join(', ')));
+  extractPreview.innerHTML = `<div class="result-card ok"><dl>`
+    + `<dt>${t('labelUploaded')}</dt><dd>${localeNumber(yourMarkers.length)}</dd>`
+    + `<dt>${t('labelPublishedRemoved')}</dt><dd>${localeNumber(outcome.exactMatches)}</dd>`
+    + `<dt>${t('labelPersonalOverrides')}</dt><dd>${localeNumber(outcome.overrides)}</dd>`
+    + `<dt>${t('labelPersonalUnique')}</dt><dd>${localeNumber(outcome.unique)}</dd>`
+    + `<dt>${t('labelOwnTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>`
+    + '</dl></div>';
+}
+
+extractRunButton.addEventListener('click', withBusy(extractRunButton, async () => {
+  await yourMarkersLoad;
+  await communityLoad;
+  await extractFetch;
+  refreshExtractPreview();
+  if (extractRunButton.disabled) return;
+
+  const generatedAt = new Date();
+  const lang = currentLang();
+  const references = extractReferences();
+  const sourceNames = extractSourceNames();
+  const outcome = extractOwnMarkers(yourMarkers, references);
+  let outputBytes;
+  let validationLine;
+  let backupEntries;
+
+  try {
+    validateMarkers(outcome.result, { source: 'extract-own' });
+    outputBytes = writeMarkersBin(outcome.result);
+    const reparsed = parseMarkersBin(
+      outputBytes.buffer.slice(outputBytes.byteOffset, outputBytes.byteOffset + outputBytes.byteLength),
+      { source: 'validation' },
+    );
+    const lost = outcome.result.length - reparsed.length;
+    validationLine = lost > 0 ? t('logValidationOkDedup', lost) : t('logValidationOk');
+    backupEntries = await backupYourMarkerFiles(generatedAt);
+  } catch (err) {
+    renderResult('extract-result', escapeHtml(err.message), true);
+    return;
+  }
+
+  const entries = [
+    { name: 'own-minimapmarkers.bin', data: outputBytes },
+    { name: 'own-markers.json', data: new TextEncoder().encode(JSON.stringify(outcome.result, null, 4)) },
+    ...backupEntries,
+    {
+      name: 'extract-own-log.txt',
+      data: new TextEncoder().encode(buildExtractOwnLog({
+        generatedAt,
+        userFilenames: yourMarkerFiles.map((file) => file.name),
+        backupFilenames: backupEntries.map((entry) => entry.name),
+        sourceNames,
+        referenceCount: references.length,
+        uploadedCount: yourMarkers.length,
+        exactMatches: outcome.exactMatches,
+        overrides: outcome.overrides,
+        unique: outcome.unique,
+        totalCount: outcome.total,
+        validationLine,
+      }, lang)),
+    },
+  ];
+
+  const zipName = 'tibia-maps-merge-own-markers.zip';
+  downloadBlob(new Blob([buildZip(entries)]), zipName);
+  renderResult('extract-result', `
+    ${t('extractSuccessZip', zipName)}
+    <dl>
+      <dt>${t('labelPublishedRemoved')}</dt><dd>${localeNumber(outcome.exactMatches)}</dd>
+      <dt>${t('labelPersonalOverrides')}</dt><dd>${localeNumber(outcome.overrides)}</dd>
+      <dt>${t('labelPersonalUnique')}</dt><dd>${localeNumber(outcome.unique)}</dd>
+      <dt>${t('labelOwnTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
     </dl>
   `, false);
 }));

@@ -44,6 +44,31 @@ export function buildConversionLog({
   ].join('\n');
 }
 
+export function buildExtractOwnLog({
+  generatedAt, userFilenames, backupFilenames, sourceNames, referenceCount,
+  uploadedCount, exactMatches, overrides, unique, totalCount, validationLine,
+}, lang) {
+  const t = (key, ...args) => tFor(lang, key, ...args);
+  const n = (value) => localeNumber(value, lang);
+  return [
+    t('logTitleExtractOwn'),
+    `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
+    '',
+    line(t('logUserFile'), userFilenames.join(', ')),
+    line(t('logBackupFile'), backupFilenames.join(', ')),
+    line(t('logReferenceSources'), sourceNames.join(', ')),
+    line(t('logReferenceMarkers'), n(referenceCount)),
+    line(t('logUploadedMarkers'), n(uploadedCount)),
+    line(t('logPublishedRemoved'), n(exactMatches)),
+    line(t('logPersonalOverrides'), n(overrides)),
+    line(t('logPersonalUnique'), n(unique)),
+    line(t('logTotal'), n(totalCount)),
+    line(t('logValidation'), validationLine ?? t('logValidationOk')),
+    line(t('logProcessingLocation'), t('logProcessingLocal')),
+    '',
+  ].join('\n');
+}
+
 function describeMarker(m) {
   return `icon=${m.icon ?? 'null'}, description="${m.description ?? ''}"`;
 }
