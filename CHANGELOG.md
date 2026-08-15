@@ -4,6 +4,18 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.8.1] - 2026-08-15
+
+### Fixed
+
+- Two of the nine published collections were missing from Marker Sets:
+  **Orcsoberfest island** (30 marks) and **Percht island** (37). Both folders
+  carry minimap tiles as well as a `markers.json`, and the listing that built
+  the catalogue was truncated at six entries per folder -- `Minimap_*` sorts
+  before `markers.json`, so exactly those two looked like image-only folders.
+  All nine are now offered, and a check against the repository asserts the
+  picker matches what is published, in both directions.
+
 ## [1.8.0] - 2026-08-15
 
 ### Added

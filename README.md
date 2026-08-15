@@ -70,8 +70,9 @@ with the latest game update). Four modes:
   take one back out. This is the only mode that *removes* markers. The set is
   either one of the collections tibiamaps.io publishes alongside its map data
   ([`extra/`](https://github.com/tibiamaps/tibia-map-data/tree/main/extra) --
-  achievements, rapid respawn, points of interest, anniversary, lightbearer,
-  devovorga, ignore), read live from that repository, or the positions in a
+  all nine it publishes: achievements, rapid respawn, points of interest,
+  anniversary, lightbearer, Orcsoberfest island, Percht island, devovorga and
+  ignore), read live from that repository, or the positions in a
   Tibia Wiki quest article -- which is what makes "clear this quest's marks
   now that I'm done" one action. Adding keeps the same policy as everywhere
   else: markers are keyed by coordinate and yours win, so a collection fills

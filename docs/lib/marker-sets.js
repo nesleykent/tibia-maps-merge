@@ -8,6 +8,10 @@
 //
 // Nothing here is fetched until a set is actually chosen: one of them is over
 // 5,000 markers, which is not worth downloading to draw a list.
+//
+// Every folder published under extra/ has a markers.json, including the two
+// island folders that also carry minimap tiles -- only the markers are read
+// here; this project does not write map images.
 
 import { mergeMarkers } from './markers.js';
 
@@ -20,6 +24,8 @@ export const MARKER_SETS = [
   { id: 'points-of-interest', name: 'Points of interest', large: true, mostlyUnlabelled: true },
   { id: 'anniversary', name: 'Anniversary' },
   { id: 'lightbearer', name: 'Lightbearer' },
+  { id: 'orcsoberfest-island', name: 'Orcsoberfest island' },
+  { id: 'percht-island', name: 'Percht island' },
   { id: 'devovorga', name: 'Devovorga' },
   { id: 'ignore', name: 'Ignore' },
 ];
