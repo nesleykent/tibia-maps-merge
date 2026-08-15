@@ -12,8 +12,8 @@ For example:
 
 ```text
 33273, 31997, 7, Cormaya Ward Stone, checkmark
-33685, 32188, 7, Vanys, mouth
-33584, 32209, 7, Summer Court Entrance, flag
+33584, 32209, 7, Summer Court entrance, flag
+32735, 32283, 8, Strange Empty Bucket, bag
 ```
 
 That opens up an interesting workflow when combined with Tibia Wiki and an AI
@@ -47,11 +47,15 @@ access points; levers and other interactive objects; quest items and chests;
 puzzles; dangerous passages; bosses and boss rooms; shortcuts; and locations
 required during individual missions.
 
-Many of these already have exact coordinates on Tibia Wiki, but the
-coordinates usually live *inside map links* rather than in the article text. A
-sentence may simply say to go "here", while the hyperlink on `here` carries
-the actual map position. The extraction prompt turns those scattered locations
-into a single marker list.
+Many of these already have exact coordinates on Tibia Wiki, but they are easy
+to miss by hand. Depending on the wiki, a coordinate may sit *inside a map
+link* — a sentence says to go "here" while the hyperlink on `here` carries the
+position — or be written inline next to the instruction. On
+tibiawiki.com.br, for instance, the walkthrough is behind a spoiler toggle and
+the coordinates appear as `(33584,32209,7:2aqui)` in the middle of the prose.
+
+Either way they are scattered across dozens of paragraphs, spoilers and
+subsections. The extraction prompt collects them into a single marker list.
 
 ## The output format
 
@@ -188,10 +192,31 @@ pass over the article, checking spoilers, subsections, access instructions,
 objects, transitions and boss sections again. This noticeably improves
 coverage on long quests.
 
+## Make sure the assistant can actually read the article
+
+Two things can quietly starve the extraction, and both are worth checking
+before blaming the prompt:
+
+- **The walkthrough may be behind a spoiler toggle.** On tibiawiki.com.br the
+  visible page is barely a summary — the entire guide sits in a collapsed
+  spoiler block. It *is* in the page source, so an assistant that reads the
+  HTML gets it, but one that only reads rendered text may see a few hundred
+  words and return almost nothing.
+- **The site may challenge automated fetches.** tibiawiki.com.br sits behind
+  Cloudflare, which answers plain HTTP fetches with an interstitial instead of
+  the article. If the assistant reports that it cannot open the URL, paste the
+  article text into the conversation instead of the link and keep the rest of
+  the prompt unchanged — that is exactly how the worked example below was
+  produced.
+
+A quick sanity check: if the returned list has only a handful of marks for a
+long quest, the assistant probably never saw the walkthrough.
+
 ## The prompt
 
 Replace `QUEST_URL` at the bottom with the Tibia Wiki quest article you want
-to process.
+to process — for example
+`https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest`.
 
 ````text
 You will receive a link to a quest article on Tibia Wiki.
@@ -313,22 +338,56 @@ QUEST URL:
 QUEST_URL
 ````
 
-## Example output
+## A worked example
 
-A successful extraction produces something like:
+Running the prompt above against
+[The Dream Courts Quest](https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest)
+produced these 30 marks, covering the whole quest from the first NPC through
+the Ward Stones, the three Haunted Houses and the Nightmare Beast items:
 
 ```text
-33273, 31722, 7, Quest NPC, mouth
-33584, 32209, 7, Summer Court Entrance, flag
-33685, 32188, 7, Court NPC, mouth
-32250, 31385, 5, Ward Stone, checkmark
-32688, 32235, 7, Haunted House Entrance, flag
-32699, 32247, 8, Stricken Soul, mouth
-32735, 32283, 8, Quest Object, bag
-32699, 32245, 8, Cellar Descent, red down
+33273, 31722, 7, Myzzi / court access dialogue, mouth
+33584, 32209, 7, Summer Court entrance, flag
+33685, 32188, 7, Stairs down to Vanys, red down
+32353, 31249, 3, Winter Court entrance, flag
+33710, 32112, 7, Stairs up to Undal, red up
+32250, 31385, 5, Okolnir Ward Stone, checkmark
+31938, 31652, 10, Folda Ward Stone, checkmark
+32057, 32792, 13, Calassa Ward Stone, checkmark
+33555, 32219, 7, Feyrist Ward Stone, checkmark
+32383, 32610, 7, Meriana Ward Stone, checkmark
+33273, 31997, 7, Cormaya Ward Stone, checkmark
+32759, 32627, 7, Andrew Lyze / sealed sarcophagus entrance, mouth
+32332, 32091, 7, Halls of Hope Earth Portal access, lock
+32688, 32235, 7, Haunted House entrance / descent, red down
+32699, 32247, 8, Stricken Soul / Haunted Nexus task, mouth
+32735, 32283, 8, Strange Empty Bucket, bag
+32699, 32245, 8, Cellar door / lower descent, red down
+32677, 32651, 7, Haunted Temple entrance / descent, red down
+32625, 32620, 8, Temple altar descent, red down
+32605, 32629, 9, Sealed temple altar door, lock
+33096, 32389, 7, Haunted Tomb entrance, skull
+33070, 32318, 8, Tomb obelisks / Onyx puzzle, checkmark
+33555, 32540, 15, Key 3200 tombs, bag
+33661, 32547, 14, Key 3200 door, lock
+33683, 32124, 6, Orc Skull chest, bag
+33664, 32192, 7, Colourful Mushroom, bag
+33671, 32203, 7, Anatomy Book, bag
+33703, 32185, 5, Rosebush, bag
+33671, 32119, 7, Winter Court return destination, flag
+33718, 32182, 7, Summer Court return destination, flag
 ```
 
-Paste that straight into Add Marks.
+Every coordinate above was checked against the article: all 30 appear verbatim
+in the page text, none were invented, every icon name resolved rather than
+leaking into a label, no coordinate is repeated, and the set encodes to a
+valid 1,269-byte `minimapmarkers.bin` that re-parses to the same 30 marks.
+
+That run also happened to reach every coordinate the article contains, which
+will not always be the case — the **Review** step is still where you check the
+result against the source.
+
+Paste the output straight into Add Marks.
 
 ## Using the result
 
@@ -376,7 +435,8 @@ Community markers          Existing personal markers
 
 This prompt has primarily been tested with ChatGPT, which has handled the
 combination of page inspection, hyperlink extraction, semantic classification
-and strict output formatting more reliably. Gemini has produced weaker results
+and strict output formatting more reliably. The worked example above is a real
+GPT run against the article text, unedited. Gemini has produced weaker results
 with the same prompt, particularly on complete coordinate coverage and strict
 adherence to the requested output.
 
