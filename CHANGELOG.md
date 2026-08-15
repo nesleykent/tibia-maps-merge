@@ -4,6 +4,19 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.6.1] - 2026-08-15
+
+### Fixed
+
+- The extraction prompt contradicted itself about code blocks: the output
+  format asked for the marks "inside exactly ONE plain-text code block",
+  while the rules below told the assistant not to output "code fences around
+  the extracted marks". Either instruction could win, which is why a run
+  sometimes came back as bare text. The format now asks for one block fenced
+  with triple backticks and says the whole response must be that block and
+  nothing else, and the rule was narrowed to what it actually meant -- no
+  headings, prose or per-line fences *inside* the block.
+
 ## [1.6.0] - 2026-08-15
 
 ### Added

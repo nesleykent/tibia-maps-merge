@@ -234,7 +234,9 @@ Inspect the entire page, including spoilers, collapsed sections, "here" links, m
 
 OUTPUT FORMAT
 
-Return the final marks inside exactly ONE plain-text code block.
+Return the final marks inside exactly ONE plain-text code block, fenced with triple backticks.
+
+The entire response must be that one code block: nothing before it, nothing after it, no language tag other than plain text.
 
 Inside the code block, use one mark per line:
 
@@ -335,7 +337,7 @@ Remove URL parameters that are not part of X, Y, or Z.
 
 Do not output numeric or hexadecimal icon codes.
 
-Do not output headings, explanations, sources, comments, totals, bullets, numbering, Markdown tables, or code fences around the extracted marks.
+Inside the code block, output nothing but the marks: no headings, explanations, sources, comments, totals, bullets, numbering or Markdown tables, and no extra fences around individual lines.
 
 Before producing the final response, perform a second complete pass through the article and its location links to identify any coordinates missed during the first extraction.
 
