@@ -4,6 +4,18 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.4.1] - 2026-08-15
+
+### Changed
+
+- The Review table's Icon column now shows just the icon. Repeating its name
+  as text beside it made every row read twice as wide as it needed to. The
+  name is still there as a tooltip and for screen readers.
+- Added a first **Map** column linking each mark to its position on
+  tibiamaps.io (`https://tibiamaps.io/map#x,y,z:1`), opening in a new tab --
+  so a coordinate can be checked against the real map before it is written
+  to the file.
+
 ## [1.4.0] - 2026-08-15
 
 ### Changed

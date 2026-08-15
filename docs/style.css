@@ -849,7 +849,7 @@ button { font-family: inherit; }
   line-height: var(--system-12-line-height);
 }
 
-.marker-table td:nth-child(-n+3) {
+.marker-table td:nth-child(n+2):nth-child(-n+4) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -859,10 +859,41 @@ button { font-family: inherit; }
   text-overflow: ellipsis;
 }
 
-.icon-cell {
+/* The icon column is the icon alone -- its name is a tooltip and is read by
+   screen readers, but repeating it as text made every row noisy. */
+.cell-icon { line-height: 0; }
+
+.col-map,
+.cell-map {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.map-link {
   display: inline-flex;
   align-items: center;
-  gap: var(--ig-space-2);
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--input-border-radius);
+  color: var(--muted);
+}
+
+.map-link:hover {
+  background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .cell-actions {

@@ -496,22 +496,42 @@ function savePending() {
 
 let pending = loadPending();
 
+// tibiamaps.io's map takes the position in its fragment, with a zoom level
+// after the colon: https://tibiamaps.io/map#33281,31724,7:1
+const mapUrl = (m) => `https://tibiamaps.io/map#${m.x},${m.y},${m.z}:1`;
+
+const MAP_PIN_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false">'
+  + '<path d="M8 1.6c2.5 0 4.5 2 4.5 4.5 0 3.2-4.5 8.3-4.5 8.3S3.5 9.3 3.5 6.1c0-2.5 2-4.5 4.5-4.5z" '
+  + 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
+  + '<circle cx="8" cy="6.1" r="1.7" fill="currentColor"/></svg>';
+
 function renderPending() {
   addRows.textContent = '';
   pending.forEach((marker, index) => {
+    const coordinates = `${marker.x}, ${marker.y}, ${marker.z}`;
     const row = document.createElement('tr');
     row.innerHTML = `
+      <td class="cell-map">
+        <a class="map-link" href="${mapUrl(marker)}" target="_blank" rel="noopener">${MAP_PIN_SVG}<span class="visually-hidden"></span></a>
+      </td>
       <td>${marker.x}</td>
       <td>${marker.y}</td>
       <td>${marker.z}</td>
       <td class="cell-label"></td>
-      <td><span class="icon-cell">${iconGlyph(marker.icon, { size: 18 })}<span></span></span></td>
+      <td class="cell-icon">${iconGlyph(marker.icon, { size: 18 })}<span class="visually-hidden"></span></td>
       <td class="cell-actions">
         <button type="button" class="row-btn" data-action="edit"></button>
         <button type="button" class="row-btn destructive" data-action="delete"></button>
       </td>`;
     row.querySelector('.cell-label').textContent = marker.description;
-    row.querySelector('.icon-cell span').textContent = iconLabel(marker.icon);
+    // The icon column is the icon alone; its name stays available to screen
+    // readers and as a tooltip rather than crowding the row.
+    const iconCell = row.querySelector('.cell-icon');
+    iconCell.querySelector('.visually-hidden').textContent = iconLabel(marker.icon);
+    iconCell.title = iconLabel(marker.icon);
+    const mapLink = row.querySelector('.map-link');
+    mapLink.title = t('viewOnMap', coordinates);
+    mapLink.querySelector('.visually-hidden').textContent = t('viewOnMap', coordinates);
     const [editButton, deleteButton] = row.querySelectorAll('.row-btn');
     editButton.textContent = t('editAction');
     deleteButton.textContent = t('deleteAction');
