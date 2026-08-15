@@ -97,13 +97,18 @@ header > * {
   z-index: 1;
 }
 
-.lang-switch {
+/* The one row the page already spends on chrome. Anything that has to be
+   reachable but must not take space from the tool goes here -- it costs
+   nothing, because the language switch was paying for the row anyway. */
+.header-links {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: var(--ig-space-2);
   margin-bottom: var(--ig-space-8);
 }
 
-.lang-switch a {
+.header-link {
   display: inline-flex;
   min-height: 32px;
   align-items: center;
@@ -111,14 +116,19 @@ header > * {
   padding: 0 var(--ig-space-4);
   border: 1px solid rgba(255, 255, 255, .32);
   border-radius: var(--ig-radius-pill);
+  background: none;
   color: rgb(var(--web-always-white));
+  cursor: pointer;
+  font-family: inherit;
   font-size: var(--system-12-font-size);
   font-weight: var(--font-weight-system-semibold);
   line-height: var(--system-12-line-height);
+  letter-spacing: 0;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.lang-switch a:hover {
+.header-link:hover {
   background: rgba(255, 255, 255, .12);
   text-decoration: none;
 }
@@ -167,104 +177,6 @@ header h1 {
   margin: var(--ig-space-2) 0 0;
   font-size: var(--system-12-font-size);
   line-height: var(--system-12-line-height);
-}
-
-/* The mechanics live at the foot of the page, collapsed, linked from the
-   footer. They are read once; the tabs and the tool they belong to are what
-   the top of the page is for. The one part needed mid-task -- where the
-   client keeps minimapmarkers.bin -- is a sheet instead, opened from beside
-   each file picker, so nobody has to leave what they are doing to find it. */
-.intro {
-  margin-top: var(--ig-space-8);
-  border: 1px solid var(--border);
-  border-radius: var(--ig-radius-md);
-  background: var(--surface-raised);
-}
-
-.intro > summary {
-  display: flex;
-  align-items: center;
-  gap: var(--ig-space-3);
-  min-height: 44px;
-  padding: 0 var(--ig-space-5);
-  border-radius: var(--ig-radius-md);
-  color: var(--muted);
-  cursor: pointer;
-  font-size: var(--system-14-font-size);
-  font-weight: var(--font-weight-system-semibold);
-  line-height: var(--system-14-line-height);
-  list-style: none;
-}
-
-/* Safari draws its own triangle unless both of these are cleared. */
-.intro > summary::-webkit-details-marker { display: none; }
-
-.intro > summary::before {
-  width: 6px;
-  height: 6px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  content: "";
-  transform: rotate(-45deg);
-  transition: transform var(--ig-duration-micro) var(--ig-ease-standard);
-}
-
-.intro > summary:hover { color: var(--text); }
-
-.intro > summary:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.intro[open] > summary {
-  border-bottom: 1px solid var(--border);
-  border-radius: var(--ig-radius-md) var(--ig-radius-md) 0 0;
-  color: var(--text);
-}
-
-.intro[open] > summary::before { transform: rotate(45deg); }
-
-.intro-body {
-  padding: var(--ig-space-5) var(--ig-space-6) var(--ig-space-6);
-  font-size: var(--system-14-font-size);
-  line-height: var(--system-16-line-height);
-}
-
-.intro-body ol {
-  margin: 0;
-  padding-left: 1.25rem;
-  color: var(--text);
-}
-
-.intro-body li { margin-bottom: var(--ig-space-3); }
-.intro-body li:last-child { margin-bottom: 0; }
-
-.intro-body h3 {
-  margin: var(--ig-space-6) 0 0;
-  padding-top: var(--ig-space-5);
-  border-top: 1px solid var(--border);
-  font-size: var(--system-14-font-size);
-  font-weight: var(--font-weight-system-semibold);
-  line-height: var(--system-14-line-height);
-}
-
-.intro-body dl {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--ig-space-2) var(--ig-space-4);
-  align-items: baseline;
-  margin: var(--ig-space-4) 0 0;
-}
-
-.intro-body dt {
-  color: var(--muted);
-  font-weight: var(--font-weight-system-semibold);
-}
-
-.intro-body dd {
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: anywhere;
 }
 
 /* Stays put while a panel scrolls: Edit Marks runs well past a screen, and
@@ -855,6 +767,20 @@ button { font-family: inherit; }
   overflow-wrap: anywhere;
 }
 
+/* The "How it works" steps -- the only ordered list that renders in a sheet. */
+.sheet-body ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-16-line-height);
+}
+
+.sheet-body li { margin-bottom: var(--ig-space-3); }
+.sheet-body li:last-child { margin-bottom: 0; }
+
+.sheet-body ol + .micro-hint { margin-top: var(--ig-space-4); }
+
 .sheet-body .marker-form { margin-bottom: 0; }
 
 .sheet-body .form-message { margin-top: var(--ig-space-4); }
@@ -1267,11 +1193,6 @@ footer .link-btn {
     line-height: var(--system-16-line-height);
   }
 
-  .intro-body {
-    padding: var(--ig-space-4) var(--ig-space-5) var(--ig-space-5);
-  }
-
-  .intro-body dl,
   .sheet-body dl,
   .result-card dl {
     grid-template-columns: 1fr;

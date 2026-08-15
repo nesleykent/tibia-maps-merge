@@ -4,6 +4,26 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.13.0] - 2026-08-15
+
+### Changed
+
+- **"How it works" is a pill beside the language switch, and a sheet when you
+  open it.** The header already spends one row on the language link, so a
+  second item there costs nothing -- which is the point: the mechanics are now
+  reachable from the top of the page while taking no page space at all, at the
+  top or the bottom. The collapsed block that was sitting above the disclaimer
+  is gone, and the page is the tool: hero, tabs, panel, and nothing else.
+  Still linked from the footer too.
+
+- That makes six sheets, all opened and closed by the one mechanism added in
+  1.12.0. Read-once and reference material is a sheet across the board now --
+  how it works, where the client keeps its file, the icon names, the other
+  assistants -- and the page flow is left to the tool.
+
+- "That's Merge, the first tab below" reads oddly from inside a modal; it is
+  "the first of the four tabs" now.
+
 ## [1.12.0] - 2026-08-15
 
 ### Changed

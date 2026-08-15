@@ -9,7 +9,10 @@
 <body>
 <div class="app">
   <header>
-    <div class="lang-switch"><a href="../">English</a></div>
+    <div class="header-links">
+      <button type="button" class="header-link" data-open-sheet="how-it-works-sheet">Como funciona</button>
+      <a class="header-link" href="../">English</a>
+    </div>
     <h1>Tibia Maps Merge</h1>
     <p class="subtitle">O mapa do Tibia muda a cada atualização do jogo, e o
       <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
@@ -296,6 +299,24 @@
     </div>
   </dialog>
 
+  <dialog class="sheet" id="how-it-works-sheet" aria-labelledby="how-it-works-title">
+    <div class="sheet-head"><h3 id="how-it-works-title">Como Funciona</h3></div>
+    <div class="sheet-body">
+      <ol>
+        <li>Buscamos as marcações mais recentes da comunidade direto do tibiamaps.io -- o mesmo arquivo usado pelo instalador de mapas deles, por isso está sempre atualizado com a versão mais recente do Tibia.</li>
+        <li>Você envia suas próprias marcações -- o arquivo <code>minimapmarkers.bin</code> da pasta <code>minimap</code> do seu cliente Tibia (ou um <code>markers.json</code>, se você já tiver um).</li>
+        <li>Nós mesclamos tudo, totalmente no seu navegador -- as marcações são combinadas pelas coordenadas do mapa. Se você e a comunidade marcaram o mesmo local, a sua marcação prevalece.</li>
+        <li>Você recebe um novo <code>minimapmarkers.bin</code>, além de um backup do que você enviou e um log completo do que mudou. Coloque o novo arquivo na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
+      </ol>
+      <p class="micro-hint">Essa é a aba <strong>Mesclar</strong>, a primeira das quatro. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para <strong>Converter</strong>. E se você quiser montar sua própria lista de
+        marcações -- digitadas manualmente, ou lidas de uma quest -- use <strong>Editar Marcações</strong>, que adiciona essa lista ao seu arquivo ou a remove de volta.
+        <strong>Coleções</strong> faz o mesmo com uma coleção pronta.</p>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" data-close-sheet="how-it-works-sheet">Concluído</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="file-location-sheet" aria-labelledby="file-location-title">
     <div class="sheet-head"><h3 id="file-location-title">Onde Encontro Meu minimapmarkers.bin?</h3></div>
     <div class="sheet-body">
@@ -311,27 +332,13 @@
     </div>
   </dialog>
 
-  <details class="intro" id="how-it-works">
-    <summary>Como funciona</summary>
-    <div class="intro-body">
-    <ol>
-      <li>Buscamos as marcações mais recentes da comunidade direto do tibiamaps.io -- o mesmo arquivo usado pelo instalador de mapas deles, por isso está sempre atualizado com a versão mais recente do Tibia.</li>
-      <li>Você envia suas próprias marcações -- o arquivo <code>minimapmarkers.bin</code> da pasta <code>minimap</code> do seu cliente Tibia (ou um <code>markers.json</code>, se você já tiver um).</li>
-      <li>Nós mesclamos tudo, totalmente no seu navegador -- as marcações são combinadas pelas coordenadas do mapa. Se você e a comunidade marcaram o mesmo local, a sua marcação prevalece.</li>
-      <li>Você recebe um novo <code>minimapmarkers.bin</code>, além de um backup do que você enviou e um log completo do que mudou. Coloque o novo arquivo na mesma pasta <code>minimap</code> (substituindo o antigo) e reinicie o cliente Tibia.</li>
-    </ol>
-    <p class="micro-hint">Essa é a aba <strong>Mesclar</strong>, a primeira abaixo. Se você só quer converter um arquivo entre formatos sem mesclar nada -- para edição manual, controle de versão ou outras ferramentas -- mude para <strong>Converter</strong>. E se você quiser montar sua própria lista de
-      marcações -- digitadas manualmente, ou lidas de uma quest -- use <strong>Editar Marcações</strong>, que adiciona essa lista ao seu arquivo ou a remove de volta.
-      <strong>Coleções</strong> faz o mesmo com uma coleção pronta.</p>
-    </div>
-  </details>
 
   <aside class="disclaimer">
     <p>Esta é uma ferramenta independente e não oficial, sem afiliação, endosso ou patrocínio da CipSoft GmbH ou do tibiamaps.io. <strong>Tibia</strong> é uma marca registrada da CipSoft GmbH, e os ícones de marcação exibidos aqui são os próprios símbolos de minimapa do cliente Tibia. Os dados de marcações da comunidade são obtidos em tempo real e sem modificações do download público do tibiamaps.io -- todo o crédito por esses dados pertence ao tibiamaps.io e seus colaboradores. Esta ferramenta apenas combina esses dados com suas próprias marcações, totalmente no seu navegador; nada é enviado a lugar nenhum.</p>
   </aside>
 
   <footer>
-    <a href="#how-it-works">Como funciona</a>
+    <button type="button" class="link-btn" data-open-sheet="how-it-works-sheet">Como funciona</button>
     · <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Onde encontro meu arquivo?</button>
     · <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Código-fonte no GitHub</a>
     · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>

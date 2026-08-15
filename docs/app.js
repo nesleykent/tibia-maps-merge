@@ -73,18 +73,9 @@ const modeForHash = () => modeTabs.find((b) => b.dataset.slug === location.hash.
 // it may well be meant for something else on the page. The initial restore
 // runs at the very end of this file: selecting Marker Sets asks for the set
 // dates, whose state is declared further down.
-// A fragment aimed at a closed disclosure should open it. Browsers do that for
-// a target *inside* one, but not when the target is the <details> itself --
-// which is exactly what the footer's "How it works" link points at.
-function openTargetedDetails() {
-  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-  if (target instanceof HTMLDetailsElement) target.open = true;
-}
-
 window.addEventListener('hashchange', () => {
   const mode = modeForHash();
   if (mode) selectMode(mode, { updateUrl: false });
-  openTargetedDetails();
 });
 
 // ---------- Version footer ----------
@@ -1187,4 +1178,3 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
 
 // Last, so every mode is fully wired before one is restored from the URL.
 if (modeForHash()) selectMode(modeForHash(), { updateUrl: false });
-openTargetedDetails();

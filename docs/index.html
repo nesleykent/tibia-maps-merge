@@ -9,7 +9,10 @@
 <body>
 <div class="app">
   <header>
-    <div class="lang-switch"><a href="pt-br/">Português (BR)</a></div>
+    <div class="header-links">
+      <button type="button" class="header-link" data-open-sheet="how-it-works-sheet">How it works</button>
+      <a class="header-link" href="pt-br/">Português (BR)</a>
+    </div>
     <h1>Tibia Maps Merge</h1>
     <p class="subtitle">Tibia's map changes with every game update, and
       <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
@@ -295,6 +298,23 @@
     </div>
   </dialog>
 
+  <dialog class="sheet" id="how-it-works-sheet" aria-labelledby="how-it-works-title">
+    <div class="sheet-head"><h3 id="how-it-works-title">How It Works</h3></div>
+    <div class="sheet-body">
+      <ol>
+        <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
+        <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
+        <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
+        <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
+      </ol>
+      <p class="micro-hint">That's <strong>Merge</strong>, the first of the four tabs. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
+        quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" data-close-sheet="how-it-works-sheet">Done</button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="file-location-sheet" aria-labelledby="file-location-title">
     <div class="sheet-head"><h3 id="file-location-title">Where Do I Find My minimapmarkers.bin?</h3></div>
     <div class="sheet-body">
@@ -310,26 +330,13 @@
     </div>
   </dialog>
 
-  <details class="intro" id="how-it-works">
-    <summary>How it works</summary>
-    <div class="intro-body">
-    <ol>
-      <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
-      <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
-      <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
-      <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
-    </ol>
-    <p class="micro-hint">That's <strong>Merge</strong>, the first tab below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
-      quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
-    </div>
-  </details>
 
   <aside class="disclaimer">
     <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH, and the marker icons shown here are the Tibia client's own minimap symbols. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
   </aside>
 
   <footer>
-    <a href="#how-it-works">How it works</a>
+    <button type="button" class="link-btn" data-open-sheet="how-it-works-sheet">How it works</button>
     · <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find my file?</button>
     · <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
     · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
