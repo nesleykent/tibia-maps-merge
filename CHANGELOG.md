@@ -4,6 +4,22 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.4.2] - 2026-08-15
+
+### Added
+
+- The wiki importer now says which wikis it works with and links to their
+  quest lists ([tibiawiki.com.br](https://www.tibiawiki.com.br/wiki/Quests),
+  [tibia.fandom.com](https://tibia.fandom.com/wiki/Quests)), so finding an
+  article to paste doesn't require guessing.
+- A pointer to the
+  [quest marks guide](guides/quest-marks-from-tibia-wiki.md) next to it. The
+  importer extracts coordinates accurately but lifts labels from the
+  surrounding prose and gives every mark the batch icon; the guide's
+  AI-assisted route is what produces labels written for a player and an icon
+  chosen per location, so the two are now presented as what they are --
+  quick extraction, or a more accurate pass.
+
 ## [1.4.1] - 2026-08-15
 
 ### Changed
