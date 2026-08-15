@@ -318,11 +318,15 @@ textarea:focus {
   outline: none;
 }
 
-.checkbox-row {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  align-items: start;
-  gap: var(--ig-space-3);
+/* One standalone setting, on or off -- a switch, not a checkbox. Checkboxes
+   are for a hierarchy of settings; this has no children and no siblings. The
+   label leads and the control trails, per the macOS and iOS convention. */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ig-space-5);
+  min-height: 44px;
   margin-bottom: var(--ig-space-5);
   color: var(--text);
   cursor: pointer;
@@ -330,19 +334,49 @@ textarea:focus {
   line-height: var(--system-14-line-height);
 }
 
-.checkbox-row input {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  accent-color: var(--accent);
-}
-
-.checkbox-row span {
+.switch-row > span {
   min-width: 0;
 }
 
-.checkbox-row code {
+.switch-row code {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+/* A checkbox underneath with role="switch", so it is announced as a switch and
+   keeps every keyboard and label behaviour for free. The track is a real
+   element rather than a pseudo-element on the input: inputs are replaced
+   elements, and ::after on one is not reliably rendered. */
+.switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--ig-radius-pill);
+  background: rgb(var(--ig-separator));
+  transition: background var(--ig-duration-micro) var(--ig-ease-standard);
+}
+
+.switch::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  content: "";
+  background: rgb(var(--web-always-white));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+  transition: transform var(--ig-duration-micro) var(--ig-ease-standard);
+}
+
+.switch-row:has(input:checked) .switch { background: var(--accent); }
+
+.switch-row:has(input:checked) .switch::after { transform: translateX(18px); }
+
+.switch-row:has(input:focus-visible) .switch {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .file-picker {
@@ -840,9 +874,31 @@ button { font-family: inherit; }
    meta line -- when it last changed on the left, any caveat on the right.
    The longest name wraps rather than squeezing the note into a column. */
 .set-name {
+  display: flex;
+  align-items: center;
+  gap: var(--ig-space-2);
   grid-row: 1;
   grid-column: 1 / -1;
   font-weight: var(--font-weight-system-semibold);
+}
+
+/* Several collections can be picked at once, so each card says whether it is
+   one of them. Border and tint alone read as "current" rather than "chosen",
+   which is the difference that matters once more than one can be. */
+.set-check {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity var(--ig-duration-micro) var(--ig-ease-standard);
+}
+
+.set-choice:has(input:checked) .set-check { opacity: 1; }
+
+.set-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .set-note,
@@ -851,6 +907,12 @@ button { font-family: inherit; }
   font-size: var(--system-12-font-size);
   line-height: var(--system-12-line-height);
 }
+
+/* The check occupies the name row, so the meta line keeps its own indent. */
+.set-date,
+.set-note { padding-left: calc(14px + var(--ig-space-2)); }
+
+.set-note { padding-left: 0; }
 
 /* Both pinned to row two explicitly. Left to auto-placement they stack, since
    sparse packing will not step back to column one after filling column two. */

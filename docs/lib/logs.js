@@ -49,8 +49,9 @@ function describeMarker(m) {
 }
 
 export function buildMarkerSetsLog({
-  generatedAt, userFilenames, backupFilenames, setName, setCount, mode,
-  baseCount, addedCount, keptCount, removedCount, totalCount, validationLine,
+  generatedAt, userFilenames, backupFilenames, setName, setCount,
+  setCountsByName = [], mode, baseCount, addedCount, keptCount, removedCount,
+  totalCount, validationLine,
 }, lang) {
   const t = (key, ...args) => tFor(lang, key, ...args);
   const n = (value) => localeNumber(value, lang);
@@ -65,6 +66,17 @@ export function buildMarkerSetsLog({
     line(t('logOutputFormat'), t('formatBin')),
     line(t('logSetName'), setName),
     line(t('logSetCount'), n(setCount)),
+  );
+  // With more than one picked, the total alone hides both the split and the
+  // fact that collections can share a coordinate.
+  if (setCountsByName.length > 1) {
+    for (const [name, count] of setCountsByName) {
+      lines.push(`  ${line(name, n(count))}`);
+    }
+    const listed = setCountsByName.reduce((sum, [, count]) => sum + count, 0);
+    if (listed > setCount) lines.push(`  ${line(t('logSetShared'), n(listed - setCount))}`);
+  }
+  lines.push(
     line(t('logSetAction'), t(mode === 'remove' ? 'logSetActionRemove' : 'logSetActionAdd')),
     line(t('logExistingLoaded'), n(baseCount)),
   );

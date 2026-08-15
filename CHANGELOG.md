@@ -4,6 +4,37 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.14.0] - 2026-08-15
+
+### Added
+
+- **Marker Sets takes more than one collection at a time.** The picker is
+  checkboxes now, and everything ticked is applied together -- added or
+  removed in one download. Collections are fetched on first tick and kept, so
+  unticking and re-ticking costs nothing, and a fetch that fails leaves the
+  box ticked so it can be retried rather than silently clearing.
+
+  Where two collections name the same coordinate, the mark counts once and
+  the preview says so. Three of the nine overlap in practice, all with Points
+  of Interest. Which one wins is decided by picker order -- arbitrary, but
+  fixed, so the preview always matches the download. The log breaks the total
+  down per collection and names the double-count.
+
+  Each card carries a checkmark when it is picked. Border and tint alone read
+  as "current" rather than "chosen", which is the distinction that starts
+  mattering once more than one can be. **Clear Selection** appears in the step
+  head once anything is picked.
+
+### Changed
+
+- **The audit-files option in Merge is a switch, not a checkbox.** It is one
+  standalone setting with no children and no siblings; Apple's guidance puts
+  checkboxes with hierarchies of settings and switches with independent
+  on/off state. Label leads, control trails, per the macOS and iOS
+  convention. It is still a checkbox underneath with `role="switch"`, so
+  every keyboard and label behaviour is unchanged and it is announced
+  correctly.
+
 ## [1.13.0] - 2026-08-15
 
 ### Changed

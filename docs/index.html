@@ -53,9 +53,10 @@
       </li>
     </ol>
 
-    <label class="checkbox-row">
-      <input type="checkbox" id="export-audit">
+    <label class="switch-row">
       <span>Also export audit files (<code>merged-markers.json</code> + <code>conflicts.json</code>)</span>
+      <input type="checkbox" role="switch" class="visually-hidden" id="export-audit">
+      <span class="switch" aria-hidden="true"></span>
     </label>
 
     <button class="primary-btn" id="merge-run" disabled>Download merged minimapmarkers.bin</button>
@@ -203,12 +204,14 @@
       <li class="step">
         <div class="step-head">
           <h3><span class="step-number">2</span>Choose marks</h3>
+          <span class="step-note">Pick one or more</span>
+          <button class="secondary-btn hidden" id="sets-clear">Clear Selection</button>
         </div>
-        <div class="set-choices" id="set-choices" role="radiogroup" aria-labelledby="set-choices-label"></div>
+        <div class="set-choices" id="set-choices" role="group" aria-labelledby="set-choices-label"></div>
         <span class="visually-hidden" id="set-choices-label">Marks to apply</span>
         <p class="set-explainer hidden" id="set-note-points-of-interest">The <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> scatters Points of Interest across each subarea you start discovering, in different spots for every character. This collection is every position one can turn up in -- 5,205 of them, and 98% carry no label, because it is a search list to hunt through rather than a set of marks meant to stay in your file. Load it while you are looking, then remove it here when you are done.</p>
         <div class="status-line" id="sets-source-status"></div>
-        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time -- all nine it publishes.</p>
+        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time. Pick as many as you like; a mark in two of them counts once.</p>
       </li>
 
       <li class="step hidden" id="sets-apply-step">

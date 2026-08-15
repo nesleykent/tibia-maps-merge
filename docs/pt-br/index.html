@@ -54,9 +54,10 @@
       </li>
     </ol>
 
-    <label class="checkbox-row">
-      <input type="checkbox" id="export-audit">
+    <label class="switch-row">
       <span>Também exportar arquivos de auditoria (<code>merged-markers.json</code> + <code>conflicts.json</code>)</span>
+      <input type="checkbox" role="switch" class="visually-hidden" id="export-audit">
+      <span class="switch" aria-hidden="true"></span>
     </label>
 
     <button class="primary-btn" id="merge-run" disabled>Baixar minimapmarkers.bin mesclado</button>
@@ -204,12 +205,14 @@
       <li class="step">
         <div class="step-head">
           <h3><span class="step-number">2</span>Escolher marcações</h3>
+          <span class="step-note">Escolha uma ou mais</span>
+          <button class="secondary-btn hidden" id="sets-clear">Limpar Seleção</button>
         </div>
-        <div class="set-choices" id="set-choices" role="radiogroup" aria-labelledby="set-choices-label"></div>
+        <div class="set-choices" id="set-choices" role="group" aria-labelledby="set-choices-label"></div>
         <span class="visually-hidden" id="set-choices-label">Marcações a aplicar</span>
         <p class="set-explainer hidden" id="set-note-points-of-interest">A <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> espalha Points of Interest por cada subárea que você começa a descobrir, em lugares diferentes para cada personagem. Esta coleção traz todas as posições em que um deles pode aparecer -- são 5.205, e 98% sem rótulo nenhum, porque é uma lista de busca para vasculhar, não marcações feitas para ficar no seu arquivo. Carregue enquanto estiver procurando, e remova aqui quando terminar.</p>
         <div class="status-line" id="sets-source-status"></div>
-        <p class="micro-hint">As coleções vêm dos <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">dados de marcação publicados pelo tibiamaps.io</a>, lidos na hora -- todas as nove que ele publica.</p>
+        <p class="micro-hint">As coleções vêm dos <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">dados de marcação publicados pelo tibiamaps.io</a>, lidos na hora. Escolha quantas quiser; uma marcação que esteja em duas conta uma vez só.</p>
       </li>
 
       <li class="step hidden" id="sets-apply-step">

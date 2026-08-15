@@ -82,7 +82,11 @@ with the latest game update). Four modes:
   Anniversary, Lightbearer, Orcsoberfest Island, Percht Island, Devovorga and
   Ignore), read live from that repository; a test asserts the picker matches
   what is published, in both directions, since a missing set is invisible in
-  the UI. Each card carries the date its `markers.json` last changed, which
+  the UI. Any number of collections can be picked at once and are applied
+  together; where two name the same coordinate the mark counts once, decided
+  by picker order so the preview always matches the download, and both the
+  preview and the log say how many were double-counted. Each card carries the
+  date its `markers.json` last changed, which
   ranges from last week to 2020 -- the dates come from the GitHub commits API
   (`raw.githubusercontent.com` sends no `Last-Modified`), asked for once when
   the tab is first opened and cached for half a day, since that API allows 60
@@ -148,7 +152,9 @@ panel exists for; an accent *outline* for the action that completes a step
 without completing the view (`Add 6 Marks`); a plain outline for the
 alternatives beside it (`Import`, `Copy Prompt`); a small chip for step-head
 utilities (`Remove All`); filled red only ever as the confirming action of a
-destructive sheet. Destructive intent is a colour, not a rank -- a row's
+destructive sheet. A standalone on/off setting is a switch (`role="switch"`
+over a checkbox, label leading and control trailing); checkboxes are for
+picking several things from a list, as the collection cards do. Destructive intent is a colour, not a rank -- a row's
 `Delete` keeps its row-button size and only changes colour. Labels name their
 action rather than agreeing (`Save Changes`, `Remove All Marks`, never `OK`),
 and tab labels are the section, not the section plus the word "Mode".

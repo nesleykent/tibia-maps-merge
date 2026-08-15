@@ -955,11 +955,11 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
 renderPending();
 
 // ================= Marker Sets =================
-// One task: your marker file, plus one of the collections tibiamaps.io
-// publishes, added or removed. Nothing here is editable -- a collection is a
-// published list you take or leave whole, so this mode is a picker and a
-// preview. Marks you assemble yourself go through Edit Marks, which has the
-// row-by-row table for exactly that.
+// One task: your marker file, plus any number of the collections tibiamaps.io
+// publishes, added or removed together. Nothing here is editable -- a
+// collection is a published list you take or leave whole, so this mode is a
+// picker and a preview. Marks you assemble yourself go through Edit Marks,
+// which has the row-by-row table for exactly that.
 
 const setsInput = document.getElementById('sets-files');
 const setsFileStatus = document.getElementById('sets-file-status');
@@ -971,26 +971,46 @@ const setsRunButton = document.getElementById('sets-run');
 
 let setsBase = [];              // markers loaded from the user's file
 let setsBaseFiles = [];
-let chosenMarks = null;         // {label, markers}
+
+// Collections are picked, not loaded one at a time: fetched on first tick and
+// kept, so unticking and re-ticking costs nothing. `selectedSets` holds the
+// order they appear in the picker, which is what makes the combined list
+// deterministic where two collections name the same coordinate.
+const loadedSets = new Map();   // id -> markers
+const selectedSets = new Set(); // ids, in picker order
+let setsFetch = Promise.resolve();
 
 function setsDirection() {
   return document.querySelector('input[name="set-direction"]:checked')?.value ?? 'add';
 }
 
 // ---------- the picker ----------
+const CHECK_SVG = '<svg class="set-check" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">'
+  + '<path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" '
+  + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 for (const { id, name, large } of MARKER_SETS) {
   const choice = document.createElement('label');
   choice.className = 'set-choice';
-  choice.innerHTML = '<input type="radio" name="marker-set" class="visually-hidden">'
-    + '<span class="set-name"></span><span class="set-note"></span>'
+  choice.innerHTML = '<input type="checkbox" name="marker-set" class="visually-hidden">'
+    + `<span class="set-name">${CHECK_SVG}<span class="set-title"></span></span>`
+    + '<span class="set-note"></span>'
     + `<span class="set-date" data-set-date="${id}"></span>`;
   const input = choice.querySelector('input');
   input.value = id;
-  choice.querySelector('.set-name').textContent = name;
+  choice.querySelector('.set-title').textContent = name;
   if (large) choice.querySelector('.set-note').textContent = t('setLarge');
-  input.addEventListener('change', () => selectSet(id, name));
+  input.addEventListener('change', () => toggleSet(id, input.checked));
   setChoices.appendChild(choice);
 }
+
+const setsClearButton = document.getElementById('sets-clear');
+
+setsClearButton.addEventListener('click', () => {
+  for (const input of setChoices.querySelectorAll('input')) input.checked = false;
+  selectedSets.clear();
+  syncSetSelection();
+});
 
 // These are published data, not a live feed -- one collection has not changed
 // since 2020, another changed last week -- so each card says when its markers
@@ -1023,29 +1043,73 @@ async function fillSetDates() {
   }
 }
 
-// A collection whose contents need explaining says so once it is picked --
+// A collection whose contents need explaining says so while it is picked --
 // per-set prose in the picker itself would drown the eight that need none.
-function showSetExplainer(id) {
+function showSetExplainers() {
   for (const note of document.querySelectorAll('.set-explainer')) {
-    note.classList.toggle('hidden', note.id !== `set-note-${id}`);
+    note.classList.toggle('hidden', !selectedSets.has(note.id.replace('set-note-', '')));
   }
 }
 
-async function selectSet(id, name) {
-  showSetExplainer(id);
-  chosenMarks = null;
+/** The picked collections, in picker order, for anything that has to list them. */
+const chosenSets = () => MARKER_SETS.filter(({ id }) => selectedSets.has(id));
+
+/**
+ * Everything picked, as one list. Merged in picker order, so where two
+ * collections name the same coordinate the later one wins -- arbitrary, but
+ * fixed, which is what matters for a preview that has to match the download.
+ */
+function chosenMarkers() {
+  return mergeMarkers(...chosenSets().map(({ id }) => loadedSets.get(id) ?? []));
+}
+
+const setsReady = () => chosenSets().every(({ id }) => loadedSets.has(id));
+
+// Everything that follows from the selection changing, in one place -- the
+// status line was left claiming three collections after Clear emptied it.
+function syncSetSelection() {
+  showSetExplainers();
+  setsClearButton.classList.toggle('hidden', selectedSets.size === 0);
+  reportSetSelection();
   refreshSetsPreview();
+}
+
+function toggleSet(id, checked) {
+  if (checked) selectedSets.add(id); else selectedSets.delete(id);
+  syncSetSelection();
+  if (!checked || loadedSets.has(id)) return;
+  // Serialised rather than parallel: ticking four boxes quickly should not
+  // race four status messages against each other.
+  setsFetch = setsFetch.then(async () => {
+    if (!selectedSets.has(id) || loadedSets.has(id)) return;
+    setsSourceStatus.classList.remove('error');
+    setsSourceStatus.textContent = t('setLoading');
+    try {
+      loadedSets.set(id, await fetchMarkerSet(id));
+    } catch {
+      // Leave it ticked but unloaded: the message says so, and re-ticking or
+      // picking another collection retries without the box silently clearing.
+      setsSourceStatus.textContent = t('setUnreachable');
+      setsSourceStatus.classList.add('error');
+      refreshSetsPreview();
+      return;
+    }
+    syncSetSelection();
+  });
+}
+
+function reportSetSelection() {
+  const chosen = chosenSets();
   setsSourceStatus.classList.remove('error');
-  setsSourceStatus.textContent = t('setLoading');
-  try {
-    const markers = await fetchMarkerSet(id);
-    chosenMarks = { label: name, markers };
-    setsSourceStatus.textContent = t('setLoaded', name, markers.length);
-  } catch {
-    setsSourceStatus.textContent = t('setUnreachable');
-    setsSourceStatus.classList.add('error');
+  if (chosen.length === 0) {
+    setsSourceStatus.textContent = '';
+    return;
   }
-  refreshSetsPreview();
+  if (!setsReady()) return; // a later fetch will report for all of them
+  const total = chosenMarkers().length;
+  setsSourceStatus.textContent = chosen.length === 1
+    ? t('setLoaded', chosen[0].name, total)
+    : t('setsLoaded', chosen.length, total);
 }
 
 // ---------- your file ----------
@@ -1086,28 +1150,43 @@ setsInput.addEventListener('change', () => { setsLoad = loadSetsBase(); });
 document.querySelectorAll('input[name="set-direction"]').forEach((r) => r.addEventListener('change', refreshSetsPreview));
 
 // ---------- what it will do ----------
+/** How the picked collections are named, wherever they have to be named. */
+function chosenLabel() {
+  const chosen = chosenSets();
+  return chosen.length === 1 ? chosen[0].name : chosen.map(({ name }) => name).join(', ');
+}
+
 function refreshSetsPreview() {
-  const ready = setsBase.length > 0 && chosenMarks !== null;
+  const chosen = chosenSets();
+  const ready = setsBase.length > 0 && chosen.length > 0 && setsReady();
   setsApplyStep.classList.toggle('hidden', !ready);
   setsRunButton.disabled = !ready;
   if (!ready) {
     setsPreview.innerHTML = '';
     return;
   }
+  const marks = chosenMarkers();
   const mode = setsDirection();
-  const { added, kept, removed, total } = applyMarkerSet(setsBase, chosenMarks.markers, mode);
+  const { added, kept, removed, total } = applyMarkerSet(setsBase, marks, mode);
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
     : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
       + `<dt>${t('setLabelKept')}</dt><dd>${localeNumber(kept)}</dd>`;
-  setsPreview.innerHTML = `<div class="result-card ok">${t('setPreview', chosenMarks.label, chosenMarks.markers.length)}`
+  // Two collections can name the same coordinate; say so rather than leaving
+  // the reader to wonder why the parts do not add up to the whole.
+  const listed = chosenSets().reduce((sum, { id }) => sum + (loadedSets.get(id)?.length ?? 0), 0);
+  const overlap = listed - marks.length;
+  const overlapNote = overlap > 0 ? ` ${t('setsOverlap', overlap)}` : '';
+  setsPreview.innerHTML = `<div class="result-card ok">${t('setPreview', escapeHtml(chosenLabel()), marks.length)}${overlapNote}`
     + `<dl>${rows}<dt>${t('labelTotal')}</dt><dd>${localeNumber(total)}</dd></dl></div>`;
 }
 
 // ---------- download ----------
 setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
   await setsLoad;
-  if (setsBase.length === 0 || !chosenMarks) return;
+  await setsFetch;
+  if (setsBase.length === 0 || chosenSets().length === 0 || !setsReady()) return;
+  const chosenMarks = { label: chosenLabel(), markers: chosenMarkers() };
   const generatedAt = new Date();
   const lang = currentLang();
   const mode = setsDirection();
@@ -1148,6 +1227,7 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
         backupFilenames: backupEntries.map((e) => e.name),
         setName: chosenMarks.label,
         setCount: chosenMarks.markers.length,
+        setCountsByName: chosenSets().map(({ id, name }) => [name, loadedSets.get(id).length]),
         mode,
         baseCount: setsBase.length,
         addedCount: outcome.added,
@@ -1169,6 +1249,7 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
   renderResult('sets-result', `
     ${t('setsAppliedZip', zipName)}
     <dl>
+      <dt>${t('labelCollections')}</dt><dd>${escapeHtml(chosenMarks.label)}</dd>
       <dt>${t('labelExisting')}</dt><dd>${localeNumber(setsBase.length)}</dd>
       ${rows}
       <dt>${t('labelTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
