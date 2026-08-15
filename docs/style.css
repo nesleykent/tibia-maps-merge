@@ -797,6 +797,13 @@ button { font-family: inherit; }
 
 .step-feedback:empty { display: none; }
 
+.import-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: var(--ig-space-2);
+  align-items: center;
+}
+
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);

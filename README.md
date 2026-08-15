@@ -45,9 +45,14 @@ with the latest game update). Three modes:
   plus a label and icon applied to the batch, either of which a line can
   override by appending its own (`32250, 31385, 5, Depot, flag`).
   Unparseable lines are reported and skipped rather than failing the batch.
-  Step 3 is a table with Edit/Delete per row, kept across reloads in
-  `localStorage`. Downloads a `.zip` with the new `minimapmarkers.bin`, a
-  backup of any file you loaded, and `add-marks-log.txt`.
+  Step 2 can also fill itself from a **Tibia Wiki quest article**: paste the
+  URL and it pulls every coordinate the article links to, labelled from the
+  surrounding sentence, ready to edit. It reads the article's wikitext
+  through the MediaWiki API (`origin=*`), so no proxy or server is involved
+  and only public article text is requested. Step 3 is a table with
+  Edit/Delete per row, kept across reloads in `localStorage`. Downloads a
+  `.zip` with the new `minimapmarkers.bin`, a backup of any file you loaded,
+  and `add-marks-log.txt`.
 
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and

@@ -134,6 +134,15 @@
         </div>
         <div class="marker-form">
           <div class="field field-full">
+            <label for="wiki-url">Importar de uma quest do Tibia Wiki</label>
+            <div class="import-row">
+              <input type="text" inputmode="url" autocomplete="off" id="wiki-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
+              <button type="button" class="tertiary-btn" id="wiki-import">Importar</button>
+            </div>
+            <p class="micro-hint">Opcional. Lê o artigo direto do wiki no seu navegador e preenche o campo abaixo com todas as coordenadas que ele referencia. Os rótulos vêm do texto ao redor, então confira antes de adicionar.</p>
+            <div class="status-line" id="wiki-status"></div>
+          </div>
+          <div class="field field-full">
             <label for="mark-coords">Coordenadas</label>
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10

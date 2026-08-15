@@ -39,6 +39,13 @@ links, extracts the coordinates used throughout the walkthrough, assigns
 useful labels and marker icons, and returns text you paste straight into Add
 Marks. Tibia Maps Merge handles the marker file itself.
 
+> **Just want the coordinates?** Add Marks can now read an article by itself
+> — paste the URL into step 2 and it fills the coordinate field with every
+> position the article links to, labelled from the surrounding sentence. That
+> covers extraction. The workflow below is still what gets you *semantic*
+> results: an icon chosen per location, and a label written for a player
+> rather than lifted from the prose.
+
 ## Why this is useful
 
 Large quests contain dozens of relevant locations. A guide may reference quest

@@ -4,6 +4,7 @@ import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.
 import { buildAddMarksLog, buildConversionLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
+import { fetchQuestCoordinates } from './lib/wiki.js';
 import { CHANGELOG_URL, VERSION } from './lib/version.js';
 import { buildZip } from './lib/zip.js';
 
@@ -332,6 +333,9 @@ const PENDING_KEY = 'tibia-maps-merge:pending-markers:v1';
 
 const addExistingInput = document.getElementById('add-existing-files');
 const addExistingStatus = document.getElementById('add-existing-status');
+const wikiUrlField = document.getElementById('wiki-url');
+const wikiImportButton = document.getElementById('wiki-import');
+const wikiStatus = document.getElementById('wiki-status');
 const coordsField = document.getElementById('mark-coords');
 const markLabelField = document.getElementById('mark-label');
 const addButton = document.getElementById('add-marks');
@@ -566,6 +570,37 @@ function syncAddButton() {
 }
 coordsField.addEventListener('input', syncAddButton);
 syncAddButton();
+
+// ---------- Import from a Tibia Wiki article ----------
+// Fills the coordinate field above rather than the list: the import is one way
+// to write those lines, not a second way to add marks, so everything after it
+// -- editing, labelling, the batch icon, Review -- stays exactly the same.
+wikiImportButton.addEventListener('click', withBusy(wikiImportButton, async () => {
+  wikiStatus.classList.remove('error');
+  wikiStatus.textContent = t('wikiReading');
+  let article;
+  try {
+    article = await fetchQuestCoordinates(wikiUrlField.value);
+  } catch (err) {
+    wikiStatus.textContent = t({
+      badUrl: 'wikiBadUrl', noArticle: 'wikiNoArticle',
+    }[err.message] ?? 'wikiUnreachable');
+    wikiStatus.classList.add('error');
+    return;
+  }
+
+  if (article.coordinates.length === 0) {
+    wikiStatus.textContent = t('wikiNoCoordinates', article.title);
+    wikiStatus.classList.add('error');
+    return;
+  }
+
+  const lines = article.coordinates.map((c) => `${c.x}, ${c.y}, ${c.z}, ${c.label}`.trimEnd().replace(/,$/, ''));
+  const existing = coordsField.value.trim();
+  coordsField.value = existing ? `${existing}\n${lines.join('\n')}` : lines.join('\n');
+  syncAddButton();
+  wikiStatus.textContent = t('wikiImported', article.coordinates.length, article.title);
+}));
 
 addButton.addEventListener('click', () => {
   const { markers, errors } = parseMarks();

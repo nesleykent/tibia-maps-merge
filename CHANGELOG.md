@@ -4,6 +4,33 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.3.0] - 2026-08-15
+
+### Added
+
+- **Add Marks can read a Tibia Wiki quest article directly.** Paste an
+  article URL into step 2 and the coordinate field fills with every position
+  the article links to, labelled from the surrounding sentence. It is one
+  more way to write those lines, not a second way to add marks -- editing,
+  the batch label and icon, and Review all work exactly as before.
+  - Reads the article's wikitext through the MediaWiki API with `origin=*`,
+    which is the only part of these sites a static page can reach: the
+    rendered HTML is cross-origin and often behind a bot check, while the API
+    answers with CORS headers. No proxy and no server of our own is involved,
+    and only public article text is requested.
+  - Works with any MediaWiki install -- the API endpoint and page title are
+    derived from the URL -- so both tibiawiki.com.br and tibia.fandom.com
+    links work, in `/wiki/Title` or `/index.php?title=` form.
+  - Coordinates come from the `{{Mapa|x,y,z}}` map-link template, falling
+    back to bare `(x,y,z)` positions for articles that write them inline.
+    Labels are built from the clause preceding each link, with wiki markup,
+    gallery captions, file names and nested templates stripped out.
+  - Labels are a starting point, not an answer: they are drafted into the
+    editable coordinate field so they can be fixed before adding, and again
+    per row under Review. For semantic icons and hand-written labels, the
+    [quest marks guide](guides/quest-marks-from-tibia-wiki.md) still covers
+    the AI-assisted route.
+
 ## [1.2.0] - 2026-08-14
 
 ### Added
