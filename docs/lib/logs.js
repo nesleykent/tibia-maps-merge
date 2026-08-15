@@ -128,6 +128,7 @@ export function buildAddMarksLog({
   const t = (key, ...args) => tFor(lang, key, ...args);
   const n = (value) => localeNumber(value, lang);
   const keepingConflicts = conflictPolicy === 'keep';
+  const individualConflicts = conflictPolicy === 'individual';
   const lines = [
     t('logTitleAddMarks'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
@@ -152,9 +153,12 @@ export function buildAddMarksLog({
     );
     if (conflicts.length > 0) {
       lines.push(
-        line(t('logEditConflictPolicy'), t(keepingConflicts ? 'logEditPolicyKeep' : 'logEditPolicyReplace')),
-        line(t(keepingConflicts ? 'logKept' : 'logReplaced'), n(keepingConflicts ? keptCount : replacedCount)),
+        line(t('logEditConflictPolicy'), t(individualConflicts
+          ? 'logEditPolicyIndividual'
+          : (keepingConflicts ? 'logEditPolicyKeep' : 'logEditPolicyReplace'))),
       );
+      if (replacedCount > 0) lines.push(line(t('logReplaced'), n(replacedCount)));
+      if (keptCount > 0) lines.push(line(t('logKept'), n(keptCount)));
     }
   }
   lines.push(
@@ -166,7 +170,9 @@ export function buildAddMarksLog({
     lines.push('', t('logEditConflictsHeader'));
     for (const conflict of conflicts) {
       const marker = conflict.incoming;
-      lines.push(`  (${marker.x}, ${marker.y}, ${marker.z}): ${describeMarker(conflict.existing)} -> ${describeMarker(marker)}`);
+      const resolution = conflict.resolution
+        ?? (keepingConflicts ? 'keep' : 'replace');
+      lines.push(`  (${marker.x}, ${marker.y}, ${marker.z}): ${describeMarker(conflict.existing)} -> ${describeMarker(marker)} [${t(resolution === 'keep' ? 'logEditResolutionKeep' : 'logEditResolutionReplace')}]`);
     }
   }
   // The list is what the user reviewed either way -- what was considered for

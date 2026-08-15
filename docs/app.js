@@ -155,7 +155,7 @@ document.querySelectorAll('.file-picker input[type="file"]').forEach(wireFilePic
 function syncYourMarkersConsumers() {
   runButton.disabled = !community || yourMarkers.length === 0;
   updateConversionSourceOptions();
-  refreshApplyStep();
+  renderPending();
   refreshSetsPreview();
   refreshExtractPreview();
 }
@@ -173,6 +173,7 @@ async function loadYourMarkers() {
   yourMarkerGroups = [];
   yourMarkers = [];
   yourMarkersSkipped = [];
+  conflictResolutions = new Map();
   yourMarkersStatus.classList.remove('error');
   yourMarkersClear.classList.toggle('hidden', files.length === 0);
 
@@ -504,11 +505,10 @@ const addFeedback = document.getElementById('add-feedback');
 const addRows = document.getElementById('add-rows');
 const reviewStep = document.getElementById('review-step');
 const addClearButton = document.getElementById('add-clear');
+const reviewConflicts = document.getElementById('review-conflicts');
 const markApplyStep = document.getElementById('mark-apply-step');
 const markPreview = document.getElementById('mark-preview');
 const markDirectionHint = document.getElementById('mark-direction-hint');
-const markConflictControl = document.getElementById('mark-conflict-control');
-const markConflictSummary = document.getElementById('mark-conflict-summary');
 const addRunButton = document.getElementById('add-run');
 const editSheet = document.getElementById('edit-sheet');
 const editFieldX = document.getElementById('edit-x');
@@ -609,6 +609,7 @@ function savePending() {
 }
 
 let pending = loadPending();
+let conflictResolutions = new Map();
 
 // tibiamaps.io's map takes the position in its fragment, with a zoom level
 // after the colon: https://tibiamaps.io/map#33281,31724,7:1
@@ -619,8 +620,112 @@ const MAP_PIN_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden
   + 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
   + '<circle cx="8" cy="6.1" r="1.7" fill="currentColor"/></svg>';
 
+function conflictSignature(existing, incoming) {
+  return [
+    markerKey(incoming),
+    existing.icon,
+    existing.description,
+    incoming.icon,
+    incoming.description,
+  ].join('\u0000');
+}
+
+function currentReviewConflicts() {
+  const existingByKey = new Map(yourMarkers.map((marker) => [markerKey(marker), marker]));
+  return pending.flatMap((incoming) => {
+    const existing = existingByKey.get(markerKey(incoming));
+    if (!existing || sameContent(existing, incoming)) return [];
+    return [{
+      existing,
+      incoming,
+      coordinateKey: markerKey(incoming),
+      signature: conflictSignature(existing, incoming),
+    }];
+  });
+}
+
+function resolvedConflictsObject(conflicts) {
+  return Object.fromEntries(conflicts.flatMap((conflict) => {
+    const resolution = conflictResolutions.get(conflict.signature);
+    return resolution ? [[conflict.coordinateKey, resolution]] : [];
+  }));
+}
+
+function createConflictOption(conflict, resolution, sourceKey, actionKey) {
+  const marker = resolution === 'keep' ? conflict.existing : conflict.incoming;
+  const option = document.createElement('label');
+  option.className = 'conflict-option';
+
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = `conflict-${conflict.coordinateKey}`;
+  radio.value = resolution;
+  radio.checked = conflictResolutions.get(conflict.signature) === resolution;
+  radio.addEventListener('change', () => {
+    conflictResolutions.set(conflict.signature, resolution);
+    renderPending();
+  });
+
+  const body = document.createElement('span');
+  body.className = 'conflict-option-body';
+
+  const source = document.createElement('span');
+  source.className = 'conflict-option-source';
+  source.textContent = t(sourceKey);
+
+  const mark = document.createElement('span');
+  mark.className = 'conflict-option-marker';
+  const glyph = document.createElement('span');
+  glyph.innerHTML = iconGlyph(marker.icon, { size: 22 });
+  const copy = document.createElement('span');
+  const description = document.createElement('strong');
+  description.textContent = marker.description || t('markerNoLabel');
+  const iconName = document.createElement('small');
+  iconName.textContent = iconLabel(marker.icon);
+  copy.append(description, iconName);
+  mark.append(glyph, copy);
+
+  const action = document.createElement('span');
+  action.className = 'conflict-option-action';
+  action.textContent = t(actionKey);
+  body.append(source, mark, action);
+  option.append(radio, body);
+  return option;
+}
+
+function renderConflictOverview(conflicts, mode) {
+  const visible = mode === 'add' && conflicts.length > 0;
+  reviewConflicts.classList.toggle('hidden', !visible);
+  document.querySelectorAll('.marker-conflict-detail').forEach((row) => row.classList.toggle('hidden', !visible));
+  if (!visible) return;
+
+  const resolved = conflicts.filter((conflict) => conflictResolutions.has(conflict.signature)).length;
+  reviewConflicts.innerHTML = `
+    <div class="review-conflicts-copy">
+      <strong>${escapeHtml(t('markConflictsReview', conflicts.length))}</strong>
+      <span class="review-conflict-progress">${escapeHtml(t('markConflictsProgress', resolved, conflicts.length))}</span>
+      <p>${escapeHtml(t('markConflictsReviewHint'))}</p>
+    </div>
+    <div class="review-conflict-actions">
+      <button type="button" class="secondary-btn" data-resolution="replace">${escapeHtml(t('markConflictUseAll'))}</button>
+      <button type="button" class="secondary-btn" data-resolution="keep">${escapeHtml(t('markConflictKeepAll'))}</button>
+    </div>`;
+  reviewConflicts.querySelectorAll('[data-resolution]').forEach((button) => {
+    button.addEventListener('click', () => {
+      conflicts.forEach((conflict) => conflictResolutions.set(conflict.signature, button.dataset.resolution));
+      renderPending();
+    });
+  });
+}
+
 function renderPending() {
   addRows.textContent = '';
+  const conflicts = currentReviewConflicts();
+  const conflictByCoordinate = new Map(conflicts.map((conflict) => [conflict.coordinateKey, conflict]));
+  const currentSignatures = new Set(conflicts.map((conflict) => conflict.signature));
+  conflictResolutions = new Map(
+    [...conflictResolutions].filter(([signature]) => currentSignatures.has(signature)),
+  );
   pending.forEach((marker, index) => {
     const coordinates = `${marker.x}, ${marker.y}, ${marker.z}`;
     const row = document.createElement('tr');
@@ -655,6 +760,30 @@ function renderPending() {
       renderPending();
     });
     addRows.appendChild(row);
+
+    const conflict = conflictByCoordinate.get(markerKey(marker));
+    if (conflict) {
+      const detailRow = document.createElement('tr');
+      detailRow.className = 'marker-conflict-detail';
+      const detailCell = document.createElement('td');
+      detailCell.colSpan = 7;
+      const fieldset = document.createElement('fieldset');
+      fieldset.className = 'coordinate-conflict';
+      const legend = document.createElement('legend');
+      legend.textContent = t(conflictResolutions.has(conflict.signature)
+        ? 'markConflictDecided'
+        : 'markConflictNeedsDecision');
+      const choices = document.createElement('div');
+      choices.className = 'conflict-options';
+      choices.append(
+        createConflictOption(conflict, 'keep', 'markConflictInFile', 'markConflictKeep'),
+        createConflictOption(conflict, 'replace', 'markConflictReviewed', 'markConflictUseReviewed'),
+      );
+      fieldset.append(legend, choices);
+      detailCell.appendChild(fieldset);
+      detailRow.appendChild(detailCell);
+      addRows.appendChild(detailRow);
+    }
   });
 
   // Nothing to review until there's something in the list, so the whole step
@@ -673,47 +802,51 @@ function markDirection() {
   return document.querySelector('input[name="mark-direction"]:checked')?.value ?? 'add';
 }
 
-function markConflictPolicy() {
-  return document.querySelector('input[name="mark-conflict-policy"]:checked')?.value ?? 'replace';
-}
-
 function refreshApplyStep() {
   const ready = pending.length > 0 && yourMarkers.length > 0;
   markApplyStep.classList.toggle('hidden', !ready);
   if (!ready) {
     markPreview.innerHTML = '';
-    markConflictControl.classList.add('hidden');
+    reviewConflicts.classList.add('hidden');
+    document.querySelectorAll('.marker-conflict-detail').forEach((row) => row.classList.add('hidden'));
+    addRunButton.disabled = pending.length === 0;
     return;
   }
   const mode = markDirection();
+  const reviewConflictsList = currentReviewConflicts();
+  const resolutions = resolvedConflictsObject(reviewConflictsList);
+  const unresolved = mode === 'add'
+    ? reviewConflictsList.filter((conflict) => !conflictResolutions.has(conflict.signature)).length
+    : 0;
   const outcome = applyEditedMarks(yourMarkers, pending, {
     mode,
-    conflictPolicy: markConflictPolicy(),
+    conflictPolicy: 'replace',
+    conflictResolutions: resolutions,
   });
-  const { added, identical, conflicts, replaced, kept, removed, total } = outcome;
-  const hasConflicts = mode === 'add' && conflicts.length > 0;
-  markConflictControl.classList.toggle('hidden', !hasConflicts);
-  markConflictSummary.textContent = hasConflicts ? t('markConflictsFound', conflicts.length) : '';
+  const { added, identical, conflicts, removed, total } = outcome;
+  const replaced = Object.values(resolutions).filter((resolution) => resolution === 'replace').length;
+  const kept = Object.values(resolutions).filter((resolution) => resolution === 'keep').length;
+  renderConflictOverview(reviewConflictsList, mode);
+  addRunButton.disabled = unresolved > 0;
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
     : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
       + `<dt>${t('labelAlreadyIdentical')}</dt><dd>${localeNumber(identical)}</dd>`
       + (conflicts.length > 0
-        ? `<dt>${t(markConflictPolicy() === 'replace' ? 'labelConflictsReplaced' : 'labelConflictsKept')}</dt>`
-          + `<dd>${localeNumber(replaced + kept)}</dd>`
+        ? `<dt>${t('labelConflictsReplaced')}</dt><dd>${localeNumber(replaced)}</dd>`
+          + `<dt>${t('labelConflictsKept')}</dt><dd>${localeNumber(kept)}</dd>`
+          + `<dt>${t('labelConflictsUnresolved')}</dt><dd>${localeNumber(unresolved)}</dd>`
         : '');
   markDirectionHint.textContent = t(
     mode === 'remove' ? 'markDirectionHintRemove' : 'markDirectionHintAdd',
     conflicts.length,
+    unresolved,
   );
   markPreview.innerHTML = `<div class="result-card ok"><dl>${rows}`
     + `<dt>${t('labelTotal')}</dt><dd>${localeNumber(total)}</dd></dl></div>`;
 }
 
 document.querySelectorAll('input[name="mark-direction"]').forEach(
-  (radio) => radio.addEventListener('change', refreshApplyStep),
-);
-document.querySelectorAll('input[name="mark-conflict-policy"]').forEach(
   (radio) => radio.addEventListener('change', refreshApplyStep),
 );
 
@@ -956,7 +1089,19 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   const lang = currentLang();
 
   const mode = markDirection();
-  const conflictPolicy = markConflictPolicy();
+  const reviewConflictsList = currentReviewConflicts();
+  const unresolved = mode === 'add'
+    ? reviewConflictsList.filter((conflict) => !conflictResolutions.has(conflict.signature))
+    : [];
+  if (unresolved.length > 0) {
+    renderResult('add-result', escapeHtml(t('markResolveConflictsFirst', unresolved.length)), true);
+    return;
+  }
+  const conflictResolutionsByCoordinate = resolvedConflictsObject(reviewConflictsList);
+  const selectedResolutions = Object.values(conflictResolutionsByCoordinate);
+  const conflictPolicy = selectedResolutions.length === 0 || selectedResolutions.every((value) => value === 'replace')
+    ? 'replace'
+    : (selectedResolutions.every((value) => value === 'keep') ? 'keep' : 'individual');
 
   let outcome;
   let outputBytes;
@@ -964,7 +1109,11 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   let backupEntries = [];
   try {
     backupEntries = await backupYourMarkerFiles(generatedAt);
-    outcome = applyEditedMarks(yourMarkers, pending, { mode, conflictPolicy });
+    outcome = applyEditedMarks(yourMarkers, pending, {
+      mode,
+      conflictPolicy: 'replace',
+      conflictResolutions: conflictResolutionsByCoordinate,
+    });
     validateMarkers(outcome.result, { source: 'edit-marks' });
     outputBytes = writeMarkersBin(outcome.result);
     const reparsed = parseMarkersBin(
@@ -1016,8 +1165,8 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
     : `<dt>${t('labelYouAdded')}</dt><dd>${localeNumber(outcome.added)}</dd>`
       + `<dt>${t('labelAlreadyIdentical')}</dt><dd>${localeNumber(outcome.identical)}</dd>`
       + (outcome.conflicts.length > 0
-        ? `<dt>${t(conflictPolicy === 'replace' ? 'labelConflictsReplaced' : 'labelConflictsKept')}</dt>`
-          + `<dd>${localeNumber(outcome.conflicts.length)}</dd>`
+        ? `<dt>${t('labelConflictsReplaced')}</dt><dd>${localeNumber(outcome.replaced)}</dd>`
+          + `<dt>${t('labelConflictsKept')}</dt><dd>${localeNumber(outcome.kept)}</dd>`
         : '');
   renderResult('add-result', `
     ${t(mode === 'remove' ? 'marksUpdatedZip' : 'marksCreatedZip', zipName)}

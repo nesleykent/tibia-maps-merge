@@ -8,11 +8,13 @@ const sameContent = (a, b) => a.icon === b.icon && a.description === b.descripti
  *
  * A shared coordinate is only a conflict when its label or icon differs.
  * `replace` makes the reviewed-list mark win; `keep` preserves the mark from
- * the loaded file. Removal is coordinate-only and ignores the conflict policy.
+ * the loaded file. `conflictResolutions` can override that fallback for each
+ * coordinate. Removal is coordinate-only and ignores all conflict choices.
  */
 export function applyEditedMarks(base, reviewed, {
   mode = 'add',
   conflictPolicy = 'replace',
+  conflictResolutions = null,
 } = {}) {
   const existing = mergeMarkers(base);
   const incoming = mergeMarkers(reviewed);
@@ -48,22 +50,36 @@ export function applyEditedMarks(base, reviewed, {
     } else if (sameContent(current, marker)) {
       identical += 1;
     } else {
-      conflicts.push({ existing: current, incoming: marker });
+      const key = markerKey(marker);
+      const explicitResolution = conflictResolutions instanceof Map
+        ? conflictResolutions.get(key)
+        : conflictResolutions?.[key];
+      const resolution = explicitResolution ?? conflictPolicy;
+      if (!['replace', 'keep'].includes(resolution)) {
+        throw new Error(`Unknown Edit Marks conflict resolution at ${key}: ${resolution}`);
+      }
+      conflicts.push({ existing: current, incoming: marker, resolution });
     }
   }
 
-  const replacing = conflictPolicy === 'replace';
-  const result = replacing
-    ? mergeMarkers(existing, incoming)
-    : mergeMarkers(incoming, existing);
+  const resolutionByKey = new Map(conflicts.map((conflict) => [
+    markerKey(conflict.incoming),
+    conflict.resolution,
+  ]));
+  const acceptedIncoming = incoming.filter((marker) => (
+    resolutionByKey.get(markerKey(marker)) !== 'keep'
+  ));
+  const result = mergeMarkers(existing, acceptedIncoming);
+  const replaced = conflicts.filter((conflict) => conflict.resolution === 'replace').length;
+  const kept = conflicts.length - replaced;
 
   return {
     result,
     added,
     identical,
     conflicts,
-    replaced: replacing ? conflicts.length : 0,
-    kept: replacing ? 0 : conflicts.length,
+    replaced,
+    kept,
     removed: 0,
     total: result.length,
   };

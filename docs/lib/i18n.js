@@ -82,19 +82,34 @@ const STRINGS = {
     marksSkippedIntro: 'Skipped these lines:',
     marksCreatedZip: (name) => `Marker file created -- <strong>${name}</strong> downloaded.`,
     marksUpdatedZip: (name) => `Marker file updated -- <strong>${name}</strong> downloaded.`,
-    markDirectionHintAdd: (conflicts) => conflicts > 0
-      ? 'New coordinates will be added. Choose below which version wins at the coordinates that differ.'
+    markDirectionHintAdd: (conflicts, unresolved = 0) => conflicts > 0
+      ? (unresolved > 0
+        ? `${localeNumber(unresolved, 'en')} conflict decision(s) still need review above.`
+        : `All ${localeNumber(conflicts, 'en')} conflict(s) were reviewed above.`)
       : 'New coordinates will be added. No marks have a different label or icon at the same coordinate.',
     markDirectionHintRemove: 'Every coordinate in the list is dropped from the file you loaded, whatever its label or icon there.',
-    markConflictsFound: (count) => count === 1
-      ? '1 coordinate has different marks. Which one should win?'
-      : `${localeNumber(count, 'en')} coordinates have different marks. Which version should win?`,
+    markConflictsReview: (count) => count === 1
+      ? 'Review 1 coordinate conflict'
+      : `Review ${localeNumber(count, 'en')} coordinate conflicts`,
+    markConflictsReviewHint: 'Compare what is in your file with the reviewed list, then decide each conflict. Identical marks need no decision.',
+    markConflictsProgress: (resolved, total) => `${localeNumber(resolved, 'en')} of ${localeNumber(total, 'en')} decided`,
+    markConflictNeedsDecision: 'Needs decision',
+    markConflictDecided: 'Decision made',
+    markConflictInFile: 'In your file',
+    markConflictReviewed: 'Reviewed list',
+    markConflictKeep: 'Keep this mark',
+    markConflictUseReviewed: 'Use this mark',
+    markConflictKeepAll: 'Keep all from my file',
+    markConflictUseAll: 'Use all reviewed marks',
+    markerNoLabel: '(no label)',
+    markResolveConflictsFirst: (count) => `Review the ${localeNumber(count, 'en')} unresolved conflict(s) before downloading.`,
     labelCollections: 'Collections applied',
     labelExisting: 'Markers loaded from your file(s)',
     labelYouAdded: 'Markers you added',
     labelAlreadyIdentical: 'Already identical',
     labelConflictsReplaced: 'Conflicts using your reviewed list',
     labelConflictsKept: 'Conflicts keeping your file',
+    labelConflictsUnresolved: 'Conflicts still to review',
 
     formatBin: 'Tibia binary marker format (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -154,6 +169,9 @@ const STRINGS = {
     logEditConflictPolicy: 'Conflict policy',
     logEditPolicyReplace: 'use the mark from the reviewed list',
     logEditPolicyKeep: 'keep the mark already in the loaded file',
+    logEditPolicyIndividual: 'reviewed individually, coordinate by coordinate',
+    logEditResolutionReplace: 'used reviewed-list mark',
+    logEditResolutionKeep: 'kept loaded-file mark',
     logEditConflictsHeader: 'Conflicts reviewed (coordinate: loaded file -> reviewed list):',
     logReviewedListHeader: 'Reviewed marker list (coordinate: icon, label):',
     logRemovedListHeader: 'Coordinates you removed (coordinate: icon, label as listed):',
@@ -238,19 +256,34 @@ const STRINGS = {
     marksSkippedIntro: 'Linhas ignoradas:',
     marksCreatedZip: (name) => `Arquivo de marcações criado -- <strong>${name}</strong> baixado.`,
     marksUpdatedZip: (name) => `Arquivo de marcações atualizado -- <strong>${name}</strong> baixado.`,
-    markDirectionHintAdd: (conflicts) => conflicts > 0
-      ? 'Novas coordenadas serão adicionadas. Escolha abaixo qual versão prevalece nas coordenadas que diferem.'
+    markDirectionHintAdd: (conflicts, unresolved = 0) => conflicts > 0
+      ? (unresolved > 0
+        ? `${localeNumber(unresolved, 'pt-BR')} decisão(ões) de conflito ainda precisa(m) ser revisada(s) acima.`
+        : `Todos os ${localeNumber(conflicts, 'pt-BR')} conflito(s) foram revisados acima.`)
       : 'Novas coordenadas serão adicionadas. Nenhuma marcação tem rótulo ou ícone diferente na mesma coordenada.',
     markDirectionHintRemove: 'Toda coordenada da lista sai do arquivo que você carregou, qualquer que seja o rótulo ou ícone dela lá.',
-    markConflictsFound: (count) => count === 1
-      ? '1 coordenada tem marcações diferentes. Qual deve prevalecer?'
-      : `${localeNumber(count, 'pt-BR')} coordenadas têm marcações diferentes. Qual versão deve prevalecer?`,
+    markConflictsReview: (count) => count === 1
+      ? 'Revisar 1 conflito de coordenada'
+      : `Revisar ${localeNumber(count, 'pt-BR')} conflitos de coordenada`,
+    markConflictsReviewHint: 'Compare o que está no seu arquivo com a lista revisada e decida cada conflito. Marcações idênticas não exigem decisão.',
+    markConflictsProgress: (resolved, total) => `${localeNumber(resolved, 'pt-BR')} de ${localeNumber(total, 'pt-BR')} decididos`,
+    markConflictNeedsDecision: 'Decisão necessária',
+    markConflictDecided: 'Decisão tomada',
+    markConflictInFile: 'No seu arquivo',
+    markConflictReviewed: 'Lista revisada',
+    markConflictKeep: 'Manter esta marcação',
+    markConflictUseReviewed: 'Usar esta marcação',
+    markConflictKeepAll: 'Manter todas do meu arquivo',
+    markConflictUseAll: 'Usar todas as marcações revisadas',
+    markerNoLabel: '(sem rótulo)',
+    markResolveConflictsFirst: (count) => `Revise o(s) ${localeNumber(count, 'pt-BR')} conflito(s) não resolvido(s) antes de baixar.`,
     labelCollections: 'Coleções aplicadas',
     labelExisting: 'Marcações carregadas do(s) seu(s) arquivo(s)',
     labelYouAdded: 'Marcações que você adicionou',
     labelAlreadyIdentical: 'Já idênticas',
     labelConflictsReplaced: 'Conflitos usando sua lista revisada',
     labelConflictsKept: 'Conflitos mantendo seu arquivo',
+    labelConflictsUnresolved: 'Conflitos ainda por revisar',
 
     formatBin: 'Formato binário de marcações do Tibia (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -310,6 +343,9 @@ const STRINGS = {
     logEditConflictPolicy: 'Política de conflitos',
     logEditPolicyReplace: 'usar a marcação da lista revisada',
     logEditPolicyKeep: 'manter a marcação que já está no arquivo carregado',
+    logEditPolicyIndividual: 'revisados individualmente, coordenada por coordenada',
+    logEditResolutionReplace: 'usou a marcação da lista revisada',
+    logEditResolutionKeep: 'manteve a marcação do arquivo carregado',
     logEditConflictsHeader: 'Conflitos revisados (coordenada: arquivo carregado -> lista revisada):',
     logReviewedListHeader: 'Lista de marcações revisada (coordenada: ícone, rótulo):',
     logRemovedListHeader: 'Coordenadas removidas (coordenada: ícone, rótulo conforme listado):',

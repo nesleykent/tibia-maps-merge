@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.17.1] - 2026-08-15
+
+### Changed
+
+- **Edit Marks conflicts are now resolved inside Review.** Every conflicting
+  coordinate shows the mark already in the uploaded file beside the mark from
+  the reviewed list, including both label and icon. Users decide each conflict
+  separately or apply a visible bulk choice; download stays disabled while any
+  conflict remains unresolved, and the audit log records every decision.
+
 ## [1.17.0] - 2026-08-15
 
 ### Added

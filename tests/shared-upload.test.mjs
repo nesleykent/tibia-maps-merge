@@ -18,6 +18,8 @@ for (const page of pages) {
     assert.match(html, /id="extract-community" checked/);
     assert.match(html, /id="extract-set-choices"/);
     assert.match(html, /id="conversion-source"/);
+    assert.match(html, /id="review-conflicts"/);
+    assert.doesNotMatch(html, /name="mark-conflict-policy"/);
     assert.doesNotMatch(html, /id="personal-files"/);
     assert.doesNotMatch(html, /id="add-existing-files"/);
     assert.doesNotMatch(html, /id="sets-files"/);

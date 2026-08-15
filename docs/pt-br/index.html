@@ -179,6 +179,7 @@
           <h3><span class="step-number">2</span>Revisar</h3>
           <button class="secondary-btn destructive" id="add-clear">Remover Tudo</button>
         </div>
+        <div class="review-conflicts hidden" id="review-conflicts"></div>
         <div class="table-wrap">
           <table class="marker-table">
             <thead>
@@ -199,14 +200,6 @@
         </div>
         <span class="visually-hidden" id="mark-direction-label">O que fazer com as marcações acima</span>
         <p class="micro-hint" id="mark-direction-hint"></p>
-        <div class="conflict-control hidden" id="mark-conflict-control">
-          <span class="field-label" id="mark-conflict-summary"></span>
-          <div class="direction-choices" role="radiogroup" aria-labelledby="mark-conflict-summary">
-            <label class="direction"><input type="radio" name="mark-conflict-policy" value="replace" checked><span>Usar as marcações da minha lista revisada</span></label>
-            <label class="direction"><input type="radio" name="mark-conflict-policy" value="keep"><span>Manter as marcações que já estão no meu arquivo</span></label>
-          </div>
-          <p class="micro-hint">Esta escolha se aplica somente quando as coordenadas são iguais mas o rótulo ou ícone é diferente. Marcações idênticas permanecem inalteradas.</p>
-        </div>
         <div class="result" id="mark-preview"></div>
       </li>
     </ol>

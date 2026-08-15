@@ -66,16 +66,18 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   loaded and asks which way to apply the reviewed list: **add** merges it in,
   while **remove** drops every coordinate in the list from the file, whatever
   it is labelled there. When adding, identical overlaps stay unchanged and
-  real conflicts are shown before download; you choose whether the reviewed
-  list or the loaded file wins at all of those coordinates. That is what
-  makes rewriting labels and icons deliberate instead of implicit. Removing
+  real conflicts appear inside the review table with the loaded-file and
+  reviewed-list versions side by side. You decide each coordinate separately,
+  or use a bulk action when the same answer applies to all; download remains
+  disabled until every conflict has a decision. That is what makes rewriting
+  labels and icons deliberate instead of implicit. Removing
   is what clears a quest's
   marks once you are done with it: import the quest, delete any row you want
   to keep, remove. With no file loaded the step stays hidden -- there is
   nothing to remove from, so the only possible outcome is a new file.
   Downloads a `.zip` with the new `minimapmarkers.bin`, a backup of any file
-  you loaded, and `edit-marks-log.txt`. The log records the selected conflict
-  policy and both versions of every conflicting mark.
+  you loaded, and `edit-marks-log.txt`. The log records every coordinate-level
+  conflict decision and both versions of each conflicting mark.
 
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and
