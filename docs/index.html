@@ -18,27 +18,6 @@
       with your own winning if you've marked the same spot differently.</p>
   </header>
 
-  <details class="intro">
-    <summary>How it works</summary>
-    <div class="intro-body">
-    <ol>
-      <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
-      <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
-      <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
-      <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
-    </ol>
-    <p class="micro-hint">That's <strong>Merge</strong>, the first tab below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
-      quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
-    <h3 id="where-is-my-file">Where do I find my minimapmarkers.bin?</h3>
-      <dl>
-        <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
-        <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
-        <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
-      </dl>
-      <p class="micro-hint">From <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">tibiamaps.io's installation guides</a> -- check there if your setup differs (e.g. a non-default install location, or the Test Server client).</p>
-    </div>
-  </details>
-
   <nav class="mode-tabs" role="tablist" aria-label="Mode">
     <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Merge</button>
     <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Convert</button>
@@ -67,6 +46,7 @@
           <input type="file" multiple accept=".bin,.json" id="personal-files">
           <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
         </label>
+        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find it?</button></p>
       </li>
     </ol>
 
@@ -124,6 +104,7 @@
           <input type="file" multiple accept=".bin,.json" id="add-existing-files">
           <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
         </label>
+        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find it?</button></p>
         <div class="status-line" id="add-existing-status"></div>
       </li>
 
@@ -140,7 +121,7 @@
               <button type="button" class="tertiary-btn" id="prompt-copy">Copy Prompt</button>
               <button type="button" class="tertiary-btn" id="prompt-chatgpt">Open in ChatGPT</button>
             </div>
-            <p class="micro-hint"><strong>Import</strong> reads the article itself -- <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> and <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copy Prompt</strong> and <strong>Open in ChatGPT</strong> hand the link to an assistant, which writes better labels and picks an icon per mark; paste its answer into Coordinates. <button type="button" class="link-btn" id="prompt-open">Other assistants</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">How it works</a>.</p>
+            <p class="micro-hint"><strong>Import</strong> reads the article itself -- <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> and <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copy Prompt</strong> and <strong>Open in ChatGPT</strong> hand the link to an assistant, which writes better labels and picks an icon per mark; paste its answer into Coordinates. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Other assistants</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">How it works</a>.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
           <div class="field field-main">
@@ -148,7 +129,7 @@
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
-            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" id="icon-names-open">See the icon names</button></p>
+            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">See the icon names</button></p>
           </div>
           <div class="field field-side">
             <span class="field-label" id="mark-icon-label">Marker icon</span>
@@ -212,6 +193,7 @@
           <input type="file" multiple accept=".bin,.json" id="sets-files">
           <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
         </label>
+        <p class="micro-hint"><button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find it?</button></p>
         <div class="status-line" id="sets-file-status"></div>
       </li>
 
@@ -252,7 +234,7 @@
       <div class="assistant-list" id="assistant-list"></div>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" id="assistant-close">Done</button>
+      <button type="button" class="primary-btn" data-close-sheet="assistant-sheet">Done</button>
     </div>
   </dialog>
 
@@ -263,7 +245,7 @@
       <div class="icon-names" id="icon-names-list"></div>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="primary-btn" id="icon-names-close">Done</button>
+      <button type="button" class="primary-btn" data-close-sheet="icon-names-sheet">Done</button>
     </div>
   </dialog>
 
@@ -313,12 +295,43 @@
     </div>
   </dialog>
 
+  <dialog class="sheet" id="file-location-sheet" aria-labelledby="file-location-title">
+    <div class="sheet-head"><h3 id="file-location-title">Where Do I Find My minimapmarkers.bin?</h3></div>
+    <div class="sheet-body">
+      <dl>
+        <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
+        <dt>macOS</dt><dd><code>~/Library/Application Support/CipSoft GmbH/Tibia/packages/Tibia.app/Contents/Resources/minimap</code></dd>
+        <dt>Linux</dt><dd><code>~/.local/share/CipSoft GmbH/Tibia/packages/Tibia/minimap</code></dd>
+      </dl>
+      <p class="micro-hint">From <a href="https://tibiamaps.io/guides" target="_blank" rel="noopener">tibiamaps.io's installation guides</a> -- check there if your setup differs (e.g. a non-default install location, or the Test Server client).</p>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="primary-btn" data-close-sheet="file-location-sheet">Done</button>
+    </div>
+  </dialog>
+
+  <details class="intro" id="how-it-works">
+    <summary>How it works</summary>
+    <div class="intro-body">
+    <ol>
+      <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
+      <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
+      <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
+      <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
+    </ol>
+    <p class="micro-hint">That's <strong>Merge</strong>, the first tab below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
+      quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
+    </div>
+  </details>
+
   <aside class="disclaimer">
     <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH, and the marker icons shown here are the Tibia client's own minimap symbols. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
   </aside>
 
   <footer>
-    <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
+    <a href="#how-it-works">How it works</a>
+    · <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find my file?</button>
+    · <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
     · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
   </footer>
 </div>

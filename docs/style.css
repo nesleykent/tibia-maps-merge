@@ -169,11 +169,13 @@ header h1 {
   line-height: var(--system-12-line-height);
 }
 
-/* The mechanics, one click away rather than in the way. A first-time reader
-   wants them; everyone else has read them once and wants the tool, so this
-   collapses to a single line and the tabs start near the top of the page. */
+/* The mechanics live at the foot of the page, collapsed, linked from the
+   footer. They are read once; the tabs and the tool they belong to are what
+   the top of the page is for. The one part needed mid-task -- where the
+   client keeps minimapmarkers.bin -- is a sheet instead, opened from beside
+   each file picker, so nobody has to leave what they are doing to find it. */
 .intro {
-  margin-bottom: var(--ig-space-6);
+  margin-top: var(--ig-space-8);
   border: 1px solid var(--border);
   border-radius: var(--ig-radius-md);
   background: var(--surface-raised);
@@ -756,6 +758,8 @@ button { font-family: inherit; }
 
 .link-btn:hover { text-decoration: underline; }
 
+.micro-hint .link-btn { font-size: inherit; }
+
 .marker-icon {
   display: inline-block;
   flex: 0 0 auto;
@@ -828,6 +832,27 @@ button { font-family: inherit; }
   color: var(--muted);
   font-size: var(--system-14-font-size);
   line-height: var(--system-16-line-height);
+}
+
+.sheet-body dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--ig-space-2) var(--ig-space-4);
+  align-items: baseline;
+  margin: 0 0 var(--ig-space-4);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-16-line-height);
+}
+
+.sheet-body dt {
+  color: var(--muted);
+  font-weight: var(--font-weight-system-semibold);
+}
+
+.sheet-body dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .sheet-body .marker-form { margin-bottom: 0; }
@@ -1203,7 +1228,14 @@ footer a {
   text-decoration: none;
 }
 
-footer a:hover { color: var(--accent); }
+footer a:hover,
+footer .link-btn:hover { color: var(--accent); }
+
+footer .link-btn {
+  color: var(--muted);
+  font-size: inherit;
+  line-height: inherit;
+}
 
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -1240,6 +1272,7 @@ footer a:hover { color: var(--accent); }
   }
 
   .intro-body dl,
+  .sheet-body dl,
   .result-card dl {
     grid-template-columns: 1fr;
   }

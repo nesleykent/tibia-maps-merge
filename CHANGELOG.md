@@ -4,6 +4,40 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.12.0] - 2026-08-15
+
+### Changed
+
+- **"How it works" is off the top of the page entirely.** Collapsing it was
+  not enough -- even as one line it held the slot between the hero and the
+  tabs. It now sits at the foot of the page with the disclaimer, linked from
+  the footer, and the page goes hero -> tabs -> tool with nothing in between.
+  A test asserts nothing creeps back in there.
+
+- **Where the client keeps `minimapmarkers.bin` is a sheet now**, not a
+  paragraph inside that disclosure. It is the one part of the intro needed
+  *during* a task rather than read once beforehand, and it was the part that
+  got buried. It opens from a quiet "Where do I find it?" beside each picker
+  that asks for your own file -- Merge, Edit Marks and Marker Sets -- so the
+  answer is where the question is, and from the footer.
+
+- **Every sheet opens and closes through one mechanism.** `data-open-sheet`
+  and `data-close-sheet` in the markup replace three near-identical pairs of
+  listeners, with each new sheet having meant another copy. Clicking the
+  backdrop now closes any of them -- Edit Mark and the remove-all confirmation
+  never did, though Escape always had. Dismissing is never the completing
+  action, so it only ever cancels.
+
+### Fixed
+
+- A fragment aimed at a closed disclosure now opens it. Browsers do this when
+  the target is *inside* one but not when it is the `<details>` itself, so the
+  footer's "How it works" link scrolled to a collapsed row and stopped.
+
+- The file-location sheet's title was sentence case while every other sheet
+  title is Title Case. The consistency test caught it, and now allows a
+  literal filename to stay lowercase inside one.
+
 ## [1.11.0] - 2026-08-15
 
 ### Changed

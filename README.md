@@ -123,9 +123,16 @@ between them. The bar is sticky, since Edit Marks runs well past a screen.
 The current mode lives in the URL (`#merge`, `#convert`, `#edit-marks`,
 `#marker-sets`) so it can be linked to and survives a reload -- the same slugs
 in both languages, set with `replaceState` so a tab does not cost a press of
-Back. An unrecognised fragment is left alone; `#where-is-my-file` is one, and
-points at the client's minimap folder paths inside the collapsed "How it
-works" disclosure above the tabs.
+Back. An unrecognised fragment is left alone.
+
+Nothing sits between the hero and the tabs -- a test enforces it. "How it
+works" is a collapsed disclosure at the foot of the page, linked from the
+footer (`#how-it-works`, which opens it: browsers auto-expand a `<details>`
+only when the fragment targets something *inside* it). The one part of it
+needed mid-task -- where the client keeps `minimapmarkers.bin` -- is a sheet
+instead, opened from beside each picker that asks for your own file. Sheets
+are declared, not wired: `data-open-sheet`/`data-close-sheet` on the trigger,
+backdrop-click and Escape to dismiss.
 
 All four modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that

@@ -14,6 +14,26 @@ const markerKey = (m) => `${m.x},${m.y},${m.z}`;
 const sameContent = (a, b) => a.icon === b.icon && a.description === b.description;
 
 // ---------- Mode tabs ----------
+// ---------- Sheets ----------
+// Every sheet opens and closes the same way, declared in the markup rather
+// than wired one at a time: three of them had their own near-identical pair of
+// listeners, and each new sheet was another copy. Clicking the backdrop closes
+// any of them, which is what Escape already did.
+for (const opener of document.querySelectorAll('[data-open-sheet]')) {
+  opener.addEventListener('click', () => document.getElementById(opener.dataset.openSheet).showModal());
+}
+
+for (const closer of document.querySelectorAll('[data-close-sheet]')) {
+  closer.addEventListener('click', () => document.getElementById(closer.dataset.closeSheet).close());
+}
+
+for (const sheet of document.querySelectorAll('dialog.sheet')) {
+  // Dismissing is never the completing action, so this only ever cancels.
+  sheet.addEventListener('click', (event) => {
+    if (event.target === sheet) sheet.close();
+  });
+}
+
 // ---------- Modes ----------
 // A real tablist: one tab in the tab order at a time, arrow keys between them,
 // and each panel named by its tab. The mode also lives in the URL, so a mode
@@ -53,9 +73,18 @@ const modeForHash = () => modeTabs.find((b) => b.dataset.slug === location.hash.
 // it may well be meant for something else on the page. The initial restore
 // runs at the very end of this file: selecting Marker Sets asks for the set
 // dates, whose state is declared further down.
+// A fragment aimed at a closed disclosure should open it. Browsers do that for
+// a target *inside* one, but not when the target is the <details> itself --
+// which is exactly what the footer's "How it works" link points at.
+function openTargetedDetails() {
+  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (target instanceof HTMLDetailsElement) target.open = true;
+}
+
 window.addEventListener('hashchange', () => {
   const mode = modeForHash();
   if (mode) selectMode(mode, { updateUrl: false });
+  openTargetedDetails();
 });
 
 // ---------- Version footer ----------
@@ -448,17 +477,11 @@ function mountIconField(container) {
 // The picker itself shows icons only -- names would just be noise to anyone
 // who plays the game. They matter in one place: typing an icon at the end of
 // a coordinate line, so they live in a reference sheet opened from that hint.
-const iconNamesSheet = document.getElementById('icon-names-sheet');
 document.getElementById('icon-names-list').innerHTML = MARKER_ICONS.map(({ id, name }) => (
   `<div class="icon-name">${iconGlyph(name, { size: 22 })}`
   + `<code>${escapeHtml(name)}</code>`
   + `<span class="icon-name-byte">0x${id.toString(16).toUpperCase().padStart(2, '0')}</span></div>`
 )).join('');
-document.getElementById('icon-names-open').addEventListener('click', () => iconNamesSheet.showModal());
-document.getElementById('icon-names-close').addEventListener('click', () => iconNamesSheet.close());
-iconNamesSheet.addEventListener('click', (event) => {
-  if (event.target === iconNamesSheet) iconNamesSheet.close();
-});
 
 const markIconSelect = mountIconField(document.querySelector('[data-icon-field="mark-icon"]'));
 const editIconSelect = mountIconField(document.querySelector('[data-icon-field="edit-icon"]'));
@@ -711,12 +734,6 @@ for (const { name, url } of OTHER_ASSISTANTS) {
   });
   assistantList.appendChild(row);
 }
-
-document.getElementById('prompt-open').addEventListener('click', () => assistantSheet.showModal());
-document.getElementById('assistant-close').addEventListener('click', () => assistantSheet.close());
-assistantSheet.addEventListener('click', (event) => {
-  if (event.target === assistantSheet) assistantSheet.close();
-});
 
 // ---------- Import from a Tibia Wiki article ----------
 // Fills the coordinate field above rather than the list: the import is one way
@@ -1170,3 +1187,4 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
 
 // Last, so every mode is fully wired before one is restored from the URL.
 if (modeForHash()) selectMode(modeForHash(), { updateUrl: false });
+openTargetedDetails();
