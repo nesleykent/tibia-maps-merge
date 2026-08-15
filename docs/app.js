@@ -572,9 +572,9 @@ function syncPromptTarget() {
   const url = currentPromptUrl();
   const raw = wikiUrlField.value.trim();
   promptTarget.classList.toggle('ready', Boolean(url));
-  promptTarget.textContent = url
-    ? t('promptTargetReady', url)
-    : (raw ? t('promptTargetInvalid') : t('promptTargetEmpty'));
+  // Nothing typed yet means nothing to report -- the line stays out of the way
+  // until it has something to confirm.
+  promptTarget.textContent = url ? t('promptTargetReady', url) : (raw ? t('promptTargetInvalid') : '');
 }
 wikiUrlField.addEventListener('input', syncPromptTarget);
 syncPromptTarget();
@@ -591,6 +591,8 @@ document.getElementById('prompt-copy').addEventListener('click', async () => {
   }
   wikiStatus.classList.remove('error');
   wikiStatus.textContent = t('promptCopied', url);
+  // The answer comes back here, so put the cursor where it has to be pasted.
+  coordsField.focus();
 });
 
 document.getElementById('prompt-chatgpt').addEventListener('click', () => {

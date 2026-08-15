@@ -4,6 +4,23 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.6.3] - 2026-08-15
+
+### Changed
+
+- Three buttons in a row said nothing about which to use. The text beside
+  them is now two parallel lines, one per route: **Import** fills Coordinates
+  itself, labelled from the article's own text; **Copy Prompt** and **Open in
+  ChatGPT** hand the link to an assistant that writes better labels and picks
+  an icon per location. Shorter than what it replaced, and it names the
+  trade-off instead of describing the mechanism.
+- The prompt route never said what to do with the answer. Both confirmations
+  now end with "paste its answer into Coordinates below", and copying the
+  prompt puts the cursor in that field, so the paste lands in the right place
+  without hunting for it.
+- The loaded-link line stays hidden until something is typed, instead of
+  explaining itself before the buttons have been introduced.
+
 ## [1.6.2] - 2026-08-15
 
 ### Fixed

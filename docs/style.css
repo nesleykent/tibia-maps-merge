@@ -820,6 +820,8 @@ button { font-family: inherit; }
   overflow-wrap: anywhere;
 }
 
+.prompt-target:empty { display: none; }
+
 .prompt-target.ready {
   color: var(--text);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
