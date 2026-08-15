@@ -56,6 +56,15 @@ with the latest game update). Three modes:
   alongside its numeric type byte
   ([`docs/lib/icons.js`](docs/lib/icons.js)).
 
+### Guides
+
+- [**Generating quest marks from Tibia Wiki with an AI assistant**](guides/quest-marks-from-tibia-wiki.md)
+  -- hand a Tibia Wiki quest URL to ChatGPT with an extraction prompt, get
+  back `x, y, z, Label, icon` lines for every NPC, entrance, floor
+  transition, item and boss in the walkthrough, and paste them straight into
+  Add Marks. Includes the full prompt and the exact icon names the parser
+  accepts.
+
 Everything runs client-side (vanilla JS: a ZIP reader + native
 `DecompressionStream` to unpack tibiamaps.io's download, a ZIP writer for
 the output archive, the same binary marker parser/writer as the CLI below).
