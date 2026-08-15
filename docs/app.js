@@ -323,7 +323,7 @@ convertButton.addEventListener('click', withBusy(convertButton, async () => {
   `, false);
 }));
 
-// ================= Add Marks Mode =================
+// ================= Edit Marks Mode =================
 // Markers typed in here are ordinary marker objects, so they go through the
 // exact same pipeline as an uploaded file: merged by coordinate with whatever
 // the user loaded, then validated, serialized, and round-trip checked with
@@ -345,6 +345,9 @@ const addFeedback = document.getElementById('add-feedback');
 const addRows = document.getElementById('add-rows');
 const reviewStep = document.getElementById('review-step');
 const addClearButton = document.getElementById('add-clear');
+const markApplyStep = document.getElementById('mark-apply-step');
+const markPreview = document.getElementById('mark-preview');
+const markDirectionHint = document.getElementById('mark-direction-hint');
 const addRunButton = document.getElementById('add-run');
 const editSheet = document.getElementById('edit-sheet');
 const editFieldX = document.getElementById('edit-x');
@@ -503,8 +506,60 @@ function renderPending() {
   // stays out of the way rather than sitting there as an empty placeholder.
   reviewStep.classList.toggle('hidden', pending.length === 0);
   addRunButton.disabled = pending.length === 0;
+  refreshApplyStep();
   savePending();
 }
+
+/**
+ * What applying the reviewed list to `base` would do.
+ *
+ * Adding puts your list in last, so a mark you wrote wins over one already at
+ * that coordinate -- the opposite of Marker Sets, where a published collection
+ * fills gaps and your own file wins. These marks *are* yours, and rewriting a
+ * label or icon is half the reason to type one. Removing drops every
+ * coordinate in the list, whatever it is labelled in the file.
+ */
+function applyPending(base, mode) {
+  const keys = new Set(pending.map(markerKey));
+  if (mode === 'remove') {
+    const result = base.filter((m) => !keys.has(markerKey(m)));
+    return { result, added: 0, replaced: 0, removed: base.length - result.length, total: result.length };
+  }
+  const baseKeys = new Set(base.map(markerKey));
+  const replaced = [...keys].filter((k) => baseKeys.has(k)).length;
+  const result = mergeMarkers(base, pending);
+  return { result, added: keys.size - replaced, replaced, removed: 0, total: result.length };
+}
+
+// With no file loaded there is nothing to remove from, so the only thing the
+// list can produce is a new file. Answering 'add' there keeps a stale radio
+// from emptying a file that was unloaded after it was picked.
+function markDirection() {
+  if (existingBase.length === 0) return 'add';
+  return document.querySelector('input[name="mark-direction"]:checked')?.value ?? 'add';
+}
+
+function refreshApplyStep() {
+  const ready = pending.length > 0 && existingBase.length > 0;
+  markApplyStep.classList.toggle('hidden', !ready);
+  if (!ready) {
+    markPreview.innerHTML = '';
+    return;
+  }
+  const mode = markDirection();
+  const { added, replaced, removed, total } = applyPending(existingBase, mode);
+  const rows = mode === 'remove'
+    ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
+    : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
+      + `<dt>${t('labelReplacedByYours')}</dt><dd>${localeNumber(replaced)}</dd>`;
+  markDirectionHint.textContent = t(mode === 'remove' ? 'markDirectionHintRemove' : 'markDirectionHintAdd');
+  markPreview.innerHTML = `<div class="result-card ok"><dl>${rows}`
+    + `<dt>${t('labelTotal')}</dt><dd>${localeNumber(total)}</dd></dl></div>`;
+}
+
+document.querySelectorAll('input[name="mark-direction"]').forEach(
+  (radio) => radio.addEventListener('change', refreshApplyStep),
+);
 
 /**
  * Add (or update) a marker, keyed by coordinate the same way merges are.
@@ -735,35 +790,39 @@ document.getElementById('clear-confirm').addEventListener('click', () => {
 });
 
 // ---------- Your existing marker file ----------
-let existingGroups = [];
+let existingBase = [];
 let existingSkipped = [];
 let existingLoad = Promise.resolve();
 
 async function loadExistingMarkers() {
   const files = Array.from(addExistingInput.files || []);
-  existingGroups = [];
+  const groups = [];
+  existingBase = [];
   existingSkipped = [];
   if (files.length === 0) {
     addExistingStatus.textContent = '';
     addExistingStatus.classList.remove('error');
+    refreshApplyStep();
     return;
   }
   addExistingStatus.textContent = t('loading');
   addExistingStatus.classList.remove('error');
   for (const file of files) {
     try {
-      existingGroups.push(await loadMarkersFile(file));
+      groups.push(await loadMarkersFile(file));
     } catch (err) {
       existingSkipped.push({ file: file.name, error: err.message });
     }
   }
-  const loaded = existingGroups.reduce((sum, group) => sum + group.length, 0);
-  if (existingGroups.length === 0) {
+  if (groups.length === 0) {
     addExistingStatus.textContent = t('noneParsed');
     addExistingStatus.classList.add('error');
+    refreshApplyStep();
     return;
   }
-  addExistingStatus.textContent = t('existingLoaded', loaded, files.map((f) => f.name).join(', '));
+  existingBase = mergeMarkers(...groups);
+  addExistingStatus.textContent = t('existingLoaded', existingBase.length, files.map((f) => f.name).join(', '));
+  refreshApplyStep();
 }
 
 addExistingInput.addEventListener('change', () => { existingLoad = loadExistingMarkers(); });
@@ -779,7 +838,9 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   const lang = currentLang();
   const files = Array.from(addExistingInput.files || []);
 
-  let merged;
+  const mode = markDirection();
+
+  let outcome;
   let outputBytes;
   let validationLine;
   const backupEntries = [];
@@ -790,38 +851,35 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
         data: new Uint8Array(await file.arrayBuffer()),
       });
     }
-    // Your new markers go in last, so they win at a coordinate you already had.
-    merged = mergeMarkers(...existingGroups, pending);
-    validateMarkers(merged, { source: 'add-marks' });
-    outputBytes = writeMarkersBin(merged);
+    outcome = applyPending(existingBase, mode);
+    validateMarkers(outcome.result, { source: 'edit-marks' });
+    outputBytes = writeMarkersBin(outcome.result);
     const reparsed = parseMarkersBin(
       outputBytes.buffer.slice(outputBytes.byteOffset, outputBytes.byteOffset + outputBytes.byteLength),
       { source: 'validation' },
     );
-    const removed = merged.length - reparsed.length;
-    validationLine = removed > 0 ? t('logValidationOkDedup', removed) : t('logValidationOk');
+    const lost = outcome.result.length - reparsed.length;
+    validationLine = lost > 0 ? t('logValidationOkDedup', lost) : t('logValidationOk');
   } catch (err) {
     renderResult('add-result', escapeHtml(err.message), true);
     return;
   }
 
-  const existingCount = existingGroups.reduce((sum, group) => sum + group.length, 0);
-  const existingKeys = new Set(existingGroups.flatMap((group) => group.map(markerKey)));
-  const replacedCount = pending.filter((m) => existingKeys.has(markerKey(m))).length;
-
   const entries = [
     { name: 'minimapmarkers.bin', data: outputBytes },
     ...backupEntries,
     {
-      name: 'add-marks-log.txt',
+      name: 'edit-marks-log.txt',
       data: new TextEncoder().encode(buildAddMarksLog({
         generatedAt,
         userFilenames: files.map((f) => f.name),
         backupFilenames: backupEntries.map((e) => e.name),
-        existingCount,
-        addedCount: pending.length,
-        replacedCount,
-        totalCount: merged.length,
+        mode,
+        existingCount: existingBase.length,
+        addedCount: outcome.added,
+        replacedCount: outcome.replaced,
+        removedCount: outcome.removed,
+        totalCount: outcome.total,
         validationLine,
         addedMarkers: pending,
       }, lang)),
@@ -836,13 +894,16 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
       `<li>${escapeHtml(s.file)}: ${escapeHtml(s.error)}</li>`
     )).join('')}</ul>`
     : '';
+  const rows = mode === 'remove'
+    ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(outcome.removed)}</dd>`
+    : `<dt>${t('labelYouAdded')}</dt><dd>${localeNumber(outcome.added)}</dd>`
+      + `<dt>${t('labelReplacedByYours')}</dt><dd>${localeNumber(outcome.replaced)}</dd>`;
   renderResult('add-result', `
-    ${t('marksCreatedZip', zipName)}
+    ${t(mode === 'remove' ? 'marksUpdatedZip' : 'marksCreatedZip', zipName)}
     <dl>
-      <dt>${t('labelExisting')}</dt><dd>${localeNumber(existingCount)}</dd>
-      <dt>${t('labelYouAdded')}</dt><dd>${localeNumber(pending.length)}</dd>
-      <dt>${t('labelReplacedByYours')}</dt><dd>${localeNumber(replacedCount)}</dd>
-      <dt>${t('labelTotal')}</dt><dd>${localeNumber(merged.length)}</dd>
+      <dt>${t('labelExisting')}</dt><dd>${localeNumber(existingBase.length)}</dd>
+      ${rows}
+      <dt>${t('labelTotal')}</dt><dd>${localeNumber(outcome.total)}</dd>
     </dl>
     ${skippedHtml}
   `, false);
@@ -851,22 +912,20 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
 renderPending();
 
 // ================= Marker Sets =================
-// One task: your marker file, plus a set of marks, added or removed. The set
-// is either a collection tibiamaps.io publishes or the positions in a quest
-// article -- both arrive as ordinary marker objects, so the same arithmetic
-// and the same encoder handle either.
+// One task: your marker file, plus one of the collections tibiamaps.io
+// publishes, added or removed. Nothing here is editable -- a collection is a
+// published list you take or leave whole, so this mode is a picker and a
+// preview. Marks you assemble yourself go through Edit Marks, which has the
+// row-by-row table for exactly that.
 
 const setsInput = document.getElementById('sets-files');
 const setsFileStatus = document.getElementById('sets-file-status');
 const setChoices = document.getElementById('set-choices');
-const setQuestRow = document.getElementById('set-quest-row');
-const setQuestUrl = document.getElementById('set-quest-url');
 const setsSourceStatus = document.getElementById('sets-source-status');
 const setsApplyStep = document.getElementById('sets-apply-step');
 const setsPreview = document.getElementById('sets-preview');
 const setsRunButton = document.getElementById('sets-run');
 
-const QUEST_CHOICE = 'quest';
 let setsBase = [];              // markers loaded from the user's file
 let setsBaseFiles = [];
 let chosenMarks = null;         // {label, markers}
@@ -889,24 +948,16 @@ for (const { id, name, large } of MARKER_SETS) {
   setChoices.appendChild(choice);
 }
 
-const questChoice = document.createElement('label');
-questChoice.className = 'set-choice';
-questChoice.innerHTML = '<input type="radio" name="marker-set" class="visually-hidden">'
-  + '<span class="set-name"></span><span class="set-note"></span>';
-questChoice.querySelector('input').value = QUEST_CHOICE;
-questChoice.querySelector('.set-name').textContent = t('setFromQuest');
-questChoice.querySelector('input').addEventListener('change', () => {
-  setQuestRow.classList.remove('hidden');
-  chosenMarks = null;
-  setsSourceStatus.textContent = '';
-  setsSourceStatus.classList.remove('error');
-  refreshSetsPreview();
-  setQuestUrl.focus();
-});
-setChoices.appendChild(questChoice);
+// A collection whose contents need explaining says so once it is picked --
+// per-set prose in the picker itself would drown the eight that need none.
+function showSetExplainer(id) {
+  for (const note of document.querySelectorAll('.set-explainer')) {
+    note.classList.toggle('hidden', note.id !== `set-note-${id}`);
+  }
+}
 
 async function selectSet(id, name) {
-  setQuestRow.classList.add('hidden');
+  showSetExplainer(id);
   chosenMarks = null;
   refreshSetsPreview();
   setsSourceStatus.classList.remove('error');
@@ -921,37 +972,6 @@ async function selectSet(id, name) {
   }
   refreshSetsPreview();
 }
-
-document.getElementById('set-quest-load').addEventListener('click', withBusy(
-  document.getElementById('set-quest-load'),
-  async () => {
-    chosenMarks = null;
-    refreshSetsPreview();
-    setsSourceStatus.classList.remove('error');
-    setsSourceStatus.textContent = t('wikiReading');
-    let article;
-    try {
-      article = await fetchQuestCoordinates(setQuestUrl.value);
-    } catch (err) {
-      setsSourceStatus.textContent = t({ badUrl: 'wikiBadUrl', noArticle: 'wikiNoArticle' }[err.message] ?? 'wikiUnreachable');
-      setsSourceStatus.classList.add('error');
-      return;
-    }
-    if (article.coordinates.length === 0) {
-      setsSourceStatus.textContent = t('wikiNoCoordinates', article.title);
-      setsSourceStatus.classList.add('error');
-      return;
-    }
-    chosenMarks = {
-      label: article.title,
-      markers: article.coordinates.map((c) => ({
-        description: c.label, icon: DEFAULT_ICON, x: c.x, y: c.y, z: c.z,
-      })),
-    };
-    setsSourceStatus.textContent = t('setLoaded', article.title, chosenMarks.markers.length);
-    refreshSetsPreview();
-  },
-));
 
 // ---------- your file ----------
 let setsLoad = Promise.resolve();

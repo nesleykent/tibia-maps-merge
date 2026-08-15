@@ -83,8 +83,8 @@ export function buildMarkerSetsLog({
 }
 
 export function buildAddMarksLog({
-  generatedAt, userFilenames, backupFilenames, existingCount, addedCount,
-  replacedCount, totalCount, validationLine, addedMarkers,
+  generatedAt, userFilenames, backupFilenames, mode, existingCount, addedCount,
+  replacedCount, removedCount, totalCount, validationLine, addedMarkers,
 }, lang) {
   const t = (key, ...args) => tFor(lang, key, ...args);
   const n = (value) => localeNumber(value, lang);
@@ -99,14 +99,22 @@ export function buildAddMarksLog({
   }
   lines.push(
     line(t('logOutputFormat'), t('formatBin')),
+    line(t('logSetAction'), t(mode === 'remove' ? 'logSetActionRemove' : 'logSetActionAdd')),
     line(t('logExistingLoaded'), n(existingCount)),
-    line(t('logMarkersCreated'), n(addedCount)),
-    line(t('logReplaced'), n(replacedCount)),
+  );
+  if (mode === 'remove') {
+    lines.push(line(t('logSetRemoved'), n(removedCount)));
+  } else {
+    lines.push(line(t('logMarkersCreated'), n(addedCount)), line(t('logReplaced'), n(replacedCount)));
+  }
+  lines.push(
     line(t('logTotal'), n(totalCount)),
     line(t('logValidation'), validationLine ?? t('logValidationOk')),
     line(t('logProcessingLocation'), t('logProcessingLocal')),
     '',
-    t('logAddedListHeader'),
+    // The list is what you put together either way -- what was written in, or
+    // what was taken out.
+    t(mode === 'remove' ? 'logRemovedListHeader' : 'logAddedListHeader'),
   );
   for (const m of addedMarkers) {
     lines.push(`  (${m.x}, ${m.y}, ${m.z}): ${describeMarker(m)}`);

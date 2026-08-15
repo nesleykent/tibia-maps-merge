@@ -26,8 +26,8 @@
       <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
       <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
     </ol>
-    <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>. And if you want to type markers in
-      by hand -- coordinates, a label and an icon -- use <strong>Add Marks</strong>. <strong>Marker Sets</strong> applies a ready-made collection to your file, or takes one back out.</p>
+    <p class="micro-hint">That's <strong>Merge Mode</strong>, below. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Conversion Mode</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
+      quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
     <details>
       <summary>Where do I find my minimapmarkers.bin?</summary>
       <dl>
@@ -42,7 +42,7 @@
   <nav class="mode-tabs">
     <button class="mode-tab-button active" data-mode="merge">Merge Mode</button>
     <button class="mode-tab-button" data-mode="convert">Conversion Mode</button>
-    <button class="mode-tab-button" data-mode="add">Add Marks</button>
+    <button class="mode-tab-button" data-mode="add">Edit Marks</button>
     <button class="mode-tab-button" data-mode="sets">Marker Sets</button>
   </nav>
 
@@ -112,13 +112,13 @@
   </section>
 
   <section class="mode-panel" id="mode-add">
-    <p class="hint">Type marks in by hand -- coordinates, a label and an icon -- and get a ready-to-install <code>minimapmarkers.bin</code> back.</p>
+    <p class="hint">Put a list of marks together -- typed in by hand, or read straight out of a Tibia Wiki quest -- edit it row by row, then add it to your marker file or take it back out.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
           <h3><span class="step-number">1</span>Your marker file</h3>
-          <span class="step-note">Optional -- leave empty to start a new file</span>
+          <span class="step-note">Optional to add, required to remove</span>
         </div>
         <label class="file-picker">
           <input type="file" multiple accept=".bin,.json" id="add-existing-files">
@@ -160,7 +160,7 @@
           </div>
         </div>
         <div class="form-row">
-          <button class="tertiary-btn" id="add-marks">Add Marks</button>
+          <button class="tertiary-btn" id="add-marks">Add to List</button>
         </div>
         <div class="step-feedback" id="add-feedback"></div>
       </li>
@@ -179,15 +179,28 @@
           </table>
         </div>
       </li>
+
+      <li class="step hidden" id="mark-apply-step">
+        <div class="step-head">
+          <h3><span class="step-number">4</span>Add or remove</h3>
+        </div>
+        <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
+          <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Add to my file</span></label>
+          <label class="direction"><input type="radio" name="mark-direction" value="remove"><span>Remove from my file</span></label>
+        </div>
+        <span class="visually-hidden" id="mark-direction-label">What to do with the marks above</span>
+        <p class="micro-hint" id="mark-direction-hint"></p>
+        <div class="result" id="mark-preview"></div>
+      </li>
     </ol>
 
     <button class="primary-btn" id="add-run" disabled>Download minimapmarkers.bin</button>
-    <p class="micro-hint">Downloads a <code>.zip</code> with the new <code>minimapmarkers.bin</code>, a backup of any file you loaded, and <code>add-marks-log.txt</code>. Drop the new file into your Tibia client's <code>minimap</code> folder (replacing the old one) and restart the client.</p>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the new <code>minimapmarkers.bin</code>, a backup of any file you loaded, and <code>edit-marks-log.txt</code>. Drop the new file into your Tibia client's <code>minimap</code> folder (replacing the old one) and restart the client.</p>
     <div class="result" id="add-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-sets">
-    <p class="hint">Apply a ready-made collection of marks to your file -- or take one back out. Useful for event and achievement markers, and for clearing a quest's marks once you are done with it.</p>
+    <p class="hint">Apply a ready-made collection of marks to your file -- or take one back out. Useful for event, achievement and respawn markers. For marks you put together yourself, use <strong>Edit Marks</strong>.</p>
 
     <ol class="steps">
       <li class="step">
@@ -208,12 +221,9 @@
         </div>
         <div class="set-choices" id="set-choices" role="radiogroup" aria-labelledby="set-choices-label"></div>
         <span class="visually-hidden" id="set-choices-label">Marks to apply</span>
-        <div class="import-row set-quest-row hidden" id="set-quest-row">
-          <input type="text" inputmode="url" autocomplete="off" id="set-quest-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
-          <button type="button" class="tertiary-btn" id="set-quest-load">Load quest</button>
-        </div>
+        <p class="set-explainer hidden" id="set-note-points-of-interest">The <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> scatters Points of Interest across each subarea you start discovering, in different spots for every character. This collection is every position one can turn up in -- a search list to hunt through, not a set of marks meant to stay in your file. Load it while you are looking, then remove it here when you are done.</p>
         <div class="status-line" id="sets-source-status"></div>
-        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time. A quest is read the same way <strong>Add Marks</strong> reads one.</p>
+        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time -- all nine it publishes.</p>
       </li>
 
       <li class="step hidden" id="sets-apply-step">

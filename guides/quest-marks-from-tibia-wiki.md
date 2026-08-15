@@ -2,7 +2,7 @@
 
 [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/) can turn a
 plain-text list of Tibia coordinates into a ready-to-install
-`minimapmarkers.bin`. Its **Add Marks** mode accepts one mark per line:
+`minimapmarkers.bin`. Its **Edit Marks** mode accepts one mark per line:
 
 ```text
 x, y, z, Label, icon
@@ -26,7 +26,7 @@ coordinate extraction prompt
         ↓
 x, y, z, Label, icon
         ↓
-Tibia Maps Merge / Add Marks
+Tibia Maps Merge / Edit Marks
         ↓
 minimapmarkers.bin
         ↓
@@ -39,7 +39,7 @@ links, extracts the coordinates used throughout the walkthrough, assigns
 useful labels and marker icons, and returns text you paste straight into Add
 Marks. Tibia Maps Merge handles the marker file itself.
 
-> **Just want the coordinates?** Add Marks can now read an article by itself
+> **Just want the coordinates?** Edit Marks can now read an article by itself
 > — paste the URL into step 2 and it fills the coordinate field with every
 > position the article links to, labelled from the surrounding sentence. That
 > covers extraction. The workflow below is still what gets you *semantic*
@@ -77,7 +77,7 @@ short description that shows up on the minimap. The final field is the marker
 icon.
 
 Both trailing fields are optional per line. Anything you leave out falls back
-to the **Label** and **Marker icon** fields in Add Marks, so you can also
+to the **Label** and **Marker icon** fields in Edit Marks, so you can also
 paste bare `x, y, z` lines and label the whole batch at once.
 
 ## Use the icon names the tool actually knows
@@ -113,7 +113,7 @@ Names are case-insensitive, so `RED DOWN` works as well as `red down`.
 
 **An unrecognized name is not an error** — it is treated as part of the label.
 A line ending in `arrowdown` or `dollar` produces a marker labelled
-"… , arrowdown" carrying whatever icon is selected in the Add Marks form, with
+"… , arrowdown" carrying whatever icon is selected in the Edit Marks form, with
 no warning. That is why the prompt below spells out the exact names. If a
 batch comes back with labels ending in stray icon words, the assistant
 invented names; correct them and paste again.
@@ -159,13 +159,13 @@ the marks should follow that sequence rather than being sorted numerically.
 The list is then useful both as import data and as a compact representation of
 the walkthrough.
 
-Note that Add Marks sorts the final file the way the Tibia client does (by
+Note that Edit Marks sorts the final file the way the Tibia client does (by
 floor, then position), so the ordering matters for reading and editing the
 pasted list, not for the resulting `.bin`.
 
 ## One line per coordinate
 
-Add Marks keys marks by their `(x, y, z)` coordinate — the same rule the merge
+Edit Marks keys marks by their `(x, y, z)` coordinate — the same rule the merge
 pipeline uses. If two lines share a coordinate, the **last one wins** and the
 earlier one is silently dropped.
 
@@ -401,7 +401,7 @@ That run also happened to reach every coordinate the article contains, which
 will not always be the case — the **Review** step is still where you check the
 result against the source.
 
-Paste the output straight into Add Marks.
+Paste the output straight into Edit Marks.
 
 ### Your run will not match this one exactly
 
@@ -435,7 +435,7 @@ model to change behaviour over time.
 ## Using the result
 
 1. Open [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/) and
-   select **Add Marks**.
+   select **Edit Marks**.
 2. *Optional* — under **Your marker file**, load your existing
    `minimapmarkers.bin` or `markers.json`. The new marks are merged into it by
    coordinate, yours winning on a clash, so the download is your whole marker
@@ -469,7 +469,7 @@ Community markers          Existing personal markers
                      ↓
              Merged marker file
                      ↓
-              Add Marks (load it, paste quest marks)
+              Edit Marks (load it, paste quest marks)
                      ↓
         Quest-ready minimapmarkers.bin
 ```

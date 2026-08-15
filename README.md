@@ -34,9 +34,10 @@ with the latest game update). Four modes:
   straight to `community-markers.json`. Downloads a `.zip` with the
   converted file and `conversion-log.txt` (source/output format, marker
   count, and a real round-trip validation check).
-- **Add Marks** -- write markers by hand instead of uploading them. One
-  path, top to bottom: **1** your marker file, **2** define marks, **3**
-  review, then download. Step 1 is optional -- load your own
+- **Edit Marks** -- put a list of marks together yourself, edit it, then add
+  it to your marker file or take it back out. One path, top to bottom: **1**
+  your marker file, **2** define marks, **3** review, **4** add or remove,
+  then download. Step 1 is optional when adding -- load your own
   `minimapmarkers.bin`/`markers.json` and the new marks are merged into it
   by coordinate, yours winning on a clash, so the download is your whole
   marker file rather than just the new marks; leave it empty and you get a
@@ -52,10 +53,17 @@ with the latest game update). Four modes:
   and only public article text is requested. Both wiki styles are handled:
   tibiawiki.com.br's plain `{{Mapa|x,y,z}}` links, and tibia.fandom.com's
   Mapper `sector.offset` templates (following the `/Spoiler` subpage where
-  the walkthrough actually lives). Step 3 is a table with
-  Edit/Delete per row, kept across reloads in `localStorage`. Downloads a
-  `.zip` with the new `minimapmarkers.bin`, a backup of any file you loaded,
-  and `add-marks-log.txt`.
+  the walkthrough actually lives). Step 3 is a table with Edit/Delete per
+  row, kept across reloads in `localStorage`. Step 4 appears once a file is
+  loaded and asks which way to apply the reviewed list: **add** merges it in
+  (your marks win at a shared coordinate -- rewriting a label or icon is half
+  the reason to type one), **remove** drops every coordinate in the list from
+  the file, whatever it is labelled there. That is what clears a quest's
+  marks once you are done with it: import the quest, delete any row you want
+  to keep, remove. With no file loaded the step stays hidden -- there is
+  nothing to remove from, so the only possible outcome is a new file.
+  Downloads a `.zip` with the new `minimapmarkers.bin`, a backup of any file
+  you loaded, and `edit-marks-log.txt`.
 
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and
@@ -66,18 +74,22 @@ with the latest game update). Four modes:
   sprite sheet the [TibiaWiki Mapper](https://tibia.fandom.com/wiki/Mapper)
   uses (`docs/assets/minimap-symbols.png`); its slot order is not the
   format's byte order, so the mapping is pinned by a test.
-- **Marker Sets** -- apply a ready-made collection of marks to your file, or
-  take one back out. This is the only mode that *removes* markers. The set is
-  either one of the collections tibiamaps.io publishes alongside its map data
+- **Marker Sets** -- the same add/remove, with a ready-made collection in
+  place of a list you assembled. The collections are the ones tibiamaps.io
+  publishes alongside its map data
   ([`extra/`](https://github.com/tibiamaps/tibia-map-data/tree/main/extra) --
-  all nine it publishes: achievements, rapid respawn, points of interest,
+  all nine of them: achievements, rapid respawn, points of interest,
   anniversary, lightbearer, Orcsoberfest island, Percht island, devovorga and
-  ignore), read live from that repository, or the positions in a
-  Tibia Wiki quest article -- which is what makes "clear this quest's marks
-  now that I'm done" one action. Adding keeps the same policy as everywhere
-  else: markers are keyed by coordinate and yours win, so a collection fills
-  gaps rather than overwriting your own marks. The step shows what will
-  change before you download.
+  ignore), read live from that repository; a test asserts the picker matches
+  what is published, in both directions, since a missing set is invisible in
+  the UI. Nothing is fetched until a collection is picked -- one of them is
+  over 5,000 markers. Adding follows the opposite precedence to Edit Marks:
+  a published collection fills gaps and *your* file wins, because those marks
+  are not yours. The step shows what will change before you download.
+  Points of interest carries a note about where it comes from -- the
+  [Measuring Tibia Quest](https://tibia.fandom.com/wiki/Measuring_Tibia_Quest)
+  scatters PoIs differently for every character, so the collection is every
+  position one can appear in: a search list, not marks meant to stay.
 
 ### Guides
 
@@ -85,7 +97,7 @@ with the latest game update). Four modes:
   -- hand a Tibia Wiki quest URL to ChatGPT with an extraction prompt, get
   back `x, y, z, Label, icon` lines for every NPC, entrance, floor
   transition, item and boss in the walkthrough, and paste them straight into
-  Add Marks. Includes the full prompt and the exact icon names the parser
+  Edit Marks. Includes the full prompt and the exact icon names the parser
   accepts.
 
 Everything runs client-side (vanilla JS: a ZIP reader + native

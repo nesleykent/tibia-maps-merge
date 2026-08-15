@@ -4,6 +4,48 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- **"Add Marks" is now "Edit Marks", and it removes as well as adds.** Once a
+  marker file is loaded, a fourth step asks which way to apply the list you
+  reviewed. **Add** merges it in, your marks winning at a shared coordinate --
+  the opposite of Marker Sets, and deliberately so: these marks are yours, and
+  rewriting a label or icon is half the reason to type one. **Remove** drops
+  every coordinate in the list from your file, whatever it is labelled there.
+  With no file loaded the step stays hidden -- there is nothing to remove
+  from, so the only thing the list can produce is a new file. The log records
+  which way it went, and the output is now `edit-marks-log.txt`.
+
+- **Reading a quest article moved out of Marker Sets and into Edit Marks.** It
+  was in both, and only one of them has the table. Clearing a quest's marks is
+  the case that shows why that matters: import the quest, look at what it
+  found, delete the rows you want to keep, then remove. In Marker Sets the
+  same quest was all-or-nothing, with no way to see or change a single mark
+  before applying it.
+
+  Marker Sets is now what its name says -- the nine published collections,
+  taken or left whole.
+
+### Added
+
+- **Points of interest is labelled "(PoI)" and explains itself.** Picking it
+  shows where it comes from: the
+  [Measuring Tibia Quest](https://tibia.fandom.com/wiki/Measuring_Tibia_Quest)
+  scatters Points of Interest across each subarea you start discovering, in
+  different spots for every character. The collection is every position one
+  can appear in -- a search list to hunt through, not marks meant to stay in
+  your file. Which is also why 98% of its 5,205 entries have no label, and why
+  being able to remove it again matters.
+
+### Fixed
+
+- The add/remove radios were stretched across their own row above the label
+  text instead of sitting beside it -- the direction control inherited the
+  collection card's single-column grid, which is built around a *hidden*
+  radio. Affected Marker Sets too.
+
 ## [1.8.1] - 2026-08-15
 
 ### Fixed

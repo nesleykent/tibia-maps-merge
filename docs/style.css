@@ -837,9 +837,23 @@ button { font-family: inherit; }
   gap: var(--ig-space-2);
 }
 
-.direction { grid-template-columns: minmax(0, 1fr); }
+/* A collection card hides its radio and shows selection through the card
+   itself; a direction shows a real radio, so it needs a column of its own --
+   without one it lands in the single column and stretches across the row. */
+.direction { grid-template-columns: max-content minmax(0, 1fr); }
+.direction input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
 
-.set-quest-row { margin-top: var(--ig-space-3); }
+/* Shown only for the one collection that needs explaining before you take it. */
+.set-explainer {
+  margin: var(--ig-space-3) 0 0;
+  padding: var(--ig-space-3) var(--ig-space-4);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
+  background: rgba(var(--ig-primary-button), .06);
+  color: var(--muted);
+  font-size: var(--system-12-font-size);
+  line-height: 1.5;
+}
 
 /* The task reads top to bottom: marker file -> define marks -> review, with
    one prominent action (the download) at the end. */

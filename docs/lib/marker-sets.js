@@ -12,6 +12,11 @@
 // Every folder published under extra/ has a markers.json, including the two
 // island folders that also carry minimap tiles -- only the markers are read
 // here; this project does not write map images.
+//
+// A collection is a fixed, published list, so this mode is a picker and a
+// preview. Marks you assemble yourself -- typed in, or pulled out of a quest
+// article -- go through Edit Marks instead, where they can be edited row by
+// row before being applied.
 
 import { mergeMarkers } from './markers.js';
 
@@ -21,7 +26,7 @@ const SOURCE = 'https://raw.githubusercontent.com/tibiamaps/tibia-map-data/main/
 export const MARKER_SETS = [
   { id: 'achievements', name: 'Achievements' },
   { id: 'rapid-respawn', name: 'Rapid respawn' },
-  { id: 'points-of-interest', name: 'Points of interest', large: true, mostlyUnlabelled: true },
+  { id: 'points-of-interest', name: 'Points of interest (PoI)', large: true, mostlyUnlabelled: true },
   { id: 'anniversary', name: 'Anniversary' },
   { id: 'lightbearer', name: 'Lightbearer' },
   { id: 'orcsoberfest-island', name: 'Orcsoberfest island' },
