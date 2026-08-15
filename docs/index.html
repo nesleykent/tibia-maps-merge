@@ -175,6 +175,14 @@
         </div>
         <span class="visually-hidden" id="mark-direction-label">What to do with the marks above</span>
         <p class="micro-hint" id="mark-direction-hint"></p>
+        <div class="conflict-control hidden" id="mark-conflict-control">
+          <span class="field-label" id="mark-conflict-summary"></span>
+          <div class="direction-choices" role="radiogroup" aria-labelledby="mark-conflict-summary">
+            <label class="direction"><input type="radio" name="mark-conflict-policy" value="replace" checked><span>Use the marks from my reviewed list</span></label>
+            <label class="direction"><input type="radio" name="mark-conflict-policy" value="keep"><span>Keep the marks already in my file</span></label>
+          </div>
+          <p class="micro-hint">This choice applies only where the coordinates match but the label or icon differs. Identical marks remain unchanged.</p>
+        </div>
         <div class="result" id="mark-preview"></div>
       </li>
     </ol>

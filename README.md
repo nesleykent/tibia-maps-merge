@@ -55,15 +55,19 @@ with the latest game update). Four modes:
   Mapper `sector.offset` templates (following the `/Spoiler` subpage where
   the walkthrough actually lives). Step 3 is a table with Edit/Delete per
   row, kept across reloads in `localStorage`. Step 4 appears once a file is
-  loaded and asks which way to apply the reviewed list: **add** merges it in
-  (your marks win at a shared coordinate -- rewriting a label or icon is half
-  the reason to type one), **remove** drops every coordinate in the list from
-  the file, whatever it is labelled there. That is what clears a quest's
+  loaded and asks which way to apply the reviewed list: **add** merges it in,
+  while **remove** drops every coordinate in the list from the file, whatever
+  it is labelled there. When adding, identical overlaps stay unchanged and
+  real conflicts are shown before download; you choose whether the reviewed
+  list or the loaded file wins at all of those coordinates. That is what
+  makes rewriting labels and icons deliberate instead of implicit. Removing
+  is what clears a quest's
   marks once you are done with it: import the quest, delete any row you want
   to keep, remove. With no file loaded the step stays hidden -- there is
   nothing to remove from, so the only possible outcome is a new file.
   Downloads a `.zip` with the new `minimapmarkers.bin`, a backup of any file
-  you loaded, and `edit-marks-log.txt`.
+  you loaded, and `edit-marks-log.txt`. The log records the selected conflict
+  policy and both versions of every conflicting mark.
 
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and

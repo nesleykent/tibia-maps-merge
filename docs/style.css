@@ -945,6 +945,22 @@ button { font-family: inherit; }
 .direction { grid-template-columns: max-content minmax(0, 1fr); }
 .direction input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
 
+.conflict-control {
+  margin-top: var(--ig-space-4);
+  padding: var(--ig-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--card-border-radius);
+  background: var(--surface-muted);
+}
+
+.conflict-control > .field-label {
+  display: block;
+  margin-bottom: var(--ig-space-3);
+}
+
+.conflict-control .direction { background: var(--surface); }
+.conflict-control .micro-hint { margin-bottom: 0; }
+
 /* Shown only for the one collection that needs explaining before you take it. */
 .set-explainer {
   margin: var(--ig-space-3) 0 0;

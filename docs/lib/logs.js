@@ -95,11 +95,14 @@ export function buildMarkerSetsLog({
 }
 
 export function buildAddMarksLog({
-  generatedAt, userFilenames, backupFilenames, mode, existingCount, addedCount,
-  replacedCount, removedCount, totalCount, validationLine, addedMarkers,
+  generatedAt, userFilenames, backupFilenames, mode, conflictPolicy,
+  existingCount, addedCount, identicalCount = 0, replacedCount,
+  keptCount = 0, conflicts = [], removedCount, totalCount, validationLine,
+  addedMarkers,
 }, lang) {
   const t = (key, ...args) => tFor(lang, key, ...args);
   const n = (value) => localeNumber(value, lang);
+  const keepingConflicts = conflictPolicy === 'keep';
   const lines = [
     t('logTitleAddMarks'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
@@ -117,17 +120,33 @@ export function buildAddMarksLog({
   if (mode === 'remove') {
     lines.push(line(t('logSetRemoved'), n(removedCount)));
   } else {
-    lines.push(line(t('logMarkersCreated'), n(addedCount)), line(t('logReplaced'), n(replacedCount)));
+    lines.push(
+      line(t('logMarkersCreated'), n(addedCount)),
+      line(t('logEditIdentical'), n(identicalCount)),
+      line(t('logEditConflicts'), n(conflicts.length)),
+    );
+    if (conflicts.length > 0) {
+      lines.push(
+        line(t('logEditConflictPolicy'), t(keepingConflicts ? 'logEditPolicyKeep' : 'logEditPolicyReplace')),
+        line(t(keepingConflicts ? 'logKept' : 'logReplaced'), n(keepingConflicts ? keptCount : replacedCount)),
+      );
+    }
   }
   lines.push(
     line(t('logTotal'), n(totalCount)),
     line(t('logValidation'), validationLine ?? t('logValidationOk')),
     line(t('logProcessingLocation'), t('logProcessingLocal')),
-    '',
-    // The list is what you put together either way -- what was written in, or
-    // what was taken out.
-    t(mode === 'remove' ? 'logRemovedListHeader' : 'logAddedListHeader'),
   );
+  if (mode !== 'remove' && conflicts.length > 0) {
+    lines.push('', t('logEditConflictsHeader'));
+    for (const conflict of conflicts) {
+      const marker = conflict.incoming;
+      lines.push(`  (${marker.x}, ${marker.y}, ${marker.z}): ${describeMarker(conflict.existing)} -> ${describeMarker(marker)}`);
+    }
+  }
+  // The list is what the user reviewed either way -- what was considered for
+  // writing, or which coordinates were taken out.
+  lines.push('', t(mode === 'remove' ? 'logRemovedListHeader' : 'logReviewedListHeader'));
   for (const m of addedMarkers) {
     lines.push(`  (${m.x}, ${m.y}, ${m.z}): ${describeMarker(m)}`);
   }

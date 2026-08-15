@@ -4,6 +4,23 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.16.0] - 2026-08-15
+
+### Added
+
+- **Edit Marks now puts coordinate conflicts under the user's control.** When
+  a reviewed mark shares coordinates with a loaded-file mark but has a
+  different label or icon, Step 4 shows the number of conflicts and asks
+  whether to use the reviewed-list versions or keep the loaded-file versions.
+  The existing replace behavior remains the default, but it is no longer
+  implicit.
+- The live preview separates new marks, already-identical marks and real
+  conflicts. Changing the policy immediately updates the result counts.
+- `edit-marks-log.txt` records the chosen policy, how many conflicts were
+  replaced or kept, and both versions of every conflicting mark. A new pure
+  merge module and five automated tests cover replace, keep, remove, invalid
+  policies and audit output.
+
 ## [1.15.0] - 2026-08-15
 
 ### Changed

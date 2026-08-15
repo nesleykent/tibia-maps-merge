@@ -69,12 +69,19 @@ const STRINGS = {
     marksSkippedIntro: 'Skipped these lines:',
     marksCreatedZip: (name) => `Marker file created -- <strong>${name}</strong> downloaded.`,
     marksUpdatedZip: (name) => `Marker file updated -- <strong>${name}</strong> downloaded.`,
-    markDirectionHintAdd: 'Your marks go into the file you loaded. At a coordinate you already had a mark on, yours from the list wins.',
+    markDirectionHintAdd: (conflicts) => conflicts > 0
+      ? 'New coordinates will be added. Choose below which version wins at the coordinates that differ.'
+      : 'New coordinates will be added. No marks have a different label or icon at the same coordinate.',
     markDirectionHintRemove: 'Every coordinate in the list is dropped from the file you loaded, whatever its label or icon there.',
+    markConflictsFound: (count) => count === 1
+      ? '1 coordinate has different marks. Which one should win?'
+      : `${localeNumber(count, 'en')} coordinates have different marks. Which version should win?`,
     labelCollections: 'Collections applied',
     labelExisting: 'Markers loaded from your file(s)',
     labelYouAdded: 'Markers you added',
-    labelReplacedByYours: 'Replaced at the same coordinate',
+    labelAlreadyIdentical: 'Already identical',
+    labelConflictsReplaced: 'Conflicts using your reviewed list',
+    labelConflictsKept: 'Conflicts keeping your file',
 
     formatBin: 'Tibia binary marker format (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -120,8 +127,15 @@ const STRINGS = {
     logNoFile: 'none -- a new marker file was created from scratch',
     logExistingLoaded: 'Markers loaded from your file(s)',
     logMarkersCreated: 'Markers you added by hand',
-    logReplaced: 'Replaced at the same coordinate (your new marker wins)',
-    logAddedListHeader: 'Markers you added (coordinate: icon, label):',
+    logReplaced: 'Replaced using the reviewed-list mark',
+    logKept: 'Kept from your file at the same coordinate',
+    logEditIdentical: 'Already identical at the same coordinate',
+    logEditConflicts: 'Different marks at the same coordinate',
+    logEditConflictPolicy: 'Conflict policy',
+    logEditPolicyReplace: 'use the mark from the reviewed list',
+    logEditPolicyKeep: 'keep the mark already in the loaded file',
+    logEditConflictsHeader: 'Conflicts reviewed (coordinate: loaded file -> reviewed list):',
+    logReviewedListHeader: 'Reviewed marker list (coordinate: icon, label):',
     logRemovedListHeader: 'Coordinates you removed (coordinate: icon, label as listed):',
   },
   'pt-BR': {
@@ -191,12 +205,19 @@ const STRINGS = {
     marksSkippedIntro: 'Linhas ignoradas:',
     marksCreatedZip: (name) => `Arquivo de marcações criado -- <strong>${name}</strong> baixado.`,
     marksUpdatedZip: (name) => `Arquivo de marcações atualizado -- <strong>${name}</strong> baixado.`,
-    markDirectionHintAdd: 'Suas marcações entram no arquivo que você carregou. Em uma coordenada que já tinha marcação, a sua da lista prevalece.',
+    markDirectionHintAdd: (conflicts) => conflicts > 0
+      ? 'Novas coordenadas serão adicionadas. Escolha abaixo qual versão prevalece nas coordenadas que diferem.'
+      : 'Novas coordenadas serão adicionadas. Nenhuma marcação tem rótulo ou ícone diferente na mesma coordenada.',
     markDirectionHintRemove: 'Toda coordenada da lista sai do arquivo que você carregou, qualquer que seja o rótulo ou ícone dela lá.',
+    markConflictsFound: (count) => count === 1
+      ? '1 coordenada tem marcações diferentes. Qual deve prevalecer?'
+      : `${localeNumber(count, 'pt-BR')} coordenadas têm marcações diferentes. Qual versão deve prevalecer?`,
     labelCollections: 'Coleções aplicadas',
     labelExisting: 'Marcações carregadas do(s) seu(s) arquivo(s)',
     labelYouAdded: 'Marcações que você adicionou',
-    labelReplacedByYours: 'Substituídas na mesma coordenada',
+    labelAlreadyIdentical: 'Já idênticas',
+    labelConflictsReplaced: 'Conflitos usando sua lista revisada',
+    labelConflictsKept: 'Conflitos mantendo seu arquivo',
 
     formatBin: 'Formato binário de marcações do Tibia (.bin)',
     formatJson: 'JSON (markers.json)',
@@ -242,8 +263,15 @@ const STRINGS = {
     logNoFile: 'nenhum -- um novo arquivo de marcações foi criado do zero',
     logExistingLoaded: 'Marcações carregadas do(s) seu(s) arquivo(s)',
     logMarkersCreated: 'Marcações adicionadas manualmente',
-    logReplaced: 'Substituídas na mesma coordenada (sua nova marcação prevalece)',
-    logAddedListHeader: 'Marcações adicionadas (coordenada: ícone, rótulo):',
+    logReplaced: 'Substituídas usando a marcação da lista revisada',
+    logKept: 'Mantidas do seu arquivo na mesma coordenada',
+    logEditIdentical: 'Já idênticas na mesma coordenada',
+    logEditConflicts: 'Marcações diferentes na mesma coordenada',
+    logEditConflictPolicy: 'Política de conflitos',
+    logEditPolicyReplace: 'usar a marcação da lista revisada',
+    logEditPolicyKeep: 'manter a marcação que já está no arquivo carregado',
+    logEditConflictsHeader: 'Conflitos revisados (coordenada: arquivo carregado -> lista revisada):',
+    logReviewedListHeader: 'Lista de marcações revisada (coordenada: ícone, rótulo):',
     logRemovedListHeader: 'Coordenadas removidas (coordenada: ícone, rótulo conforme listado):',
   },
 };

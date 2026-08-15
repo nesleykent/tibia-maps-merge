@@ -1,4 +1,5 @@
 import { fetchCommunityMarkers } from './lib/community.js';
+import { applyEditedMarks } from './lib/edit-marks.js';
 import { DEFAULT_ICON, MARKER_ICONS, iconGlyph } from './lib/icons.js';
 import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
 import { buildAddMarksLog, buildConversionLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
@@ -403,6 +404,8 @@ const addClearButton = document.getElementById('add-clear');
 const markApplyStep = document.getElementById('mark-apply-step');
 const markPreview = document.getElementById('mark-preview');
 const markDirectionHint = document.getElementById('mark-direction-hint');
+const markConflictControl = document.getElementById('mark-conflict-control');
+const markConflictSummary = document.getElementById('mark-conflict-summary');
 const addRunButton = document.getElementById('add-run');
 const editSheet = document.getElementById('edit-sheet');
 const editFieldX = document.getElementById('edit-x');
@@ -559,27 +562,6 @@ function renderPending() {
   savePending();
 }
 
-/**
- * What applying the reviewed list to `base` would do.
- *
- * Adding puts your list in last, so a mark you wrote wins over one already at
- * that coordinate -- the opposite of Marker Sets, where a published collection
- * fills gaps and your own file wins. These marks *are* yours, and rewriting a
- * label or icon is half the reason to type one. Removing drops every
- * coordinate in the list, whatever it is labelled in the file.
- */
-function applyPending(base, mode) {
-  const keys = new Set(pending.map(markerKey));
-  if (mode === 'remove') {
-    const result = base.filter((m) => !keys.has(markerKey(m)));
-    return { result, added: 0, replaced: 0, removed: base.length - result.length, total: result.length };
-  }
-  const baseKeys = new Set(base.map(markerKey));
-  const replaced = [...keys].filter((k) => baseKeys.has(k)).length;
-  const result = mergeMarkers(base, pending);
-  return { result, added: keys.size - replaced, replaced, removed: 0, total: result.length };
-}
-
 // With no file loaded there is nothing to remove from, so the only thing the
 // list can produce is a new file. Answering 'add' there keeps a stale radio
 // from emptying a file that was unloaded after it was picked.
@@ -588,25 +570,47 @@ function markDirection() {
   return document.querySelector('input[name="mark-direction"]:checked')?.value ?? 'add';
 }
 
+function markConflictPolicy() {
+  return document.querySelector('input[name="mark-conflict-policy"]:checked')?.value ?? 'replace';
+}
+
 function refreshApplyStep() {
   const ready = pending.length > 0 && existingBase.length > 0;
   markApplyStep.classList.toggle('hidden', !ready);
   if (!ready) {
     markPreview.innerHTML = '';
+    markConflictControl.classList.add('hidden');
     return;
   }
   const mode = markDirection();
-  const { added, replaced, removed, total } = applyPending(existingBase, mode);
+  const outcome = applyEditedMarks(existingBase, pending, {
+    mode,
+    conflictPolicy: markConflictPolicy(),
+  });
+  const { added, identical, conflicts, replaced, kept, removed, total } = outcome;
+  const hasConflicts = mode === 'add' && conflicts.length > 0;
+  markConflictControl.classList.toggle('hidden', !hasConflicts);
+  markConflictSummary.textContent = hasConflicts ? t('markConflictsFound', conflicts.length) : '';
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
     : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
-      + `<dt>${t('labelReplacedByYours')}</dt><dd>${localeNumber(replaced)}</dd>`;
-  markDirectionHint.textContent = t(mode === 'remove' ? 'markDirectionHintRemove' : 'markDirectionHintAdd');
+      + `<dt>${t('labelAlreadyIdentical')}</dt><dd>${localeNumber(identical)}</dd>`
+      + (conflicts.length > 0
+        ? `<dt>${t(markConflictPolicy() === 'replace' ? 'labelConflictsReplaced' : 'labelConflictsKept')}</dt>`
+          + `<dd>${localeNumber(replaced + kept)}</dd>`
+        : '');
+  markDirectionHint.textContent = t(
+    mode === 'remove' ? 'markDirectionHintRemove' : 'markDirectionHintAdd',
+    conflicts.length,
+  );
   markPreview.innerHTML = `<div class="result-card ok"><dl>${rows}`
     + `<dt>${t('labelTotal')}</dt><dd>${localeNumber(total)}</dd></dl></div>`;
 }
 
 document.querySelectorAll('input[name="mark-direction"]').forEach(
+  (radio) => radio.addEventListener('change', refreshApplyStep),
+);
+document.querySelectorAll('input[name="mark-conflict-policy"]').forEach(
   (radio) => radio.addEventListener('change', refreshApplyStep),
 );
 
@@ -888,6 +892,7 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   const files = Array.from(addExistingInput.files || []);
 
   const mode = markDirection();
+  const conflictPolicy = markConflictPolicy();
 
   let outcome;
   let outputBytes;
@@ -900,7 +905,7 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
         data: new Uint8Array(await file.arrayBuffer()),
       });
     }
-    outcome = applyPending(existingBase, mode);
+    outcome = applyEditedMarks(existingBase, pending, { mode, conflictPolicy });
     validateMarkers(outcome.result, { source: 'edit-marks' });
     outputBytes = writeMarkersBin(outcome.result);
     const reparsed = parseMarkersBin(
@@ -924,9 +929,13 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
         userFilenames: files.map((f) => f.name),
         backupFilenames: backupEntries.map((e) => e.name),
         mode,
+        conflictPolicy,
         existingCount: existingBase.length,
         addedCount: outcome.added,
+        identicalCount: outcome.identical,
         replacedCount: outcome.replaced,
+        keptCount: outcome.kept,
+        conflicts: outcome.conflicts,
         removedCount: outcome.removed,
         totalCount: outcome.total,
         validationLine,
@@ -946,7 +955,11 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(outcome.removed)}</dd>`
     : `<dt>${t('labelYouAdded')}</dt><dd>${localeNumber(outcome.added)}</dd>`
-      + `<dt>${t('labelReplacedByYours')}</dt><dd>${localeNumber(outcome.replaced)}</dd>`;
+      + `<dt>${t('labelAlreadyIdentical')}</dt><dd>${localeNumber(outcome.identical)}</dd>`
+      + (outcome.conflicts.length > 0
+        ? `<dt>${t(conflictPolicy === 'replace' ? 'labelConflictsReplaced' : 'labelConflictsKept')}</dt>`
+          + `<dd>${localeNumber(outcome.conflicts.length)}</dd>`
+        : '');
   renderResult('add-result', `
     ${t(mode === 'remove' ? 'marksUpdatedZip' : 'marksCreatedZip', zipName)}
     <dl>
