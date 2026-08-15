@@ -4,7 +4,7 @@ import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.
 import { buildAddMarksLog, buildConversionLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
-import { MARKER_SETS, applyMarkerSet, fetchMarkerSet } from './lib/marker-sets.js';
+import { MARKER_SETS, applyMarkerSet, fetchMarkerSet, fetchSetDates } from './lib/marker-sets.js';
 import { buildQuestPrompt } from './lib/prompt.js';
 import { fetchQuestCoordinates } from './lib/wiki.js';
 import { CHANGELOG_URL, VERSION } from './lib/version.js';
@@ -20,6 +20,7 @@ document.querySelectorAll('.mode-tab-button').forEach((btn) => {
     document.querySelectorAll('.mode-panel').forEach((p) => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(`mode-${btn.dataset.mode}`).classList.add('active');
+    if (btn.dataset.mode === 'sets') fillSetDates();
   });
 });
 
@@ -939,13 +940,45 @@ for (const { id, name, large } of MARKER_SETS) {
   const choice = document.createElement('label');
   choice.className = 'set-choice';
   choice.innerHTML = '<input type="radio" name="marker-set" class="visually-hidden">'
-    + '<span class="set-name"></span><span class="set-note"></span>';
+    + '<span class="set-name"></span><span class="set-note"></span>'
+    + `<span class="set-date" data-set-date="${id}"></span>`;
   const input = choice.querySelector('input');
   input.value = id;
   choice.querySelector('.set-name').textContent = name;
   if (large) choice.querySelector('.set-note').textContent = t('setLarge');
   input.addEventListener('change', () => selectSet(id, name));
   setChoices.appendChild(choice);
+}
+
+// These are published data, not a live feed -- one collection has not changed
+// since 2020, another changed last week -- so each card says when its markers
+// last moved. Asked for once, the first time the tab is opened: nine API calls
+// is not something to spend on someone who never looks at this mode.
+let setDatesRequested = false;
+
+async function fillSetDates() {
+  if (setDatesRequested) return;
+  setDatesRequested = true;
+  let dates;
+  try {
+    dates = await fetchSetDates();
+  } catch {
+    return; // a card without a date still works; an error here would not help
+  }
+  const format = new Intl.DateTimeFormat(currentLang(), { year: 'numeric', month: 'short' });
+  // Month and year only, joined by a space: pt-BR's own short format is
+  // "dez. de 2023", which is two words longer than the card has room for.
+  const monthAndYear = (date) => format
+    // Read as UTC noon -- a bare YYYY-MM-DD is midnight UTC, which slips back
+    // a month for anyone west of Greenwich when the commit landed on the 1st.
+    .formatToParts(new Date(`${date}T12:00:00Z`))
+    .filter((part) => part.type === 'month' || part.type === 'year')
+    .map((part) => part.value)
+    .join(' ');
+  for (const [id, date] of Object.entries(dates)) {
+    const slot = document.querySelector(`[data-set-date="${id}"]`);
+    if (slot) slot.textContent = t('setUpdated', monthAndYear(date));
+  }
 }
 
 // A collection whose contents need explaining says so once it is picked --

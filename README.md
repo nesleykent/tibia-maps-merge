@@ -20,7 +20,7 @@ the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 download (the same file the site itself distributes -- so it's always current
 with the latest game update). Four modes:
 
-- **Merge Mode** -- pick your own marker file(s) (`minimapmarkers.bin` from
+- **Merge** -- pick your own marker file(s) (`minimapmarkers.bin` from
   your Tibia client, or `markers.json`); they're merged with the live
   community markers, yours taking priority at any shared coordinate.
   Downloads a `.zip` containing the merged `minimapmarkers.bin`, an
@@ -29,7 +29,7 @@ with the latest game update). Four modes:
   every detected conflict). An "export audit files" checkbox adds
   `merged-markers.json` and `conflicts.json` for manual editing or
   third-party tooling.
-- **Conversion Mode** -- pure format conversion, no merging:
+- **Convert** -- pure format conversion, no merging:
   `minimapmarkers.bin` ↔ `markers.json`, or the live community markers
   straight to `community-markers.json`. Downloads a `.zip` with the
   converted file and `conversion-log.txt` (source/output format, marker
@@ -78,12 +78,17 @@ with the latest game update). Four modes:
   place of a list you assembled. The collections are the ones tibiamaps.io
   publishes alongside its map data
   ([`extra/`](https://github.com/tibiamaps/tibia-map-data/tree/main/extra) --
-  all nine of them: achievements, rapid respawn, points of interest,
-  anniversary, lightbearer, Orcsoberfest island, Percht island, devovorga and
-  ignore), read live from that repository; a test asserts the picker matches
+  all nine of them: Achievements, Rapid Respawn, Points of Interest,
+  Anniversary, Lightbearer, Orcsoberfest Island, Percht Island, Devovorga and
+  Ignore), read live from that repository; a test asserts the picker matches
   what is published, in both directions, since a missing set is invisible in
-  the UI. Nothing is fetched until a collection is picked -- one of them is
-  over 5,000 markers. Adding follows the opposite precedence to Edit Marks:
+  the UI. Each card carries the date its `markers.json` last changed, which
+  ranges from last week to 2020 -- the dates come from the GitHub commits API
+  (`raw.githubusercontent.com` sends no `Last-Modified`), asked for once when
+  the tab is first opened and cached for half a day, since that API allows 60
+  unauthenticated requests an hour and there is no single request that answers
+  for all nine. A card simply carries no date if that fails. Nothing else is
+  fetched until a collection is picked -- one of them is over 5,000 markers. Adding follows the opposite precedence to Edit Marks:
   a published collection fills gaps and *your* file wins, because those marks
   are not yours. The step shows what will change before you download.
   Points of interest carries a note about where it comes from -- the
@@ -113,10 +118,21 @@ text lives directly in each language's HTML file; the handful of strings
 
 All four modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that
-names what it produces (in Conversion Mode the label follows the chosen
-conversion). Temporary contexts -- editing a mark, confirming a removal,
-picking an icon -- are sheets with `Cancel` and the completing action
-trailing, per the macOS convention.
+names what it produces (in Convert the label follows the chosen conversion).
+Temporary contexts -- editing a mark, confirming a removal, picking an icon
+-- are sheets with `Cancel` leading and the completing action trailing, per
+the macOS convention.
+
+The action hierarchy is one ladder, applied everywhere, and
+[a test enforces it](#versioning): filled accent for the single action a
+panel exists for; an accent *outline* for the action that completes a step
+without completing the view (`Add 6 Marks`); a plain outline for the
+alternatives beside it (`Import`, `Copy Prompt`); a small chip for step-head
+utilities (`Remove All`); filled red only ever as the confirming action of a
+destructive sheet. Destructive intent is a colour, not a rank -- a row's
+`Delete` keeps its row-button size and only changes colour. Labels name their
+action rather than agreeing (`Save Changes`, `Remove All Marks`, never `OK`),
+and tab labels are the section, not the section plus the word "Mode".
 
 Source lives in [`docs/`](docs/) -- `index.html` + `app.js` wire up the UI,
 `lib/` has the actual fetch/parse/merge logic, framework-free.

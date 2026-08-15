@@ -25,17 +25,78 @@ const SOURCE = 'https://raw.githubusercontent.com/tibiamaps/tibia-map-data/main/
 /** Where each set comes from, in the order the picker lists them. */
 export const MARKER_SETS = [
   { id: 'achievements', name: 'Achievements' },
-  { id: 'rapid-respawn', name: 'Rapid respawn' },
-  { id: 'points-of-interest', name: 'Points of interest (PoI)', large: true, mostlyUnlabelled: true },
+  { id: 'rapid-respawn', name: 'Rapid Respawn' },
+  { id: 'points-of-interest', name: 'Points of Interest (PoI)', large: true, mostlyUnlabelled: true },
   { id: 'anniversary', name: 'Anniversary' },
   { id: 'lightbearer', name: 'Lightbearer' },
-  { id: 'orcsoberfest-island', name: 'Orcsoberfest island' },
-  { id: 'percht-island', name: 'Percht island' },
+  { id: 'orcsoberfest-island', name: 'Orcsoberfest Island' },
+  { id: 'percht-island', name: 'Percht Island' },
   { id: 'devovorga', name: 'Devovorga' },
   { id: 'ignore', name: 'Ignore' },
 ];
 
 export const setSourceUrl = (id) => `${SOURCE}/${id}/markers.json`;
+
+// ---------- when each collection was last touched ----------
+// These are published data, not a live feed: one has not changed since 2020,
+// another changed last week. Which is worth knowing before you take one, so
+// each card carries the date of the last commit to its markers.json.
+//
+// raw.githubusercontent.com sends no Last-Modified, so the date has to come
+// from the API. That is rate-limited to 60 requests an hour per IP without a
+// token, and there is no one request that answers for all nine -- so the
+// answers are cached for half a day, and a failure is silent: a card without
+// a date is worse than no cards at all.
+const COMMITS_API = 'https://api.github.com/repos/tibiamaps/tibia-map-data/commits';
+const DATE_CACHE_KEY = 'tibia-maps-merge.set-dates.v1';
+const DATE_CACHE_MS = 12 * 60 * 60 * 1000;
+
+const readDateCache = (storage, now) => {
+  try {
+    const cached = JSON.parse(storage.getItem(DATE_CACHE_KEY) ?? 'null');
+    if (!cached || typeof cached.dates !== 'object') return null;
+    return { dates: cached.dates, fresh: now - cached.at < DATE_CACHE_MS };
+  } catch {
+    return null;
+  }
+};
+
+async function fetchOneDate(id, fetchImpl) {
+  const url = `${COMMITS_API}?path=extra/${id}/markers.json&per_page=1`;
+  const response = await fetchImpl(url, { headers: { Accept: 'application/vnd.github+json' } });
+  if (!response.ok) throw new Error('unreachable');
+  const commits = await response.json();
+  const date = commits?.[0]?.commit?.committer?.date;
+  if (typeof date !== 'string') throw new Error('unreachable');
+  return date.slice(0, 10);
+}
+
+/**
+ * `{id: 'YYYY-MM-DD'}` for every set whose date could be established. Sets
+ * that failed are simply absent -- callers show what they got.
+ */
+export async function fetchSetDates({
+  fetchImpl = fetch, storage = localStorage, now = Date.now(),
+} = {}) {
+  const cached = readDateCache(storage, now);
+  if (cached?.fresh) return cached.dates;
+
+  const settled = await Promise.all(MARKER_SETS.map(
+    ({ id }) => fetchOneDate(id, fetchImpl).then((date) => [id, date], () => null),
+  ));
+  const dates = Object.fromEntries(settled.filter(Boolean));
+
+  // Rate-limited or offline: a cache past its half-day is still far better
+  // than blank cards, since these dates move at most a few times a year.
+  if (Object.keys(dates).length === 0) return cached?.dates ?? {};
+
+  try {
+    storage.setItem(DATE_CACHE_KEY, JSON.stringify({ at: now, dates }));
+  } catch {
+    // Private browsing or a full quota just means fetching again next time.
+  }
+  return dates;
+}
 
 const coordinateKey = (m) => `${m.x},${m.y},${m.z}`;
 

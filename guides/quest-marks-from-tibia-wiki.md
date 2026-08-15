@@ -465,7 +465,7 @@ pipeline can be:
 
 ```text
 Community markers          Existing personal markers
-        └──────── Merge Mode ────────┘
+        └────────── Merge ──────────┘
                      ↓
              Merged marker file
                      ↓

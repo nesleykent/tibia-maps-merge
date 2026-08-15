@@ -480,7 +480,14 @@ button { font-family: inherit; }
 
 .secondary-btn:hover { background: rgb(var(--ig-secondary-button-hover)); }
 
-/* Sits between the two: a real action, but never the one a panel is about. */
+/* The action ladder, in the order a view is read:
+   .primary-btn     one per panel, filled -- the action the whole view is for
+   .tertiary-btn    a real action inside a step; outlined, never filled
+     .emphasized    the one that completes its step, ranked above its neighbours
+   .secondary-btn   a small utility on a step head, subordinate to both
+   .destructive-btn filled red, only ever the confirming action of a sheet
+   Destructive intent is a colour, not a rank: .destructive on a secondary or
+   row button keeps that button's size and weight and only recolours it. */
 .tertiary-btn {
   min-height: 40px;
   padding: 0 var(--ig-space-5);
@@ -492,6 +499,15 @@ button { font-family: inherit; }
 }
 
 .tertiary-btn:hover { background: rgb(var(--ig-tertiary-button-hover)); }
+
+/* Completing a step is not the same as completing the view, so this reads
+   above the plain outlines beside it without taking the primary's fill. */
+.tertiary-btn.emphasized {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tertiary-btn.emphasized:hover { background: rgba(var(--ig-primary-button), .08); }
 
 /* The emphasized action of a destructive confirmation. */
 .destructive-btn {
@@ -797,10 +813,11 @@ button { font-family: inherit; }
 .direction {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
-  gap: var(--ig-space-2);
+  gap: 0 var(--ig-space-2);
   align-items: center;
+  align-content: center;
   min-height: 46px;
-  padding: 0 var(--ig-space-4);
+  padding: var(--ig-space-3) var(--ig-space-4);
   border: 1px solid var(--border);
   border-radius: var(--input-border-radius);
   background: var(--surface);
@@ -823,13 +840,40 @@ button { font-family: inherit; }
   outline-offset: 2px;
 }
 
-.set-name { font-weight: var(--font-weight-system-semibold); }
+/* Every card has the same two-line shape: the name across the top, then one
+   meta line -- when it last changed on the left, any caveat on the right.
+   The longest name wraps rather than squeezing the note into a column. */
+.set-name {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  font-weight: var(--font-weight-system-semibold);
+}
 
-.set-note {
+.set-note,
+.set-date {
   color: var(--muted);
   font-size: var(--system-12-font-size);
+  line-height: var(--system-12-line-height);
+}
+
+/* Both pinned to row two explicitly. Left to auto-placement they stack, since
+   sparse packing will not step back to column one after filling column two. */
+.set-date {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.set-note {
+  grid-row: 2;
+  grid-column: 2;
   text-align: right;
 }
+
+/* These are published files, and how long ago one last moved is the difference
+   between current and abandoned. Blank until the dates arrive, and it stays
+   blank if they never do -- no row, no gap. */
+.set-choice:has(.set-date:not(:empty)) .set-date,
+.set-choice:has(.set-note:not(:empty)) .set-note { margin-top: 2px; }
 
 .direction-choices {
   display: grid;

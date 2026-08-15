@@ -4,6 +4,50 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.10.0] - 2026-08-15
+
+### Added
+
+- **Every collection says when it last changed.** These are published files,
+  not a live feed, and the spread is wide: Rapid Respawn moved last week,
+  Lightbearer has not moved since November 2020. That is worth knowing before
+  you take one, so each card now carries the date of the last commit to its
+  `markers.json`.
+
+  `raw.githubusercontent.com` sends no `Last-Modified`, so the dates come from
+  the GitHub commits API. That allows 60 unauthenticated requests an hour and
+  has no single request that answers for all nine, so they are asked for once
+  when the tab is first opened and cached for half a day. If the API is
+  rate-limited or unreachable, a cache past its half-day is used anyway, and
+  failing that a card simply carries no date -- these move a few times a year,
+  and a blank line is better than an error.
+
+### Changed
+
+- **Set names are Title Case**, so "Points of Interest (PoI)", "Rapid
+  Respawn", "Orcsoberfest Island". They were a mix.
+
+- **Tabs are Merge, Convert, Edit Marks and Marker Sets.** Two of the four
+  said "Mode", which the tab bar already says.
+
+- **The action hierarchy is one ladder now, and a test enforces it.** Filled
+  accent for the single action a panel exists for; an accent *outline* for the
+  action that completes a step without completing the view -- `Add 6 Marks`
+  was a plain outline, indistinguishable from the `Import` and `Copy Prompt`
+  buttons beside it; a plain outline for those alternatives; a small chip for
+  step-head utilities; filled red only ever as the confirming action of a
+  destructive sheet. The test also checks that each panel has exactly one
+  filled action, each sheet exactly one emphasized one, and that every sheet
+  leads with `Cancel` and ends with the action that completes the task.
+
+- **Sheet titles all follow one rule.** Three were sentence case and one was
+  title case: "Other Assistants", "Icon Names", "Edit Mark", "Remove All
+  Marks?"
+
+- Every collection card is the same two-line shape -- name, then a meta line.
+  The longest name used to squeeze its note into a column beside it, which
+  made that row of cards taller than the rest.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed
