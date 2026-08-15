@@ -349,8 +349,13 @@ QUEST_URL
 
 Running the prompt above against
 [The Dream Courts Quest](https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest)
-produced these 30 marks, covering the whole quest from the first NPC through
-the Ward Stones, the three Haunted Houses and the Nightmare Beast items:
+looks like this — one plain-text block, ready to copy:
+
+![ChatGPT returning the extracted marks as a single plain-text block](images/chatgpt-extraction.png)
+
+A run produced these 30 marks, covering the whole quest from the first NPC
+through the Ward Stones, the three Haunted Houses and the Nightmare Beast
+items:
 
 ```text
 33273, 31722, 7, Myzzi / court access dialogue, mouth
@@ -395,6 +400,35 @@ will not always be the case — the **Review** step is still where you check the
 result against the source.
 
 Paste the output straight into Add Marks.
+
+### Your run will not match this one exactly
+
+These are language models, so the same prompt on the same article gives a
+slightly different answer each time, and different models differ more. That is
+normal, and it does not affect the part that matters most.
+
+Two separate runs of this prompt over the same article were compared:
+
+| | Result |
+| --- | --- |
+| Marks returned | 30 in both |
+| Coordinate sets | **identical** |
+| Coordinates supported by the article | **all of them, in both** |
+| Icons chosen | 26 of 30 the same |
+| Labels worded identically | 18 of 30 |
+
+The pattern is worth knowing: **coordinates are anchored to the article, so
+they come out stable. Wording is not, so it drifts.** The same location came
+back as "Myzzi" in one run and "Myzzi / court access dialogue" in the other;
+"Haunted House entrance" in one and "Haunted House entrance / descent" in the
+other. A few icons differ too, usually where a spot could reasonably be called
+an entrance or a descent.
+
+So treat the labels and icons as a first draft to skim in **Review**, and the
+coordinates as the part a model is least likely to get creative with — while
+still checking them, since nothing stops one from inventing a coordinate.
+Expect weaker results from models other than ChatGPT, and expect the same
+model to change behaviour over time.
 
 ## Using the result
 
@@ -449,7 +483,9 @@ adherence to the requested output.
 
 Model behaviour changes over time, so treat the generated marks as extracted
 data worth verifying against the source article — the **Review** step exists
-for exactly that.
+for exactly that. See
+[Your run will not match this one exactly](#your-run-will-not-match-this-one-exactly)
+for how much two runs actually differed.
 
 ## Limitations
 
