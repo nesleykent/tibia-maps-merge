@@ -4,6 +4,21 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.18] - 2026-08-15
+
+### Fixed
+
+- **The entire interface now uses one enforced spacing system.** Every layout
+  margin, padding, and gap is expressed through the shared 4px scale or a
+  named optical token derived from it; duplicate tab and icon-picker rules
+  were consolidated, and a regression test rejects new raw spacing lengths.
+- **Extract Own now clearly separates Community markers from Marker Sets.**
+  The second selection group begins on the same 24px vertical rhythm used by
+  the rest of the workflow instead of touching the preceding source card.
+- **Edit Marks no longer widens the page on phones.** Screen-reader-only table
+  labels are anchored inside the viewport while the marker table retains its
+  intended contained horizontal scrolling.
+
 ## [1.18.17] - 2026-08-15
 
 ### Fixed

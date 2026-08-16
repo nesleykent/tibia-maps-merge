@@ -195,6 +195,12 @@ Temporary contexts -- editing a mark, confirming a removal, picking an icon
 -- are sheets with `Cancel` leading and the completing action trailing, per
 the macOS convention.
 
+Layout spacing also has one source of truth. Every margin, padding, and gap in
+[`docs/style.css`](docs/style.css) uses the shared 4px `--ig-space-*` scale;
+the few optical half-step adjustments are named variables derived from that
+same scale. A regression test rejects raw pixel or rem spacing declarations,
+so a new section cannot quietly introduce a separate visual rhythm.
+
 The action hierarchy is one ladder, applied everywhere, and
 [a test enforces it](#versioning): filled accent for the single action a
 panel exists for; an accent *outline* for the action that completes a step

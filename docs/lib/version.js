@@ -1,2 +1,2 @@
-export const VERSION = '1.18.17';
+export const VERSION = '1.18.18';
 export const CHANGELOG_URL = 'https://github.com/nesleykent/tibia-maps-merge/blob/main/CHANGELOG.md';

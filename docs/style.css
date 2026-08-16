@@ -38,6 +38,11 @@
   --ok: rgb(var(--ig-success));
   --err: rgb(var(--ig-error-or-destructive));
   --warning: var(--ig-gradient-stop-orange);
+  /* Optical adjustments stay derived from the same 4px spacing scale. */
+  --space-optical-nudge: calc(var(--ig-space-1) / 2);
+  --space-inline-code-x: calc(var(--ig-space-3) / 2);
+  --control-chevron-space: calc(var(--ig-space-4) + var(--space-optical-nudge));
+  --selection-check-size: calc(var(--ig-space-3) + var(--space-optical-nudge));
 }
 
 * { box-sizing: border-box; }
@@ -182,7 +187,7 @@ header h1 {
 }
 
 .workspace-source-head h2 {
-  margin: 2px 0 var(--ig-space-1);
+  margin: var(--space-optical-nudge) 0 var(--ig-space-1);
   font-family: var(--font-family-brand);
   font-size: var(--system-20-font-size, 20px);
   line-height: 1.2;
@@ -252,11 +257,9 @@ header h1 {
 
 .mode-tabs::-webkit-scrollbar { display: none; }
 
-/* Never squeeze a label; the bar scrolls instead on a narrow screen. */
-.mode-tab-button { flex: 0 0 auto; }
-
 .mode-tab-button {
   position: relative;
+  flex: 0 0 auto;
   min-height: 44px;
   appearance: none;
   border: 0;
@@ -319,7 +322,7 @@ header h1 {
 }
 
 code {
-  padding: 2px 6px;
+  padding: var(--space-optical-nudge) var(--space-inline-code-x);
   border-radius: var(--ig-radius-sm);
   background: var(--surface-muted);
   color: var(--text);
@@ -351,7 +354,7 @@ textarea {
 /* With the native pull-down indicator suppressed, draw our own so every
    engine shows the same control. Inline data URI -- no external asset. */
 select {
-  padding-right: calc(var(--ig-space-3) + 18px);
+  padding-right: calc(var(--ig-space-3) + var(--control-chevron-space));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%238e8e8e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--ig-space-3) center;
@@ -628,13 +631,6 @@ button { font-family: inherit; }
 
 .form-message.error { color: var(--err); }
 
-.icon-field {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--ig-space-2);
-  align-items: center;
-}
-
 /* The icon picker: every marker type laid out at once, picked in one click.
    Radio inputs are visually hidden inside each choice, so the group keeps
    native single-selection and arrow-key behaviour. */
@@ -642,6 +638,7 @@ button { font-family: inherit; }
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--ig-space-1);
+  align-items: center;
   justify-items: center;
 }
 
@@ -859,7 +856,7 @@ button { font-family: inherit; }
 /* The "How it works" steps -- the only ordered list that renders in a sheet. */
 .sheet-body ol {
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: var(--ig-space-5);
   color: var(--text);
   font-size: var(--system-14-font-size);
   line-height: var(--system-16-line-height);
@@ -942,8 +939,8 @@ button { font-family: inherit; }
    which is the difference that matters once more than one can be. */
 .set-check {
   flex: 0 0 auto;
-  width: 14px;
-  height: 14px;
+  width: var(--selection-check-size);
+  height: var(--selection-check-size);
   color: var(--accent);
   opacity: 0;
   transition: opacity var(--ig-duration-micro) var(--ig-ease-standard);
@@ -965,7 +962,7 @@ button { font-family: inherit; }
 
 /* The check occupies the name row, so the meta line keeps its own indent. */
 .set-date,
-.set-note { padding-left: calc(14px + var(--ig-space-2)); }
+.set-note { padding-left: calc(var(--selection-check-size) + var(--ig-space-2)); }
 
 .set-note { padding-left: 0; }
 
@@ -986,7 +983,7 @@ button { font-family: inherit; }
    between current and abandoned. Blank until the dates arrive, and it stays
    blank if they never do -- no row, no gap. */
 .set-choice:has(.set-date:not(:empty)) .set-date,
-.set-choice:has(.set-note:not(:empty)) .set-note { margin-top: 2px; }
+.set-choice:has(.set-note:not(:empty)) .set-note { margin-top: var(--space-optical-nudge); }
 
 .direction-choices {
   display: grid;
@@ -1031,7 +1028,7 @@ button { font-family: inherit; }
 
 .review-conflict-progress {
   display: inline-block;
-  padding: 2px var(--ig-space-2);
+  padding: var(--space-optical-nudge) var(--ig-space-2);
   border-radius: var(--ig-radius-circle);
   background: var(--surface);
   color: var(--muted);
@@ -1113,7 +1110,7 @@ button { font-family: inherit; }
 .conflict-option input {
   width: 16px;
   height: 16px;
-  margin: 2px 0 0;
+  margin: var(--space-optical-nudge) 0 0;
   accent-color: var(--accent);
 }
 
@@ -1161,7 +1158,7 @@ button { font-family: inherit; }
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--ig-space-2);
-  margin-bottom: var(--ig-space-3);
+  margin: var(--ig-space-6) 0 var(--ig-space-3);
   color: var(--text);
   font-size: var(--system-14-font-size);
   font-weight: var(--font-weight-system-semibold);
@@ -1326,11 +1323,14 @@ button { font-family: inherit; }
 
 .visually-hidden {
   position: absolute;
+  inset: 0 auto auto 0;
   width: 1px;
   height: 1px;
   margin: -1px;
   padding: 0;
   overflow: hidden;
+  border: 0;
+  clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
 }
@@ -1404,7 +1404,7 @@ button { font-family: inherit; }
 
 .warn-list {
   margin: var(--ig-space-3) 0 0;
-  padding-left: 1.25rem;
+  padding-left: var(--ig-space-5);
   color: var(--warning);
   font-size: var(--system-12-font-size);
   line-height: var(--system-12-line-height);
