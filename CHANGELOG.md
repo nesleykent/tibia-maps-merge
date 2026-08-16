@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.5] - 2026-08-15
+
+### Fixed
+
+- **The assistant prompt now retrieves MediaWiki source with direct HTTP
+  instead of ChatGPT web search.** It supplies the exact `curl` command used
+  by the working command-line path, preserves query values with
+  `--data-urlencode`, offers Python `urllib` as a direct-HTTP fallback, and
+  explicitly rejects search-tool DNS failures as retrieval attempts.
+
 ## [1.18.4] - 2026-08-15
 
 ### Fixed

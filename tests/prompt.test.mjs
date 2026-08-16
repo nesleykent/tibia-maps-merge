@@ -57,14 +57,29 @@ test('prompt cannot short-circuit to an empty block before retrieval', async () 
   assert.ok(gateAt >= 0);
   assert.ok(emptyFallbackAt > gateAt);
   assert.match(prompt, /retrieval is an action you must actually perform/);
-  assert.match(prompt, /first source action must be an actual request/);
-  assert.match(prompt, /failed rendered-page or browser request[\s\S]*does not count as the API retrieval attempt/);
+  assert.match(prompt, /first source action must be a direct HTTP request/);
+  assert.match(prompt, /failed rendered-page request[\s\S]*does not count as the direct API retrieval attempt/);
   assert.match(prompt, /Do not call a page inaccessible unless you actually issued its API request/);
   assert.match(prompt, /Fandom URL[\s\S]*must actually request the `\/Spoiler` title/);
   assert.match(prompt, /empty fallback is never the default/);
-  assert.match(prompt, /Actually issue the request for `parse\.wikitext`/);
+  assert.match(prompt, /Actually issue the direct `curl` or code-runtime HTTP request for `parse\.wikitext`/);
   assert.match(prompt, /opening triple-backtick fence immediately followed on the next line by the closing triple-backtick fence/);
   assert.match(prompt, /no spaces, blank content line, or other whitespace between the fences/);
+});
+
+test('prompt uses direct HTTP instead of ChatGPT web search', async () => {
+  const prompt = await loadQuestPromptTemplate();
+
+  assert.match(prompt, /## Use Direct HTTP — Never Search/);
+  assert.match(prompt, /Do not use web search, browser search, or a search-URL tool/);
+  assert.match(prompt, /reports that it is “Searching” the API URL[\s\S]*use shell or code execution instead/);
+  assert.match(prompt, /curl --fail --silent --show-error --get/);
+  assert.match(prompt, /--data-urlencode 'action=parse'/);
+  assert.match(prompt, /--data-urlencode 'prop=wikitext'/);
+  assert.match(prompt, /--data-urlencode 'origin=\*'/);
+  assert.match(prompt, /Python code execution with `urllib\.request\.urlopen`/);
+  assert.match(prompt, /fallback HTTP transport, not permission to use Search/);
+  assert.match(prompt, /search-tool DNS error[\s\S]*does not count as the direct API retrieval attempt/);
 });
 
 test('boss destinations are not mislabeled as the teleport used to reach them', async () => {

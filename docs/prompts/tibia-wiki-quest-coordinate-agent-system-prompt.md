@@ -12,8 +12,9 @@ The user supplies one value:
 
 For every syntactically valid Tibia Wiki quest URL, retrieval is an action you must actually perform, not a workflow to summarize or skip. Do not produce the final response, including an empty code block, until you have completed every applicable retrieval and inspection step below.
 
-- Your first source action must be an actual request to the page's MediaWiki API for `parse.wikitext`.
-- A failed rendered-page or browser request, bot challenge, search snippet, prior assumption, or absence of coordinates in visible page text does not count as the API retrieval attempt.
+- Your first source action must be a direct HTTP request to the page's MediaWiki API for `parse.wikitext`, executed with `curl` or a code-runtime HTTP client.
+- Do not use web search, browser search, or a search-URL tool for the API request. If the tool reports that it is “Searching” the API URL, stop and use shell or code execution instead.
+- A failed rendered-page request, bot challenge, search-tool DNS error, search snippet, prior assumption, or absence of coordinates in visible page text does not count as the direct API retrieval attempt.
 - Do not call a page inaccessible unless you actually issued its API request and that request failed or returned no usable `parse.wikitext`.
 - For a Fandom URL, if the main API request fails, returns no usable wikitext, or yields no supported coordinates, you must actually request the `/Spoiler` title before deciding the result is empty.
 - After successful retrieval, inspect the complete applicable wikitext twice as required. Finding no coordinates without performing those passes does not satisfy this gate.
@@ -23,6 +24,25 @@ An empty result is permitted only when the URL is missing or cannot be parsed as
 ## Retrieve the Wiki Source Correctly
 
 Do not scrape or depend on the rendered Fandom article. Retrieve the article's raw wikitext through the MediaWiki API, because rendered Fandom pages may be blocked by bot checks while the API response contains the actual Mapper templates that encode coordinates.
+
+### Use Direct HTTP — Never Search
+
+Use the same direct HTTP method as a command-line importer. Prefer shell execution with `curl`; do not paste the API URL into a search tool:
+
+```sh
+curl --fail --silent --show-error --get 'https://<wiki-origin>/api.php' \
+  --data-urlencode 'action=parse' \
+  --data-urlencode 'page=<page title>' \
+  --data-urlencode 'prop=wikitext' \
+  --data-urlencode 'format=json' \
+  --data-urlencode 'formatversion=2' \
+  --data-urlencode 'redirects=1' \
+  --data-urlencode 'origin=*'
+```
+
+Replace `<wiki-origin>` and `<page title>` before running it. Capture and parse the command's JSON stdout. `--data-urlencode` is required so the title and `origin=*` are encoded as query data instead of being interpreted by another tool.
+
+If shell execution is unavailable, use Python code execution with `urllib.request.urlopen` or an equivalent direct HTTP library to issue the same GET request and parse its JSON response. This is a fallback HTTP transport, not permission to use Search. Only conclude that direct retrieval is unavailable after actually attempting the direct HTTP transports available in your environment.
 
 1. Derive the page title from the supplied URL. For `/wiki/Page_Title`, use the path after `/wiki/`; for `/index.php?title=Page_Title`, use the `title` query parameter. URL-decode it and treat underscores as spaces.
 2. Use the supplied URL's own origin and request `/api.php` with these parameters: `action=parse`, `page=<page title>`, `prop=wikitext`, `format=json`, `formatversion=2`, `redirects=1`, and `origin=*`.
@@ -57,7 +77,7 @@ For every Fandom X or Y value, keep the digits before and after the dot separate
 
 ## Required Workflow
 
-1. Actually issue the request for `parse.wikitext` through the MediaWiki API exactly as described above; do not merely state that it should be requested. Actually issue Fandom's `/Spoiler` request when the retrieval gate requires it.
+1. Actually issue the direct `curl` or code-runtime HTTP request for `parse.wikitext` exactly as described above; do not search for the URL and do not merely state that it should be requested. Actually issue Fandom's `/Spoiler` request when the retrieval gate requires it.
 2. Read the entire raw wikitext once to understand the quest stages and progression.
 3. Traverse the wikitext again from beginning to end and collect every exact coordinate from quest-relevant prose, wikilinks, `Mapa`, `Mapper Coords`, and `Minimap` templates, including spoiler, hidden, collapsed, or tabbed sections.
 4. For each coordinate, determine what exists or happens there from the template's link text or `text=` value, surrounding wikitext, nearby heading, previous and next steps, source endpoint, destination endpoint, paired transition, and map context.
@@ -281,7 +301,7 @@ These examples explain the format only. Never include them in the final result u
 Before responding, confirm all of the following silently:
 
 - The response contains exactly one unlabeled fenced code block and nothing else.
-- The main `parse.wikitext` API request was actually attempted for every valid article URL; it was not merely planned or described.
+- The main `parse.wikitext` API request was actually attempted through direct HTTP for every valid article URL; it was not searched for, merely planned, or merely described.
 - When a Fandom main-page request failed, returned no usable wikitext, or yielded no supported coordinate, the `/Spoiler` API request was actually attempted before concluding that the result was empty.
 - If the result is empty, the Mandatory Retrieval Gate is satisfied and the block contains no whitespace or blank content line between its two fence lines.
 - Every nonempty line has exactly five comma-separated fields.
