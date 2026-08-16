@@ -148,7 +148,7 @@
               <button type="button" class="tertiary-btn" id="prompt-copy">Copy Prompt</button>
               <button type="button" class="tertiary-btn" id="prompt-chatgpt">Open in ChatGPT</button>
             </div>
-            <p class="micro-hint"><strong>Import</strong> reads the article itself -- <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> and <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copy Prompt</strong> and <strong>Open in ChatGPT</strong> fetch the same raw source and include it in the prompt, so the assistant only writes better labels and picks an icon per mark; paste its answer into Coordinates. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Other assistants</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">How it works</a>.</p>
+            <p class="micro-hint"><strong>Import</strong> reads the article itself -- <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> and <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Open in ChatGPT</strong> opens with the generated prompt already included. TibiaWikiBR stays URL-only; Fandom includes raw source so ChatGPT needs no Fandom network access. Paste the answer into Coordinates. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Other assistants</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">How it works</a>.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
           <div class="field field-main">
@@ -246,8 +246,8 @@
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
     <div class="sheet-head"><h3 id="assistant-title">Other Assistants</h3></div>
     <div class="sheet-body">
-      <p>The same source-backed prompt, sent somewhere other than ChatGPT. The app copies it first; paste it into the assistant, then paste the returned marks into <strong>Coordinates</strong>.</p>
-      <p class="sheet-note">Most of these need you to be signed in. The prompt contains the raw article source, but only the coordinate rules for the selected wiki.</p>
+      <p>The same wiki-specific prompt, sent somewhere other than ChatGPT. It opens already included; then paste the returned marks into <strong>Coordinates</strong>.</p>
+      <p class="sheet-note">Most of these need you to be signed in. Only Fandom prompts contain raw article source.</p>
       <div class="assistant-list" id="assistant-list"></div>
     </div>
     <div class="sheet-actions">

@@ -220,12 +220,16 @@ coverage on long quests.
 
 ## Make sure the assistant can actually read the article
 
-The assistant never needs to reach the wiki. Before copying or opening the
-prompt, Tibia Maps Merge sends the page title to the same wiki origin's
-MediaWiki API with `action=parse`, `prop=wikitext`, redirects enabled and
-`origin=*`, follows Fandom's `/Spoiler` subpage when needed, and embeds the
-returned `parse.wikitext` directly in the prompt. This avoids both rendered-
-page bot checks and assistant sandboxes that block outbound DNS or HTTPS.
+The two wikis use different source paths. TibiaWikiBR keeps the original
+URL-only prompt because assistants can already inspect those articles. For
+Fandom, Tibia Maps Merge sends the page title to Fandom's MediaWiki API with
+`action=parse`, `prop=wikitext`, redirects enabled and `origin=*`, follows the
+`/Spoiler` subpage when needed, and builds a coordinate-complete excerpt. It
+keeps every `Mapper Coords`, `Minimap`, legacy Mapper URL and exact-coordinate
+line verbatim, plus headings and adjacent context, while omitting unrelated
+non-coordinate lines. This avoids Fandom's rendered-page bot checks and
+assistant sandboxes that block outbound DNS or HTTPS, keeps the prefilled URL
+usable, and does not bloat the working TibiaWikiBR prompt with article source.
 
 The app selects one decoder from the pasted URL, so the final prompt teaches
 only the relevant encoding instead of spending tokens on both:
@@ -237,9 +241,9 @@ only the relevant encoding instead of spending tokens on both:
   Fandom article has no coordinates, the app fetches its `/Spoiler` subpage,
   where the walkthrough commonly lives.
 
-Spoiler, collapsed and tabbed content is still inspected, but in the raw
-wikitext already carried inside the prompt rather than through visibility or
-network access in the assistant.
+For Fandom, coordinate-bearing content from spoiler, collapsed and tabbed
+sections is carried inside the prompt. TibiaWikiBR continues to inspect those
+sections through the article URL.
 
 A quick sanity check: if the returned list has only a handful of marks for a
 long quest, the assistant probably never saw the walkthrough.
@@ -248,13 +252,13 @@ long quest, the assistant probably never saw the walkthrough.
 
 The app uses a [**shared extraction and classification
 core**](../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md) and
-adds exactly one coordinate decoder:
-[TibiaWikiBR](../docs/prompts/tibiawikibr-coordinate-rules.md) or
-[Tibia Fandom](../docs/prompts/fandom-coordinate-rules.md). Its URL,
-source-title, wiki-site, decoder and raw-wikitext placeholders are replaced
-automatically by **Copy Prompt**, **Open in ChatGPT**, and every option under
-**Other Assistants**. Using the app is the reliable path because it selects the
-correct decoder and inserts the source itself.
+adds exactly one source strategy and coordinate decoder:
+[TibiaWikiBR source](../docs/prompts/tibiawikibr-source-access.md) plus
+[decoder](../docs/prompts/tibiawikibr-coordinate-rules.md), or
+[Fandom source](../docs/prompts/fandom-source-access.md) plus
+[decoder](../docs/prompts/fandom-coordinate-rules.md). **Copy Prompt**,
+**Open in ChatGPT**, and **Other Assistants** select the correct pair. Only the
+Fandom pair retrieves and inserts raw wikitext.
 
 ## A worked example
 

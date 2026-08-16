@@ -7,7 +7,7 @@ import { buildAddMarksLog, buildConversionLog, buildExtractOwnLog, buildMarkerSe
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
 import { MARKER_SETS, applyMarkerSet, fetchMarkerSet, fetchSetDates } from './lib/marker-sets.js';
-import { buildQuestPrompt } from './lib/prompt.js';
+import { buildQuestPrompt, questPromptVariant } from './lib/prompt.js';
 import { fetchQuestCoordinates } from './lib/wiki.js';
 import { CHANGELOG_URL, VERSION } from './lib/version.js';
 import { buildZip } from './lib/zip.js';
@@ -907,19 +907,26 @@ function currentPromptUrl() {
   }
 }
 
-async function withPrompt(action) {
-  const url = currentPromptUrl();
-  if (!url) return rejectMissingUrl();
+async function withPrompt(action, { url = currentPromptUrl(), onFailure } = {}) {
+  if (!url) {
+    onFailure?.();
+    return rejectMissingUrl();
+  }
   wikiStatus.classList.remove('error');
   wikiStatus.textContent = t('wikiReading');
   try {
-    const article = await fetchQuestCoordinates(url);
-    const prompt = await buildQuestPrompt(url, {
+    const variant = questPromptVariant(url);
+    if (!variant) throw new Error('badUrl');
+    const article = variant === 'fandom'
+      ? await fetchQuestCoordinates(url)
+      : undefined;
+    const prompt = await buildQuestPrompt(url, article && {
       sourceTitle: article.title,
       wikitext: article.wikitext,
     });
     await action(prompt, url);
   } catch (err) {
+    onFailure?.();
     wikiStatus.textContent = t({
       badUrl: 'wikiBadUrl', noArticle: 'wikiNoArticle', unreachable: 'wikiUnreachable',
     }[err.message] ?? 'promptLoadFailed');
@@ -943,37 +950,51 @@ function copyPrompt() {
   });
 }
 
-function openAssistant(name, url) {
+function openAssistant(name, destination) {
+  const questUrl = currentPromptUrl();
+  if (!questUrl) return rejectMissingUrl();
+
+  // Open synchronously while the click still grants popup permission. Fetching
+  // Fandom source first loses that user activation and browsers block the tab.
+  const assistantTab = window.open('about:blank', '_blank');
+  if (!assistantTab) {
+    wikiStatus.textContent = t('popupBlocked');
+    wikiStatus.classList.add('error');
+    return undefined;
+  }
+  assistantTab.opener = null;
+
   return withPrompt(async (prompt, questUrl) => {
+    // Prefill the assistant exactly as the original action did. Also copy the
+    // prompt as a recovery path if a service ever drops a long query string.
     try {
       await navigator.clipboard.writeText(prompt);
-    } catch {
-      wikiStatus.textContent = t('promptCopyFailed');
-      wikiStatus.classList.add('error');
-      return;
-    }
+    } catch { /* The prefilled URL remains the primary path. */ }
     wikiStatus.classList.remove('error');
-    wikiStatus.textContent = t('promptOpened', name, questUrl);
-    window.open(url, '_blank', 'noopener');
-  });
+    wikiStatus.textContent = t('promptIncluded', name, questUrl);
+    assistantTab.location.replace(destination.promptBase + encodeURIComponent(prompt));
+  }, { url: questUrl, onFailure: () => assistantTab.close() });
 }
 
 document.getElementById('prompt-copy').addEventListener('click', copyPrompt);
-document.getElementById('prompt-chatgpt').addEventListener('click', () => openAssistant('ChatGPT', 'https://chatgpt.com/'));
+document.getElementById('prompt-chatgpt').addEventListener('click', () => openAssistant('ChatGPT', {
+  promptBase: 'https://chatgpt.com/?q=',
+}));
 
 // ChatGPT and copying are the two in reach above; these are the rest, kept
 // behind a link so the row does not grow a button per service.
 const OTHER_ASSISTANTS = [
-  { name: 'Claude', url: 'https://claude.ai/new' },
-  { name: 'Gemini', url: 'https://gemini.google.com/app' },
-  { name: 'Grok', url: 'https://grok.com/' },
-  { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
+  { name: 'Claude', promptBase: 'https://claude.ai/new?q=' },
+  { name: 'Gemini', promptBase: 'https://www.google.com/search?udm=50&source=searchlabs&q=' },
+  { name: 'Grok', promptBase: 'https://grok.com/?q=' },
+  { name: 'Perplexity', promptBase: 'https://www.perplexity.ai/search?q=' },
 ];
 
 const assistantSheet = document.getElementById('assistant-sheet');
 const assistantList = document.getElementById('assistant-list');
 
-for (const { name, url } of OTHER_ASSISTANTS) {
+for (const destination of OTHER_ASSISTANTS) {
+  const { name } = destination;
   const row = document.createElement('button');
   row.type = 'button';
   row.className = 'assistant';
@@ -982,7 +1003,7 @@ for (const { name, url } of OTHER_ASSISTANTS) {
   row.querySelector('.assistant-note').textContent = t('assistantOpens');
   row.addEventListener('click', () => {
     assistantSheet.close();
-    openAssistant(name, url);
+    openAssistant(name, destination);
   });
   assistantList.appendChild(row);
 }

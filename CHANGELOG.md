@@ -4,6 +4,26 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.8] - 2026-08-15
+
+### Fixed
+
+- **Assistant tabs open reliably again.** The destination tab is now created
+  synchronously from the click, before asynchronous Fandom retrieval can cause
+  the browser to discard popup permission.
+- **TibiaWikiBR is URL-only again.** Its already-working assistant flow no
+  longer fetches or embeds raw article source. Only Fandom prompts carry API
+  wikitext and the Fandom decoder.
+- **Assistant prompts are prefilled again.** Opening an assistant places the
+  generated wiki-specific prompt in its query just as before. The prompt is
+  also copied as a fallback if a service ever drops the query string.
+- **Fandom source now fits the prefilled transport.** The prompt keeps every
+  supported coordinate-bearing source line verbatim, together with headings
+  and adjacent context, while dropping unrelated wiki prose. Threatened Dreams
+  retains all 56 Mapper templates, 13 Minimap templates and 5 legacy Mapper
+  URLs while reducing its generated prompt from about 70,500 to 40,800
+  characters.
+
 ## [1.18.7] - 2026-08-15
 
 ### Changed

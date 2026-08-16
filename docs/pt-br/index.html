@@ -149,7 +149,7 @@
               <button type="button" class="tertiary-btn" id="prompt-copy">Copiar Prompt</button>
               <button type="button" class="tertiary-btn" id="prompt-chatgpt">Abrir no ChatGPT</button>
             </div>
-            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Copiar Prompt</strong> e <strong>Abrir no ChatGPT</strong> buscam a mesma fonte bruta e a incluem no prompt, então o assistente só escreve rótulos melhores e escolhe um ícone por local; cole a resposta em Coordenadas. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
+            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Abrir no ChatGPT</strong> abre com o prompt gerado já incluído. O TibiaWikiBR usa apenas a URL; o Fandom inclui a fonte bruta para que o ChatGPT não precise acessar a rede do Fandom. Depois cole a resposta em Coordenadas. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
             <div class="status-line" id="wiki-status"></div>
           </div>
           <div class="field field-main">
@@ -247,8 +247,8 @@
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
     <div class="sheet-head"><h3 id="assistant-title">Outros Assistentes</h3></div>
     <div class="sheet-body">
-      <p>O mesmo prompt com a fonte incluída, enviado para outro lugar que não o ChatGPT. O app o copia primeiro; cole no assistente e depois cole as marcações retornadas em <strong>Coordenadas</strong>.</p>
-      <p class="sheet-note">A maioria exige login. O prompt contém a fonte bruta do artigo, mas apenas as regras de coordenadas do wiki selecionado.</p>
+      <p>O mesmo prompt específico do wiki, enviado para outro lugar que não o ChatGPT. Ele abre já incluído; depois cole as marcações retornadas em <strong>Coordenadas</strong>.</p>
+      <p class="sheet-note">A maioria exige login. Somente os prompts do Fandom contêm a fonte bruta do artigo.</p>
       <div class="assistant-list" id="assistant-list"></div>
     </div>
     <div class="sheet-actions">

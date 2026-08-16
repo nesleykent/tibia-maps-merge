@@ -4,7 +4,7 @@
 const QUEST_URL_PLACEHOLDER = '{{QUEST_URL}}';
 const SOURCE_TITLE_PLACEHOLDER = '{{SOURCE_TITLE}}';
 const WIKITEXT_SOURCE_PLACEHOLDER = '{{WIKITEXT_SOURCE}}';
-const WIKI_SITE_PLACEHOLDER = '{{WIKI_SITE}}';
+const WIKI_SOURCE_ACCESS_PLACEHOLDER = '{{WIKI_SOURCE_ACCESS}}';
 const WIKI_COORDINATE_RULES_PLACEHOLDER = '{{WIKI_COORDINATE_RULES}}';
 const PROMPT_CORE_URL = new URL(
   '../prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md',
@@ -12,11 +12,11 @@ const PROMPT_CORE_URL = new URL(
 );
 const PROMPT_VARIANTS = {
   tibiawikibr: {
-    site: 'TibiaWikiBR (tibiawiki.com.br)',
+    sourceUrl: new URL('../prompts/tibiawikibr-source-access.md', import.meta.url),
     rulesUrl: new URL('../prompts/tibiawikibr-coordinate-rules.md', import.meta.url),
   },
   fandom: {
-    site: 'Tibia Wiki on Fandom (tibia.fandom.com)',
+    sourceUrl: new URL('../prompts/fandom-source-access.md', import.meta.url),
     rulesUrl: new URL('../prompts/fandom-coordinate-rules.md', import.meta.url),
   },
 };
@@ -36,6 +36,36 @@ export function questPromptVariant(input) {
   return null;
 }
 
+/**
+ * Keep every Fandom coordinate-bearing line verbatim, together with headings
+ * and one line of surrounding context. This removes galleries and unrelated
+ * walkthrough prose without removing any supported coordinate encoding.
+ */
+export function compactFandomWikitext(wikitext) {
+  const lines = String(wikitext ?? '').split('\n');
+  const keep = new Set();
+  const coordinateBearing = /\{\{\s*(?:Mapper[ _]Coords|Minimap)\b|[?&](?:coords|mark\d+)=|\(\s*\d{4,6}\s*,\s*\d{4,6}\s*,\s*\d{1,2}\s*\)/i;
+  const heading = /^={2,6}\s*[^=]/;
+
+  lines.forEach((line, index) => {
+    if (heading.test(line)) keep.add(index);
+    if (!coordinateBearing.test(line)) return;
+    for (let nearby = Math.max(0, index - 1); nearby <= Math.min(lines.length - 1, index + 1); nearby++) {
+      keep.add(nearby);
+    }
+  });
+
+  const selected = [...keep].sort((a, b) => a - b);
+  const output = [];
+  let previous = -1;
+  for (const index of selected) {
+    if (previous >= 0 && index > previous + 1) output.push('<!-- unrelated non-coordinate source omitted -->');
+    output.push(lines[index]);
+    previous = index;
+  }
+  return output.join('\n').trim();
+}
+
 /** Fetch and cache the shared core plus one wiki-specific decoder. */
 export function loadQuestPromptTemplate(variant = 'tibiawikibr') {
   const config = PROMPT_VARIANTS[variant];
@@ -50,20 +80,19 @@ export function loadQuestPromptTemplate(variant = 'tibiawikibr') {
     };
     promptTemplatePromises.set(variant, Promise.all([
       read(PROMPT_CORE_URL),
+      read(config.sourceUrl),
       read(config.rulesUrl),
-    ]).then(([template, coordinateRules]) => {
+    ]).then(([template, sourceAccess, coordinateRules]) => {
       const missing = [
         QUEST_URL_PLACEHOLDER,
-        SOURCE_TITLE_PLACEHOLDER,
-        WIKITEXT_SOURCE_PLACEHOLDER,
-        WIKI_SITE_PLACEHOLDER,
+        WIKI_SOURCE_ACCESS_PLACEHOLDER,
         WIKI_COORDINATE_RULES_PLACEHOLDER,
       ].filter((placeholder) => !template.includes(placeholder));
       if (missing.length > 0) {
         throw new Error(`The quest prompt is missing placeholders: ${missing.join(', ')}`);
       }
       return template
-        .replace(WIKI_SITE_PLACEHOLDER, () => config.site)
+        .replace(WIKI_SOURCE_ACCESS_PLACEHOLDER, () => sourceAccess.trim())
         .replace(WIKI_COORDINATE_RULES_PLACEHOLDER, () => coordinateRules.trim())
         .trim();
     }));
@@ -78,8 +107,10 @@ export async function buildQuestPrompt(url, { sourceTitle, wikitext } = {}) {
   if (!variant) throw new Error('badUrl');
   const template = await loadQuestPromptTemplate(variant);
   const title = String(sourceTitle ?? '').trim();
-  const source = String(wikitext ?? '').trim();
-  if (!title || !source) throw new Error('missingWikiSource');
+  const source = variant === 'fandom'
+    ? compactFandomWikitext(wikitext)
+    : String(wikitext ?? '').trim();
+  if (variant === 'fandom' && (!title || !source)) throw new Error('missingWikiSource');
   const replacements = new Map([
     [QUEST_URL_PLACEHOLDER, questUrl],
     [SOURCE_TITLE_PLACEHOLDER, title],
