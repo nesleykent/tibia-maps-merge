@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.7] - 2026-08-15
+
+### Changed
+
+- **Assistant prompts now include only the decoder for the pasted wiki.** The
+  shared extraction and classification instructions are combined with either
+  the compact TibiaWikiBR `Mapa` rules or the Fandom `Mapper Coords`/`Minimap`
+  rules. This removes irrelevant cross-wiki instructions from every generated
+  prompt and saves input tokens.
+
 ## [1.18.6] - 2026-08-15
 
 ### Fixed

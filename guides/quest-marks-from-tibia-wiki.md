@@ -227,7 +227,8 @@ MediaWiki API with `action=parse`, `prop=wikitext`, redirects enabled and
 returned `parse.wikitext` directly in the prompt. This avoids both rendered-
 page bot checks and assistant sandboxes that block outbound DNS or HTTPS.
 
-The prompt teaches both supported encodings:
+The app selects one decoder from the pasted URL, so the final prompt teaches
+only the relevant encoding instead of spending tokens on both:
 
 - tibiawiki.com.br's `{{Mapa|x,y,z}}` values are already absolute Tibia
   coordinates;
@@ -245,12 +246,15 @@ long quest, the assistant probably never saw the walkthrough.
 
 ## The prompt
 
-The app and this guide use one canonical prompt:
-[**Tibia Wiki Quest Coordinate Extractor — System Prompt**](../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md).
-Its URL, source-title and raw-wikitext placeholders are replaced automatically
-by **Copy Prompt**, **Open in ChatGPT**, and every option under **Other
-Assistants**. Manual use requires replacing all three placeholders; using the
-app is the reliable path because it retrieves and inserts the source itself.
+The app uses a [**shared extraction and classification
+core**](../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md) and
+adds exactly one coordinate decoder:
+[TibiaWikiBR](../docs/prompts/tibiawikibr-coordinate-rules.md) or
+[Tibia Fandom](../docs/prompts/fandom-coordinate-rules.md). Its URL,
+source-title, wiki-site, decoder and raw-wikitext placeholders are replaced
+automatically by **Copy Prompt**, **Open in ChatGPT**, and every option under
+**Other Assistants**. Using the app is the reliable path because it selects the
+correct decoder and inserts the source itself.
 
 ## A worked example
 

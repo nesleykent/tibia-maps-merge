@@ -7,23 +7,31 @@ const promptSourceUrl = new URL(
   '../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md',
   import.meta.url,
 );
+const tibiaWikiBrRulesUrl = new URL(
+  '../docs/prompts/tibiawikibr-coordinate-rules.md',
+  import.meta.url,
+);
 
 globalThis.fetch = async (url) => ({
   ok: true,
   text: () => readFile(url, 'utf8'),
 });
 
-const { buildQuestPrompt, loadQuestPromptTemplate } = await import(
+const { buildQuestPrompt, loadQuestPromptTemplate, questPromptVariant } = await import(
   '../docs/lib/prompt.js'
 );
 
 test('assistant prompt is built from the canonical Markdown file', async () => {
   const questUrl = 'https://www.tibiawiki.com.br/wiki/Threatened_Dreams_Quest?$&';
-  const sourceTitle = 'Threatened Dreams Quest/Spoiler';
-  const wikitext = '== Mission ==\nUse $& {{Mapper Coords|128.1|127.109|10}}.';
-  const source = (await readFile(promptSourceUrl, 'utf8')).trim();
+  const sourceTitle = 'Threatened Dreams Quest';
+  const wikitext = '== Missão ==\nVá $& {{Mapa|32250,31385,5:2|aqui}}.';
+  const source = await readFile(promptSourceUrl, 'utf8');
+  const rules = (await readFile(tibiaWikiBrRulesUrl, 'utf8')).trim();
   const prompt = await buildQuestPrompt(questUrl, { sourceTitle, wikitext });
   const expected = source
+    .replace('{{WIKI_SITE}}', () => 'TibiaWikiBR (tibiawiki.com.br)')
+    .replace('{{WIKI_COORDINATE_RULES}}', () => rules)
+    .trim()
     .replaceAll('{{QUEST_URL}}', () => questUrl)
     .replaceAll('{{SOURCE_TITLE}}', () => sourceTitle)
     .replaceAll('{{WIKITEXT_SOURCE}}', () => wikitext);
@@ -32,34 +40,55 @@ test('assistant prompt is built from the canonical Markdown file', async () => {
   assert.ok(prompt.includes(`QUEST_URL: ${questUrl}`));
   assert.ok(prompt.includes(`SOURCE_TITLE: ${sourceTitle}`));
   assert.ok(prompt.includes(wikitext));
-  assert.doesNotMatch(prompt, /\{\{(?:QUEST_URL|SOURCE_TITLE|WIKITEXT_SOURCE)\}\}/);
+  assert.doesNotMatch(prompt, /\{\{(?:QUEST_URL|SOURCE_TITLE|WIKITEXT_SOURCE|WIKI_SITE|WIKI_COORDINATE_RULES)\}\}/);
 });
 
 test('assistant prompt requires the app-fetched source', async () => {
   await assert.rejects(buildQuestPrompt('https://tibia.fandom.com/wiki/Test'), /missingWikiSource/);
-});
-
-test('prompt source is cached after its first load', async () => {
-  assert.strictEqual(
-    await loadQuestPromptTemplate(),
-    await loadQuestPromptTemplate(),
+  await assert.rejects(
+    buildQuestPrompt('https://example.com/wiki/Test', { sourceTitle: 'Test', wikitext: 'source' }),
+    /badUrl/,
   );
 });
 
-test('prompt teaches both coordinate encodings', async () => {
-  const prompt = await loadQuestPromptTemplate();
+test('wiki URL selects the matching prompt variant', () => {
+  assert.equal(questPromptVariant('https://www.tibiawiki.com.br/wiki/Foo'), 'tibiawikibr');
+  assert.equal(questPromptVariant('https://tibia.fandom.com/wiki/Foo'), 'fandom');
+  assert.equal(questPromptVariant('https://example.com/wiki/Foo'), null);
+});
 
-  assert.match(prompt, /TibiaWikiBR:[\s\S]*`\{\{Mapa\|32250,31385,5:2\|aqui\}\}`/);
-  assert.match(prompt, /Fandom `Mapper Coords`:[\s\S]*`absolute = sector \* 256 \+ offset`/);
+test('each prompt variant is cached after its first load', async () => {
+  assert.strictEqual(
+    await loadQuestPromptTemplate('tibiawikibr'),
+    await loadQuestPromptTemplate('tibiawikibr'),
+  );
+  assert.strictEqual(
+    await loadQuestPromptTemplate('fandom'),
+    await loadQuestPromptTemplate('fandom'),
+  );
+});
+
+test('TibiaWikiBR prompt contains only its absolute-coordinate decoder', async () => {
+  const prompt = await loadQuestPromptTemplate('tibiawikibr');
+
+  assert.match(prompt, /Decode TibiaWikiBR Coordinates[\s\S]*`\{\{Mapa\|32250,31385,5:2\|aqui\}\}`/);
+  assert.doesNotMatch(prompt, /Mapper Coords|`Minimap`|sector \* 256/);
+});
+
+test('Fandom prompt contains only its sector-offset decoders', async () => {
+  const prompt = await loadQuestPromptTemplate('fandom');
+
+  assert.match(prompt, /Decode Tibia Fandom Coordinates[\s\S]*`absolute = sector \* 256 \+ offset`/);
   assert.match(prompt, /`128\.1` becomes `32769` and `127\.109` becomes `32621`/);
   assert.match(prompt, /named coordinate parameters[\s\S]*`\{\{Mapper Coords\|x=128\.182\|y=124\.66\|z=7\|\.\.\.\}\}`/);
-  assert.match(prompt, /Fandom `Minimap`:[\s\S]*numbered marks[\s\S]*template's `z` value/);
-  assert.match(prompt, /Legacy Fandom Mapper URLs:[\s\S]*`coords=130\.231-126\.63-6-[\s\S]*`mark1=130\.231-126\.63-6-/);
+  assert.match(prompt, /`Minimap`:[\s\S]*numbered marks[\s\S]*template's `z` value/);
+  assert.match(prompt, /Legacy Mapper URLs:[\s\S]*`coords=130\.231-126\.63-6-[\s\S]*`mark1=130\.231-126\.63-6-/);
   assert.match(prompt, /dot is a sector\/offset delimiter, not a decimal point/);
+  assert.doesNotMatch(prompt, /`\{\{Mapa\|/);
 });
 
 test('prompt uses embedded wikitext and forbids assistant-side networking', async () => {
-  const prompt = await loadQuestPromptTemplate();
+  const prompt = await loadQuestPromptTemplate('fandom');
 
   assert.match(prompt, /## Supplied Raw Wikitext — Authoritative Source/);
   assert.match(prompt, /already performed the MediaWiki `action=parse`, `prop=wikitext`/);

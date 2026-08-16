@@ -121,9 +121,10 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   embeds that source in an extraction prompt, and hands it to ChatGPT to get
   back `x, y, z, Label, icon` lines for every NPC, entrance, floor transition,
   item and boss in the walkthrough. The canonical prompt is maintained as a
-  standalone Markdown file in
-  [`docs/prompts/`](docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md),
-  which is also the source used by every assistant button in the app.
+  shared Markdown core plus a small wiki-specific decoder in
+  [`docs/prompts/`](docs/prompts/), which are also the sources used by every
+  assistant button in the app. Only the decoder matching the pasted URL is
+  included, keeping the generated prompt smaller.
 
 ### Repository layout
 
