@@ -89,10 +89,8 @@
           <h3><span class="step-number">1</span>Choose published sources to subtract</h3>
           <button type="button" class="secondary-btn hidden" id="extract-sets-clear">Clear Marker Sets</button>
         </div>
-        <div class="direction-choices extract-source-choice">
-          <label class="direction"><input type="checkbox" id="extract-community" checked><span>Community markers</span></label>
-        </div>
-        <span class="field-label extract-sets-label">Marker Sets <span class="step-note">Optional — select every set already included in your file</span></span>
+        <div class="set-choices" id="extract-source-choices" role="group" aria-label="Published sources"></div>
+        <span class="field-label choice-group-label">Marker Sets <span class="step-note">Optional — select every set already included in your file</span></span>
         <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
         <span class="visually-hidden" id="extract-set-choices-label">Marker Sets to subtract</span>
         <div class="status-line" id="extract-source-status" aria-live="polite"></div>

@@ -15,7 +15,8 @@ for (const page of pages) {
     assert.match(html, /id="your-markers-clear"/);
     assert.match(html, /id="tab-extract"/);
     assert.match(html, /id="mode-extract"/);
-    assert.match(html, /id="extract-community" checked/);
+    assert.match(html, /id="extract-source-choices"/);
+    assert.doesNotMatch(html, /id="extract-community"/);
     assert.match(html, /id="extract-set-choices"/);
     assert.match(html, /id="conversion-source"/);
     assert.match(html, /id="review-conflicts"/);

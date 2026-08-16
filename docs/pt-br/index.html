@@ -90,10 +90,8 @@
           <h3><span class="step-number">1</span>Escolha as fontes publicadas para subtrair</h3>
           <button type="button" class="secondary-btn hidden" id="extract-sets-clear">Limpar Coleções</button>
         </div>
-        <div class="direction-choices extract-source-choice">
-          <label class="direction"><input type="checkbox" id="extract-community" checked><span>Marcações da comunidade</span></label>
-        </div>
-        <span class="field-label extract-sets-label">Coleções <span class="step-note">Opcional — selecione todas que já estão no seu arquivo</span></span>
+        <div class="set-choices" id="extract-source-choices" role="group" aria-label="Fontes publicadas"></div>
+        <span class="field-label choice-group-label">Coleções <span class="step-note">Opcional — selecione todas que já estão no seu arquivo</span></span>
         <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
         <span class="visually-hidden" id="extract-set-choices-label">Coleções para subtrair</span>
         <div class="status-line" id="extract-source-status" aria-live="polite"></div>

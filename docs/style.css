@@ -1162,12 +1162,7 @@ button { font-family: inherit; }
 
 .conflict-option[data-resolution="replace"] .conflict-option-action { color: var(--accent); }
 
-.extract-source-choice {
-  max-width: 360px;
-  margin-bottom: var(--ig-space-5);
-}
-
-.extract-sets-label {
+.choice-group-label {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;

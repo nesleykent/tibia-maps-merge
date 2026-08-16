@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.16] - 2026-08-15
+
+### Fixed
+
+- **Extract Own now uses the shared Marker Set checkbox-card component for
+  Community markers.** The native checkbox remains visually hidden; the same
+  card, checkmark, hover, focus, and selected styling is reused everywhere.
+  The one-off Extract Own source-choice CSS was removed.
+
 ## [1.18.15] - 2026-08-15
 
 ### Fixed

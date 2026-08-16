@@ -12,11 +12,17 @@ test('Extract Own uses the shared persistent review and trailing action hierarch
   ]);
 
   for (const html of [english, portuguese]) {
+    assert.match(html, /class="set-choices" id="extract-source-choices"/);
+    assert.doesNotMatch(html, /class="direction-choices extract-source-choice"/);
+    assert.doesNotMatch(html, /id="extract-community"/);
     assert.match(html, /<li class="step" id="extract-preview-step">/);
     assert.doesNotMatch(html, /<li class="step hidden" id="extract-preview-step">/);
     assert.match(html, /<div class="panel-actions">\s*<button class="primary-btn" id="extract-run"/);
   }
 
+  assert.match(app, /function createSetChoice\(/);
+  assert.match(app, /id: 'extract-community'/);
+  assert.match(app, /extractSourceChoices\.appendChild\(extractCommunityChoice\)/);
   assert.doesNotMatch(app, /extractPreviewStep\.classList\.toggle\('hidden'/);
   assert.match(app, /const renderPreviewMessage = \(message\)/);
   assert.match(app, /renderPreviewMessage\(t\('extractNeedsMarkers'\)\)/);

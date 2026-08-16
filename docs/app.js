@@ -1331,17 +1331,31 @@ const CHECK_SVG = '<svg class="set-check" viewBox="0 0 16 16" width="14" height=
   + '<path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" '
   + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-for (const { id, name, large } of MARKER_SETS) {
+function createSetChoice({ id = '', inputName, value = '', title, note = '', dateId = '', checked = false }) {
   const choice = document.createElement('label');
   choice.className = 'set-choice';
-  choice.innerHTML = '<input type="checkbox" name="marker-set" class="visually-hidden">'
+  choice.innerHTML = '<input type="checkbox" class="visually-hidden">'
     + `<span class="set-name">${CHECK_SVG}<span class="set-title"></span></span>`
     + '<span class="set-note"></span>'
-    + `<span class="set-date" data-set-date="${id}"></span>`;
+    + (dateId ? `<span class="set-date" data-set-date="${dateId}"></span>` : '');
   const input = choice.querySelector('input');
-  input.value = id;
-  choice.querySelector('.set-title').textContent = name;
-  if (large) choice.querySelector('.set-note').textContent = t('setLarge');
+  if (id) input.id = id;
+  input.name = inputName;
+  input.value = value;
+  input.checked = checked;
+  choice.querySelector('.set-title').textContent = title;
+  choice.querySelector('.set-note').textContent = note;
+  return { choice, input };
+}
+
+for (const { id, name, large } of MARKER_SETS) {
+  const { choice, input } = createSetChoice({
+    inputName: 'marker-set',
+    value: id,
+    title: name,
+    note: large ? t('setLarge') : '',
+    dateId: id,
+  });
   input.addEventListener('change', () => toggleSet(id, input.checked));
   setChoices.appendChild(choice);
 }
@@ -1565,7 +1579,7 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
 // markers, unchanged published Marker Sets, and personal markers. Exact
 // content matching separates them without deleting a personal label/icon that
 // intentionally overrides published data at the same coordinate.
-const extractCommunityInput = document.getElementById('extract-community');
+const extractSourceChoices = document.getElementById('extract-source-choices');
 const extractSetChoices = document.getElementById('extract-set-choices');
 const extractSetsClear = document.getElementById('extract-sets-clear');
 const extractSourceStatus = document.getElementById('extract-source-status');
@@ -1577,16 +1591,22 @@ const extractSelectedSets = new Set();
 const extractFailedSets = new Set();
 let extractFetch = Promise.resolve();
 
+const { choice: extractCommunityChoice, input: extractCommunityInput } = createSetChoice({
+  id: 'extract-community',
+  inputName: 'extract-published-source',
+  value: 'community',
+  title: t('extractCommunityName'),
+  checked: true,
+});
+extractSourceChoices.appendChild(extractCommunityChoice);
+
 for (const { id, name, large } of MARKER_SETS) {
-  const choice = document.createElement('label');
-  choice.className = 'set-choice';
-  choice.innerHTML = '<input type="checkbox" name="extract-marker-set" class="visually-hidden">'
-    + `<span class="set-name">${CHECK_SVG}<span class="set-title"></span></span>`
-    + '<span class="set-note"></span>';
-  const input = choice.querySelector('input');
-  input.value = id;
-  choice.querySelector('.set-title').textContent = name;
-  if (large) choice.querySelector('.set-note').textContent = t('setLarge');
+  const { choice, input } = createSetChoice({
+    inputName: 'extract-marker-set',
+    value: id,
+    title: name,
+    note: large ? t('setLarge') : '',
+  });
   input.addEventListener('change', () => {
     if (input.checked) {
       extractSelectedSets.add(id);

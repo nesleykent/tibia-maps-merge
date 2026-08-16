@@ -39,7 +39,9 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   at a shared coordinate when its label or icon differs -- that is a personal
   override, not published data. Its persistent review explains what input is
   needed and previews exact copies removed, overrides kept, unique personal
-  marks, and the final total before download. The download contains both
+  marks, and the final total before download. Community and Marker Set sources
+  use the same shared checkbox-card component, without visible native inputs.
+  The download contains both
   `own-minimapmarkers.bin` and `own-markers.json`, backups, and an audit log.
 - **Convert** -- pure format conversion, no merging:
   `minimapmarkers.bin` ↔ `markers.json`, or the live community markers
