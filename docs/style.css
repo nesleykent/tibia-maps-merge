@@ -948,6 +948,12 @@ button { font-family: inherit; }
 
 .set-choice:has(input:checked) .set-check { opacity: 1; }
 
+/* Extract Own communicates selection through the card surface itself. Its
+   source choices must not present checkbox or checkmark chrome. The hidden
+   native input remains the accessible, functional state carrier. */
+#mode-extract .set-check { display: none; }
+#mode-extract .set-date { padding-left: 0; }
+
 .set-title {
   min-width: 0;
   overflow-wrap: anywhere;

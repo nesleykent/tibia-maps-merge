@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.19] - 2026-08-15
+
+### Fixed
+
+- **Extract Own no longer shows checkbox or checkmark chrome.** Its source
+  cards now communicate selection only through their existing accent border
+  and tinted surface. The hidden native inputs and all selection behavior are
+  unchanged, and the unused checkmark indent is removed from source metadata.
+
 ## [1.18.18] - 2026-08-15
 
 ### Fixed

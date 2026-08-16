@@ -5,8 +5,9 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
 test('Extract Own uses the shared persistent review and standard page action structure', async () => {
-  const [app, english, portuguese] = await Promise.all([
+  const [app, css, english, portuguese] = await Promise.all([
     read('../docs/app.js'),
+    read('../docs/style.css'),
     read('../docs/index.html'),
     read('../docs/pt-br/index.html'),
   ]);
@@ -28,4 +29,6 @@ test('Extract Own uses the shared persistent review and standard page action str
   assert.match(app, /const renderPreviewMessage = \(message\)/);
   assert.match(app, /renderPreviewMessage\(t\('extractNeedsMarkers'\)\)/);
   assert.match(app, /extractPreview\.innerHTML = `<div class="result-card ok"><dl>`/);
+  assert.match(css, /#mode-extract \.set-check\s*\{\s*display:\s*none;\s*\}/);
+  assert.match(css, /#mode-extract \.set-date\s*\{\s*padding-left:\s*0;\s*\}/);
 });

@@ -40,7 +40,8 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   override, not published data. Its persistent review explains what input is
   needed and previews exact copies removed, overrides kept, unique personal
   marks, and the final total before download. Community and Marker Set sources
-  use the same shared checkbox-card component, without visible native inputs.
+  use the same shared selection-card behavior without checkbox or checkmark
+  chrome; selected cards use their accent border and tinted surface.
   The download contains both
   `own-minimapmarkers.bin` and `own-markers.json`, backups, and an audit log.
 - **Convert** -- pure format conversion, no merging:
