@@ -24,7 +24,7 @@ const reviewed = [
   marker(32004, 'Reviewed only'),
 ];
 
-test('replace policy uses reviewed marks for real coordinate conflicts', () => {
+test('replace policy uses new marks for real coordinate conflicts', () => {
   const outcome = applyEditedMarks(existing, reviewed, { conflictPolicy: 'replace' });
   const conflict = outcome.result.find((item) => item.x === 32003);
 
@@ -141,5 +141,5 @@ test('audit log records mixed coordinate-by-coordinate conflict decisions', () =
 
   assert.match(log, /reviewed individually, coordinate by coordinate/);
   assert.match(log, /kept loaded-file mark/);
-  assert.match(log, /used reviewed-list mark/);
+  assert.match(log, /used new mark/);
 });

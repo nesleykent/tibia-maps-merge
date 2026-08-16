@@ -651,10 +651,11 @@ function resolvedConflictsObject(conflicts) {
   }));
 }
 
-function createConflictOption(conflict, resolution, sourceKey, actionKey) {
+function createConflictOption(conflict, resolution, actionKey) {
   const marker = resolution === 'keep' ? conflict.existing : conflict.incoming;
   const option = document.createElement('label');
   option.className = 'conflict-option';
+  option.dataset.resolution = resolution;
 
   const radio = document.createElement('input');
   radio.type = 'radio';
@@ -669,9 +670,9 @@ function createConflictOption(conflict, resolution, sourceKey, actionKey) {
   const body = document.createElement('span');
   body.className = 'conflict-option-body';
 
-  const source = document.createElement('span');
-  source.className = 'conflict-option-source';
-  source.textContent = t(sourceKey);
+  const action = document.createElement('span');
+  action.className = 'conflict-option-action';
+  action.textContent = t(actionKey);
 
   const mark = document.createElement('span');
   mark.className = 'conflict-option-marker';
@@ -685,10 +686,7 @@ function createConflictOption(conflict, resolution, sourceKey, actionKey) {
   copy.append(description, iconName);
   mark.append(glyph, copy);
 
-  const action = document.createElement('span');
-  action.className = 'conflict-option-action';
-  action.textContent = t(actionKey);
-  body.append(source, mark, action);
+  body.append(action, mark);
   option.append(radio, body);
   return option;
 }
@@ -707,8 +705,8 @@ function renderConflictOverview(conflicts, mode) {
       <p>${escapeHtml(t('markConflictsReviewHint'))}</p>
     </div>
     <div class="review-conflict-actions">
-      <button type="button" class="secondary-btn" data-resolution="replace">${escapeHtml(t('markConflictUseAll'))}</button>
       <button type="button" class="secondary-btn" data-resolution="keep">${escapeHtml(t('markConflictKeepAll'))}</button>
+      <button type="button" class="primary-btn" data-resolution="replace">${escapeHtml(t('markConflictUseAll'))}</button>
     </div>`;
   reviewConflicts.querySelectorAll('[data-resolution]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -770,16 +768,26 @@ function renderPending() {
       const fieldset = document.createElement('fieldset');
       fieldset.className = 'coordinate-conflict';
       const legend = document.createElement('legend');
-      legend.textContent = t(conflictResolutions.has(conflict.signature)
-        ? 'markConflictDecided'
-        : 'markConflictNeedsDecision');
+      const resolution = conflictResolutions.get(conflict.signature);
+      legend.textContent = t(resolution === 'keep'
+        ? 'markConflictDecisionKeep'
+        : resolution === 'replace'
+          ? 'markConflictDecisionNew'
+          : 'markConflictNeedsDecision');
+      const mapLink = document.createElement('a');
+      mapLink.className = 'conflict-map-link';
+      mapLink.href = mapUrl(conflict.incoming);
+      mapLink.target = '_blank';
+      mapLink.rel = 'noopener';
+      mapLink.innerHTML = `${MAP_PIN_SVG}<span></span>`;
+      mapLink.querySelector('span').textContent = t('viewOnMap', coordinates);
       const choices = document.createElement('div');
       choices.className = 'conflict-options';
       choices.append(
-        createConflictOption(conflict, 'keep', 'markConflictInFile', 'markConflictKeep'),
-        createConflictOption(conflict, 'replace', 'markConflictReviewed', 'markConflictUseReviewed'),
+        createConflictOption(conflict, 'keep', 'markConflictKeep'),
+        createConflictOption(conflict, 'replace', 'markConflictUseNew'),
       );
-      fieldset.append(legend, choices);
+      fieldset.append(legend, mapLink, choices);
       detailCell.appendChild(fieldset);
       detailRow.appendChild(detailCell);
       addRows.appendChild(detailRow);

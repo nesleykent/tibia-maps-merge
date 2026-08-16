@@ -4,7 +4,7 @@ const markerKey = (marker) => `${marker.x},${marker.y},${marker.z}`;
 const sameContent = (a, b) => a.icon === b.icon && a.description === b.description;
 
 /**
- * Apply a reviewed marker list to an existing marker file.
+ * Apply a new marker list to an existing marker file.
  *
  * A shared coordinate is only a conflict when its label or icon differs.
  * `replace` makes the reviewed-list mark win; `keep` preserves the mark from

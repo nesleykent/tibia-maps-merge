@@ -63,14 +63,15 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   Mapper `sector.offset` templates (following the `/Spoiler` subpage where
   the walkthrough actually lives). Step 2 is a table with Edit/Delete per
   row, kept across reloads in `localStorage`. Step 3 appears once a file is
-  loaded and asks which way to apply the reviewed list: **add** merges it in,
+  loaded and asks which way to apply the new list: **add** merges it in,
   while **remove** drops every coordinate in the list from the file, whatever
   it is labelled there. When adding, identical overlaps stay unchanged and
   real conflicts appear inside the review table with the loaded-file and
-  reviewed-list versions side by side. You decide each coordinate separately,
-  or use a bulk action when the same answer applies to all; download remains
-  disabled until every conflict has a decision. That is what makes rewriting
-  labels and icons deliberate instead of implicit. Removing
+  new-list versions side by side. You decide each coordinate separately,
+  using the same **Keep Existing Mark** / **Use New Mark** language as the bulk
+  actions. Each decision includes a direct tibiamaps.io coordinate link.
+  Download remains disabled until every conflict has a decision. That is what
+  makes rewriting labels and icons deliberate instead of implicit. Removing
   is what clears a quest's
   marks once you are done with it: import the quest, delete any row you want
   to keep, remove. With no file loaded the step stays hidden -- there is

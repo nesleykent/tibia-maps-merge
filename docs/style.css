@@ -619,6 +619,12 @@ button { font-family: inherit; }
 
 .form-row .form-message { margin-right: auto; }
 
+/* The action that completes a workspace trails, matching macOS dialog order. */
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .form-message {
   min-width: 0;
   color: var(--muted);
@@ -1043,7 +1049,14 @@ button { font-family: inherit; }
   display: flex;
   flex: 0 1 auto;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
   gap: var(--ig-space-2);
+}
+
+.review-conflict-actions .secondary-btn {
+  min-height: 44px;
+  margin-left: 0;
 }
 
 .marker-conflict-detail td {
@@ -1067,6 +1080,23 @@ button { font-family: inherit; }
   font-size: var(--system-12-font-size);
   font-weight: var(--font-weight-system-semibold);
 }
+
+.conflict-map-link {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--ig-space-2);
+  margin: 0 0 var(--ig-space-3) auto;
+  color: var(--accent);
+  font-size: var(--system-12-font-size);
+  font-weight: var(--font-weight-system-semibold);
+  text-decoration: none;
+}
+
+.conflict-map-link:hover { text-decoration: underline; }
+
+.conflict-map-link svg { flex: 0 0 auto; }
 
 .conflict-options {
   display: grid;
@@ -1107,13 +1137,6 @@ button { font-family: inherit; }
   min-width: 0;
 }
 
-.conflict-option-source {
-  display: block;
-  color: var(--muted);
-  font-size: var(--system-12-font-size);
-  font-weight: var(--font-weight-system-semibold);
-}
-
 .conflict-option-marker {
   display: flex;
   align-items: center;
@@ -1140,10 +1163,12 @@ button { font-family: inherit; }
 }
 
 .conflict-option-action {
-  color: var(--accent);
-  font-size: var(--system-12-font-size);
+  color: var(--text);
+  font-size: var(--system-14-font-size);
   font-weight: var(--font-weight-system-semibold);
 }
+
+.conflict-option[data-resolution="replace"] .conflict-option-action { color: var(--accent); }
 
 .extract-source-choice {
   max-width: 360px;
@@ -1545,7 +1570,8 @@ footer .link-btn {
 
   .review-conflict-actions { width: 100%; }
 
-  .review-conflict-actions .secondary-btn {
+  .review-conflict-actions .secondary-btn,
+  .review-conflict-actions .primary-btn {
     flex: 1 1 180px;
     margin: 0;
   }

@@ -4,6 +4,19 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.10] - 2026-08-15
+
+### Fixed
+
+- **Conflict decisions now use one consistent action model.** Individual and
+  bulk choices use **Keep Existing Mark** / **Use New Mark** terminology, and a
+  completed decision names the selected outcome instead of saying only
+  “Decision made.”
+- **Every conflict includes a direct tibiamaps.io coordinate link.** The bulk
+  new-marks action is the primary trailing action, while keeping existing
+  marks is secondary. The final download action also sits on the trailing side
+  following macOS action order.
+
 ## [1.18.9] - 2026-08-15
 
 ### Changed
