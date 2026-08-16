@@ -887,9 +887,9 @@ coordsField.addEventListener('input', syncAddButton);
 syncAddButton();
 
 // ---------- Quick prompt ----------
-// The importer can only read wikis that allow it; an assistant can read any of
-// them. These hand the same URL to the canonical Markdown prompt, so a wiki
-// this app cannot fetch is still one paste away from a marker list.
+// Fetch the raw wiki source here, where MediaWiki's CORS response is usable,
+// then embed it in the assistant prompt. Assistant runtimes often block
+// arbitrary outbound DNS/HTTP even though the user's browser can read it.
 function rejectMissingUrl() {
   wikiStatus.textContent = t('wikiBadUrl');
   wikiStatus.classList.add('error');
@@ -910,11 +910,19 @@ function currentPromptUrl() {
 async function withPrompt(action) {
   const url = currentPromptUrl();
   if (!url) return rejectMissingUrl();
+  wikiStatus.classList.remove('error');
+  wikiStatus.textContent = t('wikiReading');
   try {
-    const prompt = await buildQuestPrompt(url);
+    const article = await fetchQuestCoordinates(url);
+    const prompt = await buildQuestPrompt(url, {
+      sourceTitle: article.title,
+      wikitext: article.wikitext,
+    });
     await action(prompt, url);
-  } catch {
-    wikiStatus.textContent = t('promptLoadFailed');
+  } catch (err) {
+    wikiStatus.textContent = t({
+      badUrl: 'wikiBadUrl', noArticle: 'wikiNoArticle', unreachable: 'wikiUnreachable',
+    }[err.message] ?? 'promptLoadFailed');
     wikiStatus.classList.add('error');
   }
 }
@@ -935,24 +943,31 @@ function copyPrompt() {
   });
 }
 
-function openAssistant(name, base) {
-  return withPrompt((prompt, questUrl) => {
+function openAssistant(name, url) {
+  return withPrompt(async (prompt, questUrl) => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      wikiStatus.textContent = t('promptCopyFailed');
+      wikiStatus.classList.add('error');
+      return;
+    }
     wikiStatus.classList.remove('error');
     wikiStatus.textContent = t('promptOpened', name, questUrl);
-    window.open(base + encodeURIComponent(prompt), '_blank', 'noopener');
+    window.open(url, '_blank', 'noopener');
   });
 }
 
 document.getElementById('prompt-copy').addEventListener('click', copyPrompt);
-document.getElementById('prompt-chatgpt').addEventListener('click', () => openAssistant('ChatGPT', 'https://chatgpt.com/?q='));
+document.getElementById('prompt-chatgpt').addEventListener('click', () => openAssistant('ChatGPT', 'https://chatgpt.com/'));
 
 // ChatGPT and copying are the two in reach above; these are the rest, kept
 // behind a link so the row does not grow a button per service.
 const OTHER_ASSISTANTS = [
-  { name: 'Claude', url: 'https://claude.ai/new?q=' },
-  { name: 'Gemini', url: 'https://www.google.com/search?udm=50&source=searchlabs&q=' },
-  { name: 'Grok', url: 'https://grok.com/?q=' },
-  { name: 'Perplexity', url: 'https://www.perplexity.ai/search?q=' },
+  { name: 'Claude', url: 'https://claude.ai/new' },
+  { name: 'Gemini', url: 'https://gemini.google.com/app' },
+  { name: 'Grok', url: 'https://grok.com/' },
+  { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
 ];
 
 const assistantSheet = document.getElementById('assistant-sheet');

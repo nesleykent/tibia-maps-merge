@@ -220,12 +220,12 @@ coverage on long quests.
 
 ## Make sure the assistant can actually read the article
 
-The canonical prompt does not ask the assistant to scrape a rendered wiki
-page. It gives the exact request used by the app's importer: the page title is
-sent to the same wiki origin's MediaWiki API with `action=parse`,
-`prop=wikitext`, redirects enabled and `origin=*`, then the raw source is read
-from `parse.wikitext`. This avoids rendered-page bot checks and exposes the
-templates that actually carry coordinates.
+The assistant never needs to reach the wiki. Before copying or opening the
+prompt, Tibia Maps Merge sends the page title to the same wiki origin's
+MediaWiki API with `action=parse`, `prop=wikitext`, redirects enabled and
+`origin=*`, follows Fandom's `/Spoiler` subpage when needed, and embeds the
+returned `parse.wikitext` directly in the prompt. This avoids both rendered-
+page bot checks and assistant sandboxes that block outbound DNS or HTTPS.
 
 The prompt teaches both supported encodings:
 
@@ -233,13 +233,12 @@ The prompt teaches both supported encodings:
   coordinates;
 - tibia.fandom.com's `Mapper Coords` and `Minimap` values use
   `sector.offset`, converted with `sector * 256 + offset`. When the main
-  Fandom article has no coordinates, the prompt requests its `/Spoiler`
-  subpage, where the walkthrough commonly lives.
+  Fandom article has no coordinates, the app fetches its `/Spoiler` subpage,
+  where the walkthrough commonly lives.
 
-Spoiler, collapsed and tabbed content is still inspected, but in raw wikitext
-rather than through visibility in a browser. If an assistant cannot call the
-MediaWiki API at all, paste the article's raw wikitext into the conversation
-and keep the extraction and classification instructions unchanged.
+Spoiler, collapsed and tabbed content is still inspected, but in the raw
+wikitext already carried inside the prompt rather than through visibility or
+network access in the assistant.
 
 A quick sanity check: if the returned list has only a handful of marks for a
 long quest, the assistant probably never saw the walkthrough.
@@ -248,9 +247,10 @@ long quest, the assistant probably never saw the walkthrough.
 
 The app and this guide use one canonical prompt:
 [**Tibia Wiki Quest Coordinate Extractor — System Prompt**](../docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md).
-Its `{{QUEST_URL}}` placeholder is replaced automatically by **Copy Prompt**,
-**Open in ChatGPT**, and every option under **Other Assistants**. To use the
-file manually, replace that placeholder with the Tibia Wiki quest article URL.
+Its URL, source-title and raw-wikitext placeholders are replaced automatically
+by **Copy Prompt**, **Open in ChatGPT**, and every option under **Other
+Assistants**. Manual use requires replacing all three placeholders; using the
+app is the reliable path because it retrieves and inserts the source itself.
 
 ## A worked example
 

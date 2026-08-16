@@ -267,6 +267,7 @@ export async function fetchQuestCoordinates(input, { fetchImpl = fetch } = {}) {
   return {
     title: best.title,
     pageUrl: target.pageUrl,
+    wikitext: best.wikitext,
     coordinates: best.coordinates,
   };
 }

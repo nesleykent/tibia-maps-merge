@@ -4,6 +4,17 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.6] - 2026-08-15
+
+### Fixed
+
+- **Assistant prompts no longer depend on the assistant's network sandbox.**
+  Tibia Maps Merge now fetches the raw `parse.wikitext` itself, follows the
+  Fandom `/Spoiler` source when needed, and embeds that source directly in the
+  prompt. Assistant actions copy the complete source-backed prompt before
+  opening the selected service, eliminating ChatGPT DNS failures and avoiding
+  oversized query-string prompts.
+
 ## [1.18.5] - 2026-08-15
 
 ### Fixed

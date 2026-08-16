@@ -76,6 +76,7 @@ test('Fandom fetch uses raw parse.wikitext and follows the Spoiler subpage', asy
   assert.equal(requests[0].searchParams.get('page'), 'Measuring Tibia Quest');
   assert.equal(requests[1].searchParams.get('page'), 'Measuring Tibia Quest/Spoiler');
   assert.equal(article.title, 'Measuring Tibia Quest/Spoiler');
+  assert.match(article.wikitext, /\{\{Mapper Coords/);
   assert.deepEqual(
     article.coordinates.map(({ x, y, z }) => ({ x, y, z })),
     [{ x: 32769, y: 32621, z: 10 }],

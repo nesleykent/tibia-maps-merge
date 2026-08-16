@@ -117,11 +117,12 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
 ### Guides
 
 - [**Generating quest marks from Tibia Wiki with an AI assistant**](guides/quest-marks-from-tibia-wiki.md)
-  -- hand a Tibia Wiki quest URL to ChatGPT with an extraction prompt, get
-  back `x, y, z, Label, icon` lines for every NPC, entrance, floor
-  transition, item and boss in the walkthrough, and paste them straight into
-  Edit Marks. The canonical prompt is maintained as a standalone Markdown
-  file in [`docs/prompts/`](docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md),
+  -- give the app a Tibia Wiki quest URL and it fetches the raw wikitext,
+  embeds that source in an extraction prompt, and hands it to ChatGPT to get
+  back `x, y, z, Label, icon` lines for every NPC, entrance, floor transition,
+  item and boss in the walkthrough. The canonical prompt is maintained as a
+  standalone Markdown file in
+  [`docs/prompts/`](docs/prompts/tibia-wiki-quest-coordinate-agent-system-prompt.md),
   which is also the source used by every assistant button in the app.
 
 ### Repository layout
