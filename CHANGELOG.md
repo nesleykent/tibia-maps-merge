@@ -4,6 +4,18 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.9] - 2026-08-15
+
+### Changed
+
+- **Gemini gets a source-backed TibiaWikiBR prompt.** When Gemini is selected,
+  the app asynchronously requests TibiaWikiBR `parse.wikitext` and embeds a
+  compact excerpt preserving every `Mapa`/exact-coordinate line, headings and
+  adjacent context. It copies that prompt and opens the direct Gemini app for
+  one manual paste, avoiding the Google Search AI-mode URL's HTTP 400 response.
+  ChatGPT and the other assistants retain the working TibiaWikiBR URL-only
+  prompt.
+
 ## [1.18.8] - 2026-08-15
 
 ### Fixed

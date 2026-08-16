@@ -120,8 +120,9 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   -- give the app a Tibia Wiki quest URL and hand a wiki-specific extraction
   prompt to ChatGPT to get back `x, y, z, Label, icon` lines for every NPC,
   entrance, floor transition, item and boss in the walkthrough. TibiaWikiBR
-  keeps its already-working URL-only flow; Fandom embeds a coordinate-complete
-  excerpt of raw API wikitext so ChatGPT needs no Fandom network access. The prompt parts live in
+  keeps its already-working URL-only flow, except Gemini can receive an
+  asynchronously fetched source excerpt; Fandom embeds a coordinate-complete
+  excerpt of raw API wikitext so assistants need no Fandom network access. The prompt parts live in
   [`docs/prompts/`](docs/prompts/) and are used by every assistant button.
 
 ### Repository layout

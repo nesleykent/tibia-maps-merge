@@ -907,7 +907,9 @@ function currentPromptUrl() {
   }
 }
 
-async function withPrompt(action, { url = currentPromptUrl(), onFailure } = {}) {
+async function withPrompt(action, {
+  url = currentPromptUrl(), onFailure, sourceBacked = false,
+} = {}) {
   if (!url) {
     onFailure?.();
     return rejectMissingUrl();
@@ -917,12 +919,14 @@ async function withPrompt(action, { url = currentPromptUrl(), onFailure } = {}) 
   try {
     const variant = questPromptVariant(url);
     if (!variant) throw new Error('badUrl');
-    const article = variant === 'fandom'
+    const needsArticle = variant === 'fandom' || (variant === 'tibiawikibr' && sourceBacked);
+    const article = needsArticle
       ? await fetchQuestCoordinates(url)
       : undefined;
     const prompt = await buildQuestPrompt(url, article && {
       sourceTitle: article.title,
       wikitext: article.wikitext,
+      sourceBacked,
     });
     await action(prompt, url);
   } catch (err) {
@@ -965,6 +969,21 @@ function openAssistant(name, destination) {
   assistantTab.opener = null;
 
   return withPrompt(async (prompt, questUrl) => {
+    if (destination.prefill === false) {
+      try {
+        await navigator.clipboard.writeText(prompt);
+      } catch {
+        assistantTab.close();
+        wikiStatus.textContent = t('promptCopyFailed');
+        wikiStatus.classList.add('error');
+        return;
+      }
+      wikiStatus.classList.remove('error');
+      wikiStatus.textContent = t('promptCopiedOpened', name, questUrl);
+      assistantTab.location.replace(destination.home);
+      return;
+    }
+
     // Prefill the assistant exactly as the original action did. Also copy the
     // prompt as a recovery path if a service ever drops a long query string.
     try {
@@ -973,7 +992,11 @@ function openAssistant(name, destination) {
     wikiStatus.classList.remove('error');
     wikiStatus.textContent = t('promptIncluded', name, questUrl);
     assistantTab.location.replace(destination.promptBase + encodeURIComponent(prompt));
-  }, { url: questUrl, onFailure: () => assistantTab.close() });
+  }, {
+    url: questUrl,
+    onFailure: () => assistantTab.close(),
+    sourceBacked: destination.sourceBacked ?? false,
+  });
 }
 
 document.getElementById('prompt-copy').addEventListener('click', copyPrompt);
@@ -985,7 +1008,12 @@ document.getElementById('prompt-chatgpt').addEventListener('click', () => openAs
 // behind a link so the row does not grow a button per service.
 const OTHER_ASSISTANTS = [
   { name: 'Claude', promptBase: 'https://claude.ai/new?q=' },
-  { name: 'Gemini', promptBase: 'https://www.google.com/search?udm=50&source=searchlabs&q=' },
+  {
+    name: 'Gemini',
+    home: 'https://gemini.google.com/app',
+    prefill: false,
+    sourceBacked: true,
+  },
   { name: 'Grok', promptBase: 'https://grok.com/?q=' },
   { name: 'Perplexity', promptBase: 'https://www.perplexity.ai/search?q=' },
 ];
@@ -1000,7 +1028,9 @@ for (const destination of OTHER_ASSISTANTS) {
   row.className = 'assistant';
   row.innerHTML = '<span class="assistant-name"></span><span class="assistant-note"></span>';
   row.querySelector('.assistant-name').textContent = name;
-  row.querySelector('.assistant-note').textContent = t('assistantOpens');
+  row.querySelector('.assistant-note').textContent = t(
+    destination.prefill === false ? 'assistantCopies' : 'assistantOpens',
+  );
   row.addEventListener('click', () => {
     assistantSheet.close();
     openAssistant(name, destination);

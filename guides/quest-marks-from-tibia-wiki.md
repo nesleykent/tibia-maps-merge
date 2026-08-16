@@ -257,8 +257,12 @@ adds exactly one source strategy and coordinate decoder:
 [decoder](../docs/prompts/tibiawikibr-coordinate-rules.md), or
 [Fandom source](../docs/prompts/fandom-source-access.md) plus
 [decoder](../docs/prompts/fandom-coordinate-rules.md). **Copy Prompt**,
-**Open in ChatGPT**, and **Other Assistants** select the correct pair. Only the
-Fandom pair retrieves and inserts raw wikitext.
+**Open in ChatGPT**, and **Other Assistants** select the correct pair. Fandom
+always retrieves and inserts a source excerpt. Gemini also uses the embedded
+TibiaWikiBR source strategy; ChatGPT and the other assistants retain the
+original TibiaWikiBR URL-only strategy. Because Gemini's app does not accept a
+prefilled prompt URL, the app copies that source-backed prompt and opens Gemini
+for one manual paste.
 
 ## A worked example
 

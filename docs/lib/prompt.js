@@ -15,6 +15,10 @@ const PROMPT_VARIANTS = {
     sourceUrl: new URL('../prompts/tibiawikibr-source-access.md', import.meta.url),
     rulesUrl: new URL('../prompts/tibiawikibr-coordinate-rules.md', import.meta.url),
   },
+  'tibiawikibr-source': {
+    sourceUrl: new URL('../prompts/tibiawikibr-embedded-source-access.md', import.meta.url),
+    rulesUrl: new URL('../prompts/tibiawikibr-coordinate-rules.md', import.meta.url),
+  },
   fandom: {
     sourceUrl: new URL('../prompts/fandom-source-access.md', import.meta.url),
     rulesUrl: new URL('../prompts/fandom-coordinate-rules.md', import.meta.url),
@@ -41,10 +45,9 @@ export function questPromptVariant(input) {
  * and one line of surrounding context. This removes galleries and unrelated
  * walkthrough prose without removing any supported coordinate encoding.
  */
-export function compactFandomWikitext(wikitext) {
+function compactCoordinateWikitext(wikitext, coordinateBearing) {
   const lines = String(wikitext ?? '').split('\n');
   const keep = new Set();
-  const coordinateBearing = /\{\{\s*(?:Mapper[ _]Coords|Minimap)\b|[?&](?:coords|mark\d+)=|\(\s*\d{4,6}\s*,\s*\d{4,6}\s*,\s*\d{1,2}\s*\)/i;
   const heading = /^={2,6}\s*[^=]/;
 
   lines.forEach((line, index) => {
@@ -64,6 +67,21 @@ export function compactFandomWikitext(wikitext) {
     previous = index;
   }
   return output.join('\n').trim();
+}
+
+export function compactFandomWikitext(wikitext) {
+  return compactCoordinateWikitext(
+    wikitext,
+    /\{\{\s*(?:Mapper[ _]Coords|Minimap)\b|[?&](?:coords|mark\d+)=|\(\s*\d{4,6}\s*,\s*\d{4,6}\s*,\s*\d{1,2}\s*\)/i,
+  );
+}
+
+/** Keep every TibiaWikiBR Mapa/coordinate line and its immediate context. */
+export function compactTibiaWikiBrWikitext(wikitext) {
+  return compactCoordinateWikitext(
+    wikitext,
+    /\{\{\s*Mapa\b|\(\s*\d{4,6}\s*,\s*\d{4,6}\s*,\s*\d{1,2}\s*\)/i,
+  );
 }
 
 /** Fetch and cache the shared core plus one wiki-specific decoder. */
@@ -101,16 +119,21 @@ export function loadQuestPromptTemplate(variant = 'tibiawikibr') {
 }
 
 /** Build the exact Markdown prompt with the already-fetched wiki source. */
-export async function buildQuestPrompt(url, { sourceTitle, wikitext } = {}) {
+export async function buildQuestPrompt(url, { sourceTitle, wikitext, sourceBacked = false } = {}) {
   const questUrl = String(url ?? '').trim();
   const variant = questPromptVariant(questUrl);
   if (!variant) throw new Error('badUrl');
-  const template = await loadQuestPromptTemplate(variant);
+  const templateVariant = variant === 'tibiawikibr' && sourceBacked
+    ? 'tibiawikibr-source'
+    : variant;
+  const template = await loadQuestPromptTemplate(templateVariant);
   const title = String(sourceTitle ?? '').trim();
-  const source = variant === 'fandom'
+  const source = templateVariant === 'fandom'
     ? compactFandomWikitext(wikitext)
-    : String(wikitext ?? '').trim();
-  if (variant === 'fandom' && (!title || !source)) throw new Error('missingWikiSource');
+    : templateVariant === 'tibiawikibr-source'
+      ? compactTibiaWikiBrWikitext(wikitext)
+      : String(wikitext ?? '').trim();
+  if (templateVariant !== 'tibiawikibr' && (!title || !source)) throw new Error('missingWikiSource');
   const replacements = new Map([
     [QUEST_URL_PLACEHOLDER, questUrl],
     [SOURCE_TITLE_PLACEHOLDER, title],
@@ -125,4 +148,5 @@ export async function buildQuestPrompt(url, { sourceTitle, wikitext } = {}) {
 // Begin loading both small variants before a user clicks an assistant action.
 // The raw article source is still fetched only after the user requests it.
 void loadQuestPromptTemplate('tibiawikibr').catch(() => {});
+void loadQuestPromptTemplate('tibiawikibr-source').catch(() => {});
 void loadQuestPromptTemplate('fandom').catch(() => {});

@@ -23,7 +23,8 @@ globalThis.fetch = async (url) => ({
 });
 
 const {
-  buildQuestPrompt, compactFandomWikitext, loadQuestPromptTemplate, questPromptVariant,
+  buildQuestPrompt, compactFandomWikitext, compactTibiaWikiBrWikitext,
+  loadQuestPromptTemplate, questPromptVariant,
 } = await import(
   '../docs/lib/prompt.js'
 );
@@ -46,8 +47,12 @@ test('assistant prompt is built from the canonical Markdown file', async () => {
   assert.doesNotMatch(prompt, /\{\{(?:QUEST_URL|SOURCE_TITLE|WIKITEXT_SOURCE|WIKI_SOURCE_ACCESS|WIKI_COORDINATE_RULES)\}\}/);
 });
 
-test('only the Fandom prompt requires app-fetched source', async () => {
+test('Fandom and optional source-backed TibiaWikiBR prompts require fetched source', async () => {
   await assert.doesNotReject(buildQuestPrompt('https://www.tibiawiki.com.br/wiki/Test'));
+  await assert.rejects(
+    buildQuestPrompt('https://www.tibiawiki.com.br/wiki/Test', { sourceBacked: true }),
+    /missingWikiSource/,
+  );
   await assert.rejects(buildQuestPrompt('https://tibia.fandom.com/wiki/Test'), /missingWikiSource/);
   await assert.rejects(
     buildQuestPrompt('https://example.com/wiki/Test', { sourceTitle: 'Test', wikitext: 'source' }),
@@ -70,6 +75,9 @@ test('assistant tab opens synchronously and receives the generated prompt', asyn
 
   assert.ok(openAssistant.indexOf("window.open('about:blank', '_blank')") < openAssistant.indexOf('return withPrompt('));
   assert.match(openAssistant, /location\.replace\(destination\.promptBase \+ encodeURIComponent\(prompt\)\)/);
+  assert.match(openAssistant, /destination\.prefill === false[\s\S]*navigator\.clipboard\.writeText\(prompt\)[\s\S]*location\.replace\(destination\.home\)/);
+  assert.match(app, /name: 'Gemini',[\s\S]*?prefill: false,[\s\S]*?sourceBacked: true/);
+  assert.match(app, /variant === 'tibiawikibr' && sourceBacked/);
 });
 
 test('Fandom source compaction preserves every coordinate line and nearby context', () => {
@@ -92,6 +100,23 @@ test('Fandom source compaction preserves every coordinate line and nearby contex
   assert.doesNotMatch(compacted, /Unrelated introduction|Several unrelated paragraphs/);
 });
 
+test('TibiaWikiBR source compaction preserves every Mapa line and nearby context', () => {
+  const compacted = compactTibiaWikiBrWikitext([
+    'Introdução sem coordenadas.',
+    '== Missão ==',
+    'Prepare o item necessário.',
+    'Encontre o NPC {{Mapa|32250,31385,5:2|aqui}}.',
+    'Depois reporte a missão.',
+    'Vários parágrafos sem coordenadas.',
+  ].join('\n'));
+
+  assert.match(compacted, /== Missão ==/);
+  assert.match(compacted, /Prepare o item necessário/);
+  assert.match(compacted, /\{\{Mapa\|32250,31385,5:2\|aqui\}\}/);
+  assert.match(compacted, /Depois reporte a missão/);
+  assert.doesNotMatch(compacted, /Introdução sem coordenadas|Vários parágrafos/);
+});
+
 test('each prompt variant is cached after its first load', async () => {
   assert.strictEqual(
     await loadQuestPromptTemplate('tibiawikibr'),
@@ -101,6 +126,10 @@ test('each prompt variant is cached after its first load', async () => {
     await loadQuestPromptTemplate('fandom'),
     await loadQuestPromptTemplate('fandom'),
   );
+  assert.strictEqual(
+    await loadQuestPromptTemplate('tibiawikibr-source'),
+    await loadQuestPromptTemplate('tibiawikibr-source'),
+  );
 });
 
 test('TibiaWikiBR prompt stays URL-only and contains only its decoder', async () => {
@@ -109,6 +138,24 @@ test('TibiaWikiBR prompt stays URL-only and contains only its decoder', async ()
   assert.match(prompt, /Source Access — TibiaWikiBR[\s\S]*Open `QUEST_URL`/);
   assert.match(prompt, /Decode TibiaWikiBR Coordinates[\s\S]*`\{\{Mapa\|32250,31385,5:2\|aqui\}\}`/);
   assert.doesNotMatch(prompt, /WIKITEXT_SOURCE|BEGIN_TIBIA_WIKITEXT_SOURCE|action=parse|Do not browse/);
+  assert.doesNotMatch(prompt, /Mapper Coords|`Minimap`|sector \* 256/);
+});
+
+test('source-backed TibiaWikiBR prompt embeds the compact source for Gemini', async () => {
+  const prompt = await buildQuestPrompt('https://www.tibiawiki.com.br/wiki/Test', {
+    sourceBacked: true,
+    sourceTitle: 'Test',
+    wikitext: [
+      'Texto sem coordenadas.',
+      '== Missão ==',
+      'Vá {{Mapa|32250,31385,5:2|aqui}}.',
+    ].join('\n'),
+  });
+
+  assert.match(prompt, /Supplied TibiaWikiBR Source/);
+  assert.match(prompt, /SOURCE_TITLE: Test/);
+  assert.match(prompt, /\{\{Mapa\|32250,31385,5:2\|aqui\}\}/);
+  assert.doesNotMatch(prompt, /Texto sem coordenadas/);
   assert.doesNotMatch(prompt, /Mapper Coords|`Minimap`|sector \* 256/);
 });
 
