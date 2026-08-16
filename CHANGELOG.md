@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.12] - 2026-08-15
+
+### Fixed
+
+- **The conflict map link now reuses the table's map-link component.** It is
+  the same compact pin-only control, with the same hover treatment, tooltip,
+  accessible label, and exact tibiamaps.io coordinate target as every Map
+  cell.
+
 ## [1.18.11] - 2026-08-15
 
 ### Fixed

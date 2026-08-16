@@ -620,6 +620,18 @@ const MAP_PIN_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden
   + 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
   + '<circle cx="8" cy="6.1" r="1.7" fill="currentColor"/></svg>';
 
+function createMapLink(marker, coordinates) {
+  const link = document.createElement('a');
+  link.className = 'map-link';
+  link.href = mapUrl(marker);
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.title = t('viewOnMap', coordinates);
+  link.innerHTML = `${MAP_PIN_SVG}<span class="visually-hidden"></span>`;
+  link.querySelector('.visually-hidden').textContent = t('viewOnMap', coordinates);
+  return link;
+}
+
 function conflictSignature(existing, incoming) {
   return [
     markerKey(incoming),
@@ -728,9 +740,7 @@ function renderPending() {
     const coordinates = `${marker.x}, ${marker.y}, ${marker.z}`;
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td class="cell-map">
-        <a class="map-link" href="${mapUrl(marker)}" target="_blank" rel="noopener">${MAP_PIN_SVG}<span class="visually-hidden"></span></a>
-      </td>
+      <td class="cell-map"></td>
       <td>${marker.x}</td>
       <td>${marker.y}</td>
       <td>${marker.z}</td>
@@ -746,9 +756,7 @@ function renderPending() {
     const iconCell = row.querySelector('.cell-icon');
     iconCell.querySelector('.visually-hidden').textContent = iconLabel(marker.icon);
     iconCell.title = iconLabel(marker.icon);
-    const mapLink = row.querySelector('.map-link');
-    mapLink.title = t('viewOnMap', coordinates);
-    mapLink.querySelector('.visually-hidden').textContent = t('viewOnMap', coordinates);
+    row.querySelector('.cell-map').appendChild(createMapLink(marker, coordinates));
     const [editButton, deleteButton] = row.querySelectorAll('.row-btn');
     editButton.textContent = t('editAction');
     deleteButton.textContent = t('deleteAction');
@@ -774,13 +782,8 @@ function renderPending() {
         : resolution === 'replace'
           ? 'markConflictDecisionNew'
           : 'markConflictNeedsDecision');
-      const mapLink = document.createElement('a');
-      mapLink.className = 'conflict-map-link';
-      mapLink.href = mapUrl(conflict.incoming);
-      mapLink.target = '_blank';
-      mapLink.rel = 'noopener';
-      mapLink.innerHTML = `${MAP_PIN_SVG}<span></span>`;
-      mapLink.querySelector('span').textContent = t('viewOnMap', coordinates);
+      const mapLink = createMapLink(conflict.incoming, coordinates);
+      mapLink.classList.add('conflict-map-link');
       const choices = document.createElement('div');
       choices.className = 'conflict-options';
       choices.append(

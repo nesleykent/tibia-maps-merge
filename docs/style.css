@@ -1082,21 +1082,8 @@ button { font-family: inherit; }
 }
 
 .conflict-map-link {
-  display: flex;
-  width: max-content;
-  max-width: 100%;
-  align-items: center;
-  gap: var(--ig-space-2);
-  margin: 0 0 var(--ig-space-3);
-  color: var(--accent);
-  font-size: var(--system-12-font-size);
-  font-weight: var(--font-weight-system-semibold);
-  text-decoration: none;
+  margin-bottom: var(--ig-space-3);
 }
-
-.conflict-map-link:hover { text-decoration: underline; }
-
-.conflict-map-link svg { flex: 0 0 auto; }
 
 .conflict-options {
   display: grid;
