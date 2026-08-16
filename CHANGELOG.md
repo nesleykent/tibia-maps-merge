@@ -4,6 +4,14 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.11] - 2026-08-15
+
+### Fixed
+
+- **The tibiamaps.io conflict link now follows the conflict content's leading
+  edge.** It sits directly above the two mark choices instead of floating on
+  the far right of the decision card.
+
 ## [1.18.10] - 2026-08-15
 
 ### Fixed

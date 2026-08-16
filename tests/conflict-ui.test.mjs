@@ -37,4 +37,5 @@ test('bulk conflict and download actions follow trailing macOS hierarchy', async
   assert.match(bulkActions, /class="primary-btn" data-resolution="replace"/);
   assert.match(html, /<div class="panel-actions">\s*<button class="primary-btn" id="add-run"/);
   assert.match(css, /\.panel-actions\s*\{[\s\S]*?justify-content: flex-end/);
+  assert.match(css, /\.conflict-map-link\s*\{[\s\S]*?margin: 0 0 var\(--ig-space-3\);/);
 });
