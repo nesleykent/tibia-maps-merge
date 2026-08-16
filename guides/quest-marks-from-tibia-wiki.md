@@ -1,8 +1,8 @@
-# Generating quest marks from Tibia Wiki with an AI assistant
+# Generating quest markers from Tibia Wiki with an AI assistant
 
 [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/) can turn a
 plain-text list of Tibia coordinates into a ready-to-install
-`minimapmarkers.bin`. Its **Edit Marks** mode accepts one mark per line:
+`minimapmarkers.bin`. Its **Edit Markers** mode accepts one marker per line:
 
 ```text
 x, y, z, Label, icon
@@ -26,7 +26,7 @@ coordinate extraction prompt
         ↓
 x, y, z, Label, icon
         ↓
-Tibia Maps Merge / Edit Marks
+Tibia Maps Merge / Edit Markers
         ↓
 minimapmarkers.bin
         ↓
@@ -36,10 +36,10 @@ Tibia
 The idea is simple: give the assistant a Tibia Wiki quest URL and a
 specialized extraction prompt. It inspects the quest guide and its location
 links, extracts the coordinates used throughout the walkthrough, assigns
-useful labels and marker icons, and returns text you paste straight into Add
-Marks. Tibia Maps Merge handles the marker file itself.
+useful labels and marker icons, and returns text you paste straight into Edit
+Markers. Tibia Maps Merge handles the marker file itself.
 
-> **Just want the coordinates?** Edit Marks can now read an article by itself
+> **Just want the coordinates?** Edit Markers can now read an article by itself
 > — paste the URL into step 2 and it fills the coordinate field with every
 > position the article links to, labelled from the surrounding sentence. That
 > covers extraction. The workflow below is still what gets you *semantic*
@@ -66,7 +66,7 @@ subsections. The extraction prompt collects them into a single marker list.
 
 ## The output format
 
-Every generated mark uses:
+Every generated marker uses:
 
 ```text
 x, y, z, Label, icon
@@ -77,7 +77,7 @@ short description that shows up on the minimap. The final field is the marker
 icon.
 
 Both trailing fields are optional per line. Anything you leave out falls back
-to the **Label** and **Marker icon** fields in Edit Marks, so you can also
+to the **Label** and **Marker icon** fields in Edit Markers, so you can also
 paste bare `x, y, z` lines and label the whole batch at once.
 
 ## Use the icon names the tool actually knows
@@ -113,13 +113,13 @@ Names are case-insensitive, so `RED DOWN` works as well as `red down`.
 
 **An unrecognized name is not an error** — it is treated as part of the label.
 A line ending in `arrowdown` or `dollar` produces a marker labelled
-"… , arrowdown" carrying whatever icon is selected in the Edit Marks form, with
+"… , arrowdown" carrying whatever icon is selected in the Edit Markers form, with
 no warning. That is why the prompt below spells out the exact names. If a
 batch comes back with labels ending in stray icon words, the assistant
 invented names; correct them and paste again.
 
-You can always see the full list in the app: click the icon swatch in Add
-Marks to open the icon sheet, which shows every icon with its name and byte.
+You can always see the full list in the app: click the icon swatch in Edit
+Markers to open the icon sheet, which shows every icon with its name and byte.
 
 ## Semantic marker icons
 
@@ -154,12 +154,12 @@ that link can identify the boss encounter destination: `Sugar Daddy` is then
 `Sugar Daddy, sword`, not an invented `Sugar Daddy Teleport, flag`. A separate
 map link for the physical teleport tile still uses `flag`. If the boss step
 provides only the access coordinate and immediately says the boss is inside,
-the prompt collapses that access into the more useful named boss mark. When
+the prompt collapses that access into the more useful named boss marker. When
 separate access and encounter coordinates exist, it preserves both roles and
 classifies each independently.
 
 Ordinary floor arrows normally need no label. In the supplied default marker
-collection, 3,584 of 4,219 `up`/`down` marks have an empty description; named
+collection, 3,584 of 4,219 `up`/`down` markers have an empty description; named
 ones usually add a real destination or purpose such as `Dessert Dungeons` or
 `To exit`. The prompt therefore emits `x, y, z, , up` or `x, y, z, , down` for
 routine traversal instead of repeating what the icon already says with labels
@@ -174,17 +174,17 @@ The prompt asks the assistant to keep quest progression. If a guide describes:
 NPC → entrance → stairs → lever → chest → teleport → boss
 ```
 
-the marks should follow that sequence rather than being sorted numerically.
+the markers should follow that sequence rather than being sorted numerically.
 The list is then useful both as import data and as a compact representation of
 the walkthrough.
 
-Note that Edit Marks sorts the final file the way the Tibia client does (by
+Note that Edit Markers sorts the final file the way the Tibia client does (by
 floor, then position), so the ordering matters for reading and editing the
 pasted list, not for the resulting `.bin`.
 
 ## One line per coordinate
 
-Edit Marks keys marks by their `(x, y, z)` coordinate — the same rule the merge
+Edit Markers keys markers by their `(x, y, z)` coordinate — the same rule the merge
 pipeline uses. If two lines share a coordinate, the **last one wins** and the
 earlier one is silently dropped.
 
@@ -245,7 +245,7 @@ For Fandom, coordinate-bearing content from spoiler, collapsed and tabbed
 sections is carried inside the prompt. TibiaWikiBR continues to inspect those
 sections through the article URL.
 
-A quick sanity check: if the returned list has only a handful of marks for a
+A quick sanity check: if the returned list has only a handful of markers for a
 long quest, the assistant probably never saw the walkthrough.
 
 ## The prompt
@@ -270,9 +270,9 @@ Running the prompt above against
 [The Dream Courts Quest](https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest)
 looks like this — one plain-text block, ready to copy:
 
-![ChatGPT returning the extracted marks as a single plain-text block](images/chatgpt-extraction.png)
+![ChatGPT returning the extracted markers as a single plain-text block](images/chatgpt-extraction.png)
 
-A run produced these 30 marks, covering the whole quest from the first NPC
+A run produced these 30 markers, covering the whole quest from the first NPC
 through the Ward Stones, the three Haunted Houses and the Nightmare Beast
 items:
 
@@ -311,14 +311,14 @@ items:
 
 Every coordinate above was checked against the article: all 30 appear verbatim
 in the page text, none were invented, every icon name resolved rather than
-leaking into a label, no coordinate is repeated, and the set encodes to a
-valid 1,269-byte `minimapmarkers.bin` that re-parses to the same 30 marks.
+leaking into a label, no coordinate is repeated, and the collection encodes to a
+valid 1,269-byte `minimapmarkers.bin` that re-parses to the same 30 markers.
 
 That run also happened to reach every coordinate the article contains, which
 will not always be the case — the **Review** step is still where you check the
 result against the source.
 
-Paste the output straight into Edit Marks.
+Paste the output straight into Edit Markers.
 
 ### Your run will not match this one exactly
 
@@ -354,11 +354,11 @@ model to change behaviour over time.
 1. Open [Tibia Maps Merge](https://nesleykent.github.io/tibia-maps-merge/).
 2. *Optional* — under the shared **Your markers** area above the tools, load
    your existing `minimapmarkers.bin` or `markers.json`, then select **Edit
-   Marks**. The new marks are merged into it by coordinate, yours winning on a
-   clash, so the download is your whole marker file rather than just the quest
-   marks. Leave it empty to start a new file.
-3. Paste the generated lines into **Coordinates** under **Define marks**, then
-   click **Add N Marks**. Lines that can't be parsed are reported and skipped
+   Markers**. The new markers are merged into it by coordinate, with your
+   markers taking priority in a conflict, so the download is your whole marker file rather than just the quest
+   markers. Leave it empty to start a new file.
+3. Paste the generated lines into **Coordinates** under **Define markers**, then
+   click **Add N to List**. Lines that can't be parsed are reported and skipped
    rather than failing the batch, so a stray line of prose does no harm.
 4. Check the list under **Review**. Each row has **Edit** and **Delete**, so a
    wrong label, coordinate or icon is fixable without regenerating anything.
@@ -374,7 +374,7 @@ sittings before downloading.
 
 ### Combining with community markers
 
-Loading your own file first folds the quest marks into your personal
+Loading your own file first folds the quest markers into your personal
 collection. If you also want tibiamaps.io's community markers, use **Merge
 Mode**: it fetches the latest community markers and merges them with a marker
 file you upload, matching by coordinate with your version winning. So a full
@@ -386,13 +386,13 @@ Community markers          Existing personal markers
                      ↓
              Merged marker file
                      ↓
-              Edit Marks (load it, paste quest marks)
+              Edit Markers (load it, paste quest markers)
                      ↓
         Quest-ready minimapmarkers.bin
 ```
 
 If you later need to recover only your personal portion from that merged file,
-load it once under **Your markers** and use **Extract Own**. It subtracts exact
+load it once under **Your markers** and use **Extract**. It subtracts exact
 Community/Marker Set copies while keeping your custom labels and icons at
 shared coordinates.
 
@@ -405,7 +405,7 @@ GPT run against the article text, unedited. Gemini has produced weaker results
 with the same prompt, particularly on complete coordinate coverage and strict
 adherence to the requested output.
 
-Model behaviour changes over time, so treat the generated marks as extracted
+Model behaviour changes over time, so treat the generated markers as extracted
 data worth verifying against the source article — the **Review** step exists
 for exactly that. See
 [Your run will not match this one exactly](#your-run-will-not-match-this-one-exactly)
@@ -413,13 +413,13 @@ for how much two runs actually differed.
 
 ## Limitations
 
-The quality of the marker set depends on what Tibia Wiki actually exposes.
+The quality of the marker collection depends on what Tibia Wiki actually exposes.
 Some instructions have no linked coordinate at all. Some coordinates describe
 a general area rather than every action inside it. Articles change as
 contributors update walkthroughs.
 
 The prompt deliberately favours directly supported coordinates over invented
-precision, which keeps the generated set traceable back to the quest guide.
+precision, which keeps the generated collection traceable back to the quest guide.
 
 Two hard limits come from the file format itself, both enforced by the app:
 labels are capped at 100 bytes, and floors must be `0`–`15`. Lines that break

@@ -17,10 +17,10 @@ test('conflict decisions use one action vocabulary and expose the map link', asy
   assert.match(app, /createConflictOption\(conflict, 'keep', 'markConflictKeep'\)/);
   assert.match(app, /createConflictOption\(conflict, 'replace', 'markConflictUseNew'\)/);
   assert.doesNotMatch(app, /markConflictInFile|markConflictReviewed|markConflictDecided|markConflictUseReviewed/);
-  assert.match(i18n, /markConflictKeep: 'Keep Existing Mark'/);
-  assert.match(i18n, /markConflictUseNew: 'Use New Mark'/);
-  assert.match(i18n, /markConflictDecisionKeep: 'Decision: Keep Existing Mark'/);
-  assert.match(i18n, /markConflictDecisionNew: 'Decision: Use New Mark'/);
+  assert.match(i18n, /markConflictKeep: 'Keep Existing Marker'/);
+  assert.match(i18n, /markConflictUseNew: 'Use New Marker'/);
+  assert.match(i18n, /markConflictDecisionKeep: 'Decision: Keep Existing Marker'/);
+  assert.match(i18n, /markConflictDecisionNew: 'Decision: Use New Marker'/);
   assert.doesNotMatch(i18n, /Reviewed Mark|Reviewed Marks/);
 });
 

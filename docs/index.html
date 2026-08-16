@@ -16,105 +16,105 @@
     <h1>Tibia Maps Merge</h1>
     <p class="subtitle">Tibia's map changes with every game update, and
       <a href="https://tibiamaps.io/" target="_blank" rel="noopener">tibiamaps.io</a>
-      keeps its community markers updated to match. This merges <em>your</em>
-      personal markers with the latest community ones -- so you get both,
-      with your own winning if you've marked the same spot differently.</p>
+      keeps its community markers updated to match. Merge them with your
+      personal markers so you keep both. Your markers take priority when the
+      same location has a different label or icon.</p>
   </header>
 
   <section class="workspace-source" aria-labelledby="your-markers-title">
     <div class="workspace-source-head">
       <div>
-        <span class="workspace-eyebrow">Shared input</span>
+        <span class="workspace-eyebrow">Your marker file</span>
         <h2 id="your-markers-title">Your markers</h2>
         <p>Load your marker file once, then use it in any of the tools below.</p>
       </div>
-      <button type="button" class="secondary-btn hidden" id="your-markers-clear">Clear file</button>
+      <button type="button" class="secondary-btn hidden" id="your-markers-clear">Remove file</button>
     </div>
     <label class="file-picker workspace-picker">
       <input type="file" multiple accept=".bin,.json" id="your-marker-files">
-      <span class="file-picker-label" data-default="Choose your minimapmarkers.bin or markers.json…">Choose your minimapmarkers.bin or markers.json…</span>
+      <span class="file-picker-label" data-default="Choose a marker file">Choose a marker file</span>
     </label>
     <div class="status-line" id="your-markers-status" aria-live="polite"></div>
-    <p class="micro-hint">Choose more than one file to combine them in picker order; the last file wins at shared coordinates. <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find it?</button> Nothing leaves your browser.</p>
+    <p class="micro-hint">You can select multiple files. For markers at the same location, the last file takes priority. <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where is my marker file?</button> Your files stay on your device.</p>
   </section>
 
   <nav class="mode-tabs" role="tablist" aria-label="Mode">
     <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Merge</button>
-    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Marker Sets</button>
-    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Edit Marks</button>
+    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Collections</button>
+    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Edit Markers</button>
     <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Convert</button>
-    <button class="mode-tab-button" role="tab" id="tab-extract" aria-controls="mode-extract" aria-selected="false" tabindex="-1" data-mode="extract" data-slug="extract-own">Extract Own</button>
+    <button class="mode-tab-button" role="tab" id="tab-extract" aria-controls="mode-extract" aria-selected="false" tabindex="-1" data-mode="extract" data-slug="extract-own">Extract</button>
   </nav>
 
   <section class="mode-panel active" id="mode-merge" role="tabpanel" aria-labelledby="tab-merge">
-    <p class="hint">For everyday use -- merges the latest community markers with yours and gives you a ready-to-install file, an automatic backup of what you uploaded, and a full audit log.</p>
+    <p class="hint"><strong>Recommended.</strong> Merge the latest community markers with yours and download an updated map, a backup of your original markers file, and a detailed merge log.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
           <h3><span class="step-number">1</span>Community markers</h3>
-          <span class="step-note">Fetched from tibiamaps.io</span>
+          <span class="step-note">From tibiamaps.io</span>
         </div>
         <div class="status-line" id="community-status">Loading…</div>
       </li>
 
       <li class="step" id="merge-preview-step">
         <div class="step-head">
-          <h3><span class="step-number">2</span>Review merge</h3>
+          <h3><span class="step-number">2</span>Preview</h3>
         </div>
-        <p class="micro-hint">At a shared coordinate, your marker replaces the community marker's label and icon. The review below shows the exact outcome before download.</p>
+        <p class="micro-hint">For markers at the same location, your marker takes priority. The preview shows what will change before you download.</p>
         <div class="result" id="merge-preview" aria-live="polite"></div>
       </li>
     </ol>
 
     <label class="switch-row">
-      <span>Also export audit files (<code>merged-markers.json</code> + <code>conflicts.json</code>)</span>
+      <span>Include merge details (<code>merged-markers.json</code> + <code>conflicts.json</code>)</span>
       <input type="checkbox" role="switch" class="visually-hidden" id="export-audit">
       <span class="switch" aria-hidden="true"></span>
     </label>
 
-    <button class="primary-btn" id="merge-run" disabled>Download merged minimapmarkers.bin</button>
-    <p class="micro-hint">Downloads a <code>.zip</code> with the merged <code>minimapmarkers.bin</code>, a backup of your original file(s), and <code>merge-log.txt</code>.</p>
+    <button class="primary-btn" id="merge-run" disabled>Download merged files</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the updated <code>minimapmarkers.bin</code>, a backup of your original markers file, and the detailed merge log <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-extract" role="tabpanel" aria-labelledby="tab-extract">
-    <p class="hint">Recover only the markers that are yours from a file that also contains Community markers or published Marker Sets.</p>
+    <p class="hint">Recover your personal markers from a file that also contains community markers or published collections.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Choose published sources to subtract</h3>
-          <button type="button" class="secondary-btn hidden" id="extract-sets-clear">Clear Marker Sets</button>
+          <h3><span class="step-number">1</span>Select what is already in your file</h3>
+          <button type="button" class="secondary-btn hidden" id="extract-sets-clear">Clear selection</button>
         </div>
         <div class="set-choices" id="extract-source-choices" role="group" aria-label="Published sources"></div>
-        <span class="field-label choice-group-label">Marker Sets <span class="step-note">Optional — select every set already included in your file</span></span>
+        <span class="field-label choice-group-label">Collections <span class="step-note">(optional) — Select the collections already in your file</span></span>
         <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
-        <span class="visually-hidden" id="extract-set-choices-label">Marker Sets to subtract</span>
+        <span class="visually-hidden" id="extract-set-choices-label">Markers to identify</span>
         <div class="status-line" id="extract-source-status" aria-live="polite"></div>
       </li>
 
       <li class="step" id="extract-preview-step">
         <div class="step-head">
-          <h3><span class="step-number">2</span>Review extraction</h3>
+          <h3><span class="step-number">2</span>Preview</h3>
         </div>
-        <p class="micro-hint">Exact published copies are removed. A different label or icon at the same coordinate is personal and stays in the result.</p>
+        <p class="micro-hint">Exact matches are removed. A marker with a different label or icon at the same coordinate is treated as yours and kept.</p>
         <div class="result" id="extract-preview"></div>
       </li>
     </ol>
 
-    <button class="primary-btn" id="extract-run" disabled>Download own markers</button>
+    <button class="primary-btn" id="extract-run" disabled>Download my markers</button>
     <p class="micro-hint">Downloads a <code>.zip</code> with <code>own-minimapmarkers.bin</code>, <code>own-markers.json</code>, backups of your uploaded files, and <code>extract-own-log.txt</code>.</p>
     <div class="result" id="extract-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-convert" role="tabpanel" aria-labelledby="tab-convert">
-    <p class="hint">For advanced users -- converts a marker file between formats, with no merging at all. Useful for manual editing, version control, or feeding other tools.</p>
+    <p class="hint">Convert marker files between BIN and JSON. Your markers stay unchanged, ready for manual editing, version control, or use in other apps and tools.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Choose a conversion</h3>
+          <h3><span class="step-number">1</span>Convert to</h3>
         </div>
         <select id="conversion-type" aria-label="Conversion">
           <option value="bin-to-json">minimapmarkers.bin → markers.json</option>
@@ -125,24 +125,24 @@
 
       <li class="step" id="conversion-file-field">
         <div class="step-head">
-          <h3><span class="step-number">2</span>Choose one of your uploaded files</h3>
+          <h3><span class="step-number">2</span>Choose a file</h3>
         </div>
-        <select id="conversion-source" aria-label="Uploaded file to convert"></select>
+        <select id="conversion-source" aria-label="Marker file to convert"></select>
       </li>
     </ol>
 
     <button class="primary-btn" id="convert-run">Download markers.json</button>
-    <p class="micro-hint">Downloads a <code>.zip</code> with the converted file and <code>conversion-log.txt</code>.</p>
+    <p class="micro-hint">Downloads a <code>.zip</code> with the converted marker file and <code>conversion-log.txt</code>.</p>
     <div class="result" id="convert-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
-    <p class="hint">Put a list of marks together -- typed in by hand, or read straight out of a Tibia Wiki quest -- edit it row by row, then add it to your marker file or take it back out.</p>
+    <p class="hint">Create markers yourself or import them from a Tibia Wiki quest, edit them one by one, then add them to or remove them from your map.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Define marks</h3>
+          <h3><span class="step-number">1</span>Define markers</h3>
         </div>
         <div class="marker-form">
           <div class="field field-full">
@@ -161,7 +161,7 @@
             <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
 31938, 31652, 10
 32057, 32792, 13"></textarea>
-            <p class="micro-hint">One mark per line: <code>x, y, z</code>. Give a line its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">See the icon names</button></p>
+            <p class="micro-hint">One marker per line: <code>x, y, z</code>. Give a marker its own label and icon by appending them -- <code>32250, 31385, 5, Depot, flag</code> -- otherwise it uses the two fields below. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">See the icon names</button></p>
           </div>
           <div class="field field-side">
             <span class="field-label" id="mark-icon-label">Marker icon</span>
@@ -199,10 +199,10 @@
           <h3><span class="step-number">3</span>Add or remove</h3>
         </div>
         <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
-          <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Add to my file</span></label>
-          <label class="direction"><input type="radio" name="mark-direction" value="remove"><span>Remove from my file</span></label>
+          <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Add to my map</span></label>
+          <label class="direction"><input type="radio" name="mark-direction" value="remove"><span>Remove from my map</span></label>
         </div>
-        <span class="visually-hidden" id="mark-direction-label">What to do with the marks above</span>
+        <span class="visually-hidden" id="mark-direction-label">What to do with the markers above</span>
         <p class="micro-hint" id="mark-direction-hint"></p>
         <div class="result" id="mark-preview"></div>
       </li>
@@ -214,44 +214,44 @@
   </section>
 
   <section class="mode-panel" id="mode-sets" role="tabpanel" aria-labelledby="tab-sets">
-    <p class="hint">Apply a ready-made collection of marks to your file -- or take one back out. Useful for event, achievement and respawn markers. For marks you put together yourself, use <strong>Edit Marks</strong>.</p>
+    <p class="hint">Add a published marker collection to your map or remove a collection from your map. For markers you create yourself, use <strong>Edit Markers</strong>.</p>
 
     <ol class="steps">
       <li class="step">
         <div class="step-head">
-          <h3><span class="step-number">1</span>Choose marks</h3>
-          <span class="step-note">Pick one or more</span>
-          <button class="secondary-btn hidden" id="sets-clear">Clear Selection</button>
+          <h3><span class="step-number">1</span>Choose collections</h3>
+          <span class="step-note">Select one or more collections</span>
+          <button class="secondary-btn hidden" id="sets-clear">Clear selection</button>
         </div>
         <div class="set-choices" id="set-choices" role="group" aria-labelledby="set-choices-label"></div>
-        <span class="visually-hidden" id="set-choices-label">Marks to apply</span>
-        <p class="set-explainer hidden" id="set-note-points-of-interest">The <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> scatters Points of Interest across each subarea you start discovering, in different spots for every character. This collection is every position one can turn up in -- 5,205 of them, and 98% carry no label, because it is a search list to hunt through rather than a set of marks meant to stay in your file. Load it while you are looking, then remove it here when you are done.</p>
+        <span class="visually-hidden" id="set-choices-label">Selected markers</span>
+        <p class="set-explainer hidden" id="set-note-points-of-interest">The <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> scatters Points of Interest across each subarea you start discovering, in different spots for every character. This collection includes every position where one can appear -- 5,205 markers, 98% without a label. It is a temporary search list, not a collection meant to stay on your map. Add it while you are looking, then remove it when you are done.</p>
         <div class="status-line" id="sets-source-status"></div>
-        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time. Pick as many as you like; a mark in two of them counts once.</p>
+        <p class="micro-hint">Collections come from <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">tibiamaps.io's published marker data</a>, read fresh each time. Select as many as you like; duplicate markers are added once.</p>
       </li>
 
       <li class="step hidden" id="sets-apply-step">
         <div class="step-head">
-          <h3><span class="step-number">2</span>Add or remove</h3>
+          <h3><span class="step-number">2</span>Apply to your map</h3>
         </div>
         <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
-          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Add to my file</span></label>
-          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remove from my file</span></label>
+          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Add collection to my map</span></label>
+          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remove collection from my map</span></label>
         </div>
-        <span class="visually-hidden" id="direction-label">What to do with those marks</span>
+        <span class="visually-hidden" id="direction-label">What to do with the selected markers</span>
         <div class="result" id="sets-preview"></div>
       </li>
     </ol>
 
-    <button class="primary-btn" id="sets-run" disabled>Download minimapmarkers.bin</button>
-    <p class="micro-hint">Downloads a <code>.zip</code> with the updated <code>minimapmarkers.bin</code>, a backup of the file you loaded, and <code>marker-sets-log.txt</code>.</p>
+    <button class="primary-btn" id="sets-run" disabled>Download your updated map</button>
+    <p class="micro-hint">Downloads a <code>.zip</code> with your updated map, a backup of the marker file you loaded, and <code>marker-sets-log.txt</code>.</p>
     <div class="result" id="sets-result"></div>
   </section>
 
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
     <div class="sheet-head"><h3 id="assistant-title">Other Assistants</h3></div>
     <div class="sheet-body">
-      <p>The same wiki-specific prompt, sent somewhere other than ChatGPT. Most open with it included; Gemini fetches and copies its source-backed prompt before opening, so paste it there. Then paste the returned marks into <strong>Coordinates</strong>.</p>
+      <p>The same wiki-specific prompt, sent somewhere other than ChatGPT. Most open with it included; Gemini fetches and copies its source-backed prompt before opening, so paste it there. Then paste the returned markers into <strong>Coordinates</strong>.</p>
       <p class="sheet-note">Most of these need you to be signed in. Gemini receives an app-fetched TibiaWikiBR source excerpt; the other assistants keep TibiaWikiBR URL-only.</p>
       <div class="assistant-list" id="assistant-list"></div>
     </div>
@@ -263,7 +263,7 @@
   <dialog class="sheet" id="icon-names-sheet" aria-labelledby="icon-names-title">
     <div class="sheet-head"><h3 id="icon-names-title">Icon Names</h3></div>
     <div class="sheet-body">
-      <p>Type one of these as the last value on a line to give that mark its own icon -- <code>32250, 31385, 5, Depot, flag</code>. Names are case-insensitive. Anything unrecognised is read as part of the label instead, so it has to match exactly. The byte on the right is what ends up in <code>minimapmarkers.bin</code>.</p>
+      <p>Type one of these as the last value on a line to give that marker its own icon -- <code>32250, 31385, 5, Depot, flag</code>. Names are case-insensitive. Anything unrecognised is read as part of the label instead, so it has to match exactly. The byte on the right is what ends up in <code>minimapmarkers.bin</code>.</p>
       <div class="icon-names" id="icon-names-list"></div>
     </div>
     <div class="sheet-actions">
@@ -273,7 +273,7 @@
 
   <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-sheet-title">
     <form method="dialog">
-      <div class="sheet-head"><h3 id="edit-sheet-title">Edit Mark</h3></div>
+      <div class="sheet-head"><h3 id="edit-sheet-title">Edit Marker</h3></div>
       <div class="sheet-body">
         <div class="marker-form">
           <div class="field field-coord">
@@ -307,13 +307,13 @@
   </dialog>
 
   <dialog class="sheet sheet-confirm" id="clear-sheet" aria-labelledby="clear-sheet-title">
-    <div class="sheet-head"><h3 id="clear-sheet-title">Remove All Marks?</h3></div>
+    <div class="sheet-head"><h3 id="clear-sheet-title">Remove All Markers?</h3></div>
     <div class="sheet-body">
-      <p>Every mark in the list will be removed. This can't be undone. Any marker file you loaded is untouched.</p>
+      <p>Every marker in the list will be removed. This can't be undone. Any marker file you loaded is untouched.</p>
     </div>
     <div class="sheet-actions">
       <button type="button" class="tertiary-btn" id="clear-cancel">Cancel</button>
-      <button type="button" class="destructive-btn" id="clear-confirm">Remove All Marks</button>
+      <button type="button" class="destructive-btn" id="clear-confirm">Remove All Markers</button>
     </div>
   </dialog>
 
@@ -323,11 +323,10 @@
       <ol>
         <li>We fetch the latest community markers straight from tibiamaps.io -- the same file it uses for its own map installer, so it's always current with the latest Tibia update.</li>
         <li>You upload your own markers -- the <code>minimapmarkers.bin</code> file from your Tibia client's <code>minimap</code> folder (or a <code>markers.json</code>, if you already have one).</li>
-        <li>We merge them, entirely in your browser -- markers are matched by their map coordinates. If you and the community both marked the same spot, yours wins.</li>
-        <li>You get a new <code>minimapmarkers.bin</code> back, plus a backup of what you uploaded and a full log of what changed. Drop the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
+        <li>We merge them on your device -- markers are matched by their map coordinates. If you and the community both marked the same location, your marker takes priority.</li>
+        <li>You get a new <code>minimapmarkers.bin</code>, plus a backup of your original markers file and a detailed merge log. Put the new file into that same <code>minimap</code> folder (replacing the old one) and restart your Tibia client.</li>
       </ol>
-      <p class="micro-hint">That's <strong>Merge</strong>, the first of the four tabs. If you just want to convert a file between formats without merging anything -- for manual editing, version control, or other tools -- switch to <strong>Convert</strong>. And if you want to put a list of marks together yourself -- typed in by hand, or read out of a
-        quest article -- use <strong>Edit Marks</strong>, which adds that list to your file or takes it back out. <strong>Marker Sets</strong> does the same with a ready-made collection.</p>
+      <p class="micro-hint">That's <strong>Merge</strong>, the first of five tabs. Use <strong>Collections</strong> to add or remove a published collection, <strong>Edit Markers</strong> to create your own markers, <strong>Convert</strong> to switch between BIN and JSON, or <strong>Extract</strong> to recover your personal markers from a mixed file.</p>
     </div>
     <div class="sheet-actions">
       <button type="button" class="primary-btn" data-close-sheet="how-it-works-sheet">Done</button>
@@ -335,7 +334,7 @@
   </dialog>
 
   <dialog class="sheet" id="file-location-sheet" aria-labelledby="file-location-title">
-    <div class="sheet-head"><h3 id="file-location-title">Where Do I Find My minimapmarkers.bin?</h3></div>
+    <div class="sheet-head"><h3 id="file-location-title">Where Is My Marker File?</h3></div>
     <div class="sheet-body">
       <dl>
         <dt>Windows</dt><dd><code>%LOCALAPPDATA%\Tibia\packages\Tibia\minimap</code></dd>
@@ -351,12 +350,12 @@
 
 
   <aside class="disclaimer">
-    <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH, and the marker icons shown here are the Tibia client's own minimap symbols. Community marker data is fetched live and unmodified from tibiamaps.io's public download -- full credit for that data belongs to tibiamaps.io and its contributors. This tool only combines it with your own markers, entirely in your browser; nothing is uploaded anywhere.</p>
+    <p>This is an independent, unofficial tool, not affiliated with, endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. <strong>Tibia</strong> is a registered trademark of CipSoft GmbH, and the marker icons shown here are the Tibia client's own minimap symbols. Community marker data is provided by tibiamaps.io and its contributors and used directly from tibiamaps.io's public download. Processing happens on your device; your marker files stay on your device.</p>
   </aside>
 
   <footer>
     <button type="button" class="link-btn" data-open-sheet="how-it-works-sheet">How it works</button>
-    · <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where do I find my file?</button>
+    · <button type="button" class="link-btn" data-open-sheet="file-location-sheet">Where is my marker file?</button>
     · <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Source on GitHub</a>
     · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
   </footer>

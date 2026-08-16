@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
-test('Extract Own uses the shared persistent review and standard page action structure', async () => {
+test('Extract uses the shared persistent review and standard page action structure', async () => {
   const [app, css, english, portuguese] = await Promise.all([
     read('../docs/app.js'),
     read('../docs/style.css'),

@@ -19,8 +19,8 @@ the live community `minimapmarkers.bin` straight out of tibiamaps.io's own
 ["minimap with markers"](https://tibiamaps.io/downloads/minimap-with-markers)
 download (the same file the site itself distributes -- so it's always current
 with the latest game update). **Your markers** is one shared upload above the
-tools: choose the file once and Merge, Extract Own, Convert, Edit Marks and
-Marker Sets all use it. Clear it there to switch files. Five modes:
+tools: choose the file once and Merge, Collections, Edit Markers, Convert, and
+Extract all use it. Remove it there to switch files. Five modes:
 
 - **Merge** -- your uploaded marker file(s) (`minimapmarkers.bin` from
   your Tibia client, or `markers.json`) are merged with the live
@@ -33,14 +33,14 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   every detected conflict). An "export audit files" checkbox adds
   `merged-markers.json` and `conflicts.json` for manual editing or
   third-party tooling.
-- **Extract Own** -- recovers personal markers from a file that already mixes
+- **Extract** -- recovers personal markers from a file that already mixes
   them with Community markers and/or any combination of the nine published
-  Marker Sets. It subtracts exact published copies, while preserving a marker
+  collections. It subtracts exact published copies, while preserving a marker
   at a shared coordinate when its label or icon differs -- that is a personal
   override, not published data. Its persistent review explains what input is
   needed and previews exact copies removed, overrides kept, unique personal
-  marks, and the final total before download. Community and Marker Set sources
-  use the exact same selection-card component and CSS as the Marker Sets
+  markers, and the final total before download. Community and collection sources
+  use the exact same selection-card component and CSS as the Collections
   workflow, including its selected-state treatment.
   The download contains both
   `own-minimapmarkers.bin` and `own-markers.json`, backups, and an audit log.
@@ -49,15 +49,15 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   straight to `community-markers.json`. Downloads a `.zip` with the
   converted file and `conversion-log.txt` (source/output format, marker
   count, and a real round-trip validation check).
-- **Edit Marks** -- put a list of marks together yourself, edit it, then add
+- **Edit Markers** -- create a list of markers yourself, edit it, then add
   it to your marker file or take it back out. One path, top to bottom: **1**
-  define marks, **2** review, **3** add or remove, then download. The shared
+  define markers, **2** review, **3** add or remove, then download. The shared
   upload is optional when adding -- load your own `minimapmarkers.bin` or
-  `markers.json` above the tools and the new marks are merged into it
+  `markers.json` above the tools and the new markers are merged into it
   by coordinate, yours winning on a clash, so the download is your whole
-  marker file rather than just the new marks; leave it empty and you get a
-  file containing only what you typed. Step 1 is a single form for one mark
-  or a hundred: a coordinate field taking one mark per line (`x, y, z`),
+  marker file rather than just the new markers; leave it empty and you get a
+  file containing only what you typed. Step 1 is a single form for one marker
+  or a hundred: a coordinate field taking one marker per line (`x, y, z`),
   plus a label and icon applied to the batch, either of which a line can
   override by appending its own (`32250, 31385, 5, Depot, flag`).
   Unparseable lines are reported and skipped rather than failing the batch.
@@ -80,12 +80,12 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   Download remains disabled until every conflict has a decision. That is what
   makes rewriting labels and icons deliberate instead of implicit. Removing
   is what clears a quest's
-  marks once you are done with it: import the quest, delete any row you want
+  markers once you are done with it: import the quest, delete any row you want
   to keep, remove. With no file loaded the step stays hidden -- there is
   nothing to remove from, so the only possible outcome is a new file.
   Downloads a `.zip` with the new `minimapmarkers.bin`, a backup of any file
   you loaded, and `edit-marks-log.txt`. The log records every coordinate-level
-  conflict decision and both versions of each conflicting mark.
+  conflict decision and both versions of each conflicting marker.
 
   The icon picker covers all 20 marker types the binary format defines --
   the list is derived from the same `ICONS_BY_ID` table the parser and
@@ -96,16 +96,16 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   sprite sheet the [TibiaWiki Mapper](https://tibia.fandom.com/wiki/Mapper)
   uses (`docs/assets/minimap-symbols.png`); its slot order is not the
   format's byte order, so the mapping is pinned by a test.
-- **Marker Sets** -- the same add/remove, with a ready-made collection in
+- **Collections** -- the same add/remove, with a published collection in
   place of a list you assembled. The collections are the ones tibiamaps.io
   publishes alongside its map data
   ([`extra/`](https://github.com/tibiamaps/tibia-map-data/tree/main/extra) --
   all nine of them: Achievements, Rapid Respawn, Points of Interest,
   Anniversary, Lightbearer, Orcsoberfest Island, Percht Island, Devovorga and
   Ignore), read live from that repository; a test asserts the picker matches
-  what is published, in both directions, since a missing set is invisible in
+  what is published, in both directions, since a missing collection is invisible in
   the UI. Any number of collections can be picked at once and are applied
-  together; where two name the same coordinate the mark counts once, decided
+  together; where two name the same coordinate the marker counts once, decided
   by picker order so the preview always matches the download, and both the
   preview and the log say how many were double-counted. Each card carries the
   date its `markers.json` last changed, which
@@ -114,20 +114,20 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
   the tab is first opened and cached for half a day, since that API allows 60
   unauthenticated requests an hour and there is no single request that answers
   for all nine. A card simply carries no date if that fails. Nothing else is
-  fetched until a collection is picked -- one of them is over 5,000 markers. Adding follows the opposite precedence to Edit Marks:
-  a published collection fills gaps and *your* file wins, because those marks
+  fetched until a collection is picked -- one of them is over 5,000 markers. Adding follows the opposite precedence to Edit Markers:
+  a published collection fills gaps and *your* file wins, because those markers
   are not yours. The step shows what will change before you download.
   Points of interest carries a note about where it comes from -- the
   [Measuring Tibia Quest](https://tibia.fandom.com/wiki/Measuring_Tibia_Quest)
   scatters PoIs differently for every character, so the collection is every
-  position one can appear in: a search list, not marks meant to stay.
+  position one can appear in: a search list, not markers meant to stay.
 
 ### Guides
 
 - [**End-to-end user UX workflow**](guides/user-ux-workflow.md)
   -- maps the shared entry, all five tool branches, state and persistence,
   recovery paths, accessibility risks, and the external install/return loop.
-- [**Generating quest marks from Tibia Wiki with an AI assistant**](guides/quest-marks-from-tibia-wiki.md)
+- [**Generating quest markers from Tibia Wiki with an AI assistant**](guides/quest-marks-from-tibia-wiki.md)
   -- give the app a Tibia Wiki quest URL and hand a wiki-specific extraction
   prompt to ChatGPT to get back `x, y, z, Label, icon` lines for every NPC,
   entrance, floor transition, item and boss in the walkthrough. TibiaWikiBR
@@ -174,7 +174,7 @@ text lives directly in each language's HTML file; the handful of strings
 The five modes are a real tablist: `role="tablist"` with `aria-selected` and
 `aria-controls`, each panel a `tabpanel` named by its tab, a roving tabindex
 so the group is a single tab stop, and arrow keys (plus Home/End) moving
-between them. The bar is sticky, since Edit Marks runs well past a screen.
+between them. The bar is sticky, since Edit Markers runs well past a screen.
 The current mode lives in the URL (`#merge`, `#extract-own`, `#convert`,
 `#edit-marks`, `#marker-sets`) so it can be linked to and survives a reload -- the same slugs
 in both languages, set with `replaceState` so a tab does not cost a press of
@@ -195,7 +195,7 @@ numbered steps, one prominent action per panel, and a primary action that
 names what it produces (in Convert the label follows the chosen conversion).
 All page-level download actions use the same leading alignment; trailing
 action placement is reserved for sheets and dialogs.
-Temporary contexts -- editing a mark, confirming a removal, picking an icon
+Temporary contexts -- editing a marker, confirming a removal, picking an icon
 -- are sheets with `Cancel` leading and the completing action trailing, per
 the macOS convention.
 
@@ -316,11 +316,11 @@ endorsed by, or sponsored by CipSoft GmbH or tibiamaps.io. **Tibia** is a
 registered trademark of CipSoft GmbH; see [tibia.com](https://www.tibia.com/)
 for the actual game.
 
-Community marker data is fetched live and unmodified from
+Community marker data is provided by
 [tibiamaps.io's public "minimap with markers" download](https://tibiamaps.io/downloads/minimap-with-markers).
-Full credit for that data belongs to [tibiamaps.io](https://tibiamaps.io/)
-and its contributors -- this project only combines it with your own
-personal markers, entirely in your browser; nothing is uploaded anywhere.
+It is used directly from [tibiamaps.io](https://tibiamaps.io/) and its
+contributors. Processing happens on your device, and your marker files stay
+on your device.
 
 The binary minimap/marker file formats this project implements from
 scratch (in both the web app's JS and the CLI's Python) are documented by

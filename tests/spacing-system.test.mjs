@@ -23,7 +23,7 @@ test('layout spacing uses the shared token scale instead of raw lengths', async 
   assert.match(css, /--selection-check-size:\s*calc\(var\(--ig-space-3\) \+ var\(--space-optical-nudge\)\)/);
 });
 
-test('Extract Own separates its published-source groups with the shared scale', async () => {
+test('Extract separates its published-source groups with the shared scale', async () => {
   const css = await readStyles();
 
   assert.match(

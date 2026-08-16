@@ -106,10 +106,10 @@ test('audit log records the selected policy and both sides of each conflict', ()
     addedMarkers: reviewed,
   }, 'en');
 
-  assert.match(log, /Conflict policy: keep the mark already in the loaded file/);
-  assert.match(log, /Different marks at the same coordinate: 1/);
+  assert.match(log, /Conflict policy: keep the marker already in the loaded file/);
+  assert.match(log, /Different markers at the same coordinate: 1/);
   assert.match(log, /Original label.*Reviewed label/);
-  assert.match(log, /kept loaded-file mark/);
+  assert.match(log, /kept loaded-file marker/);
 });
 
 test('audit log records mixed coordinate-by-coordinate conflict decisions', () => {
@@ -140,6 +140,6 @@ test('audit log records mixed coordinate-by-coordinate conflict decisions', () =
   }, 'en');
 
   assert.match(log, /reviewed individually, coordinate by coordinate/);
-  assert.match(log, /kept loaded-file mark/);
-  assert.match(log, /used new mark/);
+  assert.match(log, /kept loaded-file marker/);
+  assert.match(log, /used new marker/);
 });
