@@ -49,6 +49,24 @@ test('prompt teaches raw MediaWiki retrieval and both coordinate encodings', asy
   assert.match(prompt, /dot is a sector\/offset delimiter, not a decimal point/);
 });
 
+test('prompt cannot short-circuit to an empty block before retrieval', async () => {
+  const prompt = await loadQuestPromptTemplate();
+  const gateAt = prompt.indexOf('## Mandatory Retrieval Gate — No Early Exit');
+  const emptyFallbackAt = prompt.indexOf('An empty result is permitted only');
+
+  assert.ok(gateAt >= 0);
+  assert.ok(emptyFallbackAt > gateAt);
+  assert.match(prompt, /retrieval is an action you must actually perform/);
+  assert.match(prompt, /first source action must be an actual request/);
+  assert.match(prompt, /failed rendered-page or browser request[\s\S]*does not count as the API retrieval attempt/);
+  assert.match(prompt, /Do not call a page inaccessible unless you actually issued its API request/);
+  assert.match(prompt, /Fandom URL[\s\S]*must actually request the `\/Spoiler` title/);
+  assert.match(prompt, /empty fallback is never the default/);
+  assert.match(prompt, /Actually issue the request for `parse\.wikitext`/);
+  assert.match(prompt, /opening triple-backtick fence immediately followed on the next line by the closing triple-backtick fence/);
+  assert.match(prompt, /no spaces, blank content line, or other whitespace between the fences/);
+});
+
 test('boss destinations are not mislabeled as the teleport used to reach them', async () => {
   const prompt = await loadQuestPromptTemplate();
 

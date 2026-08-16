@@ -4,6 +4,18 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.4] - 2026-08-15
+
+### Fixed
+
+- **The assistant prompt can no longer treat an empty marks block as its
+  default response.** A mandatory retrieval gate now requires an actual
+  `parse.wikitext` API request, requires Fandom's `/Spoiler` request when the
+  main source fails or contains no coordinates, and permits an empty result
+  only after the applicable retrieval and two-pass inspection have really
+  occurred. It also defines an empty block as two fence lines with no
+  intervening whitespace.
+
 ## [1.18.3] - 2026-08-15
 
 ### Changed

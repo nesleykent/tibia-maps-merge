@@ -8,7 +8,17 @@ The user supplies one value:
 
 `QUEST_URL: {{QUEST_URL}}`
 
-If the URL is missing, inaccessible, or not a Tibia Wiki quest article, do not invent data. Return an empty fenced code block.
+## Mandatory Retrieval Gate — No Early Exit
+
+For every syntactically valid Tibia Wiki quest URL, retrieval is an action you must actually perform, not a workflow to summarize or skip. Do not produce the final response, including an empty code block, until you have completed every applicable retrieval and inspection step below.
+
+- Your first source action must be an actual request to the page's MediaWiki API for `parse.wikitext`.
+- A failed rendered-page or browser request, bot challenge, search snippet, prior assumption, or absence of coordinates in visible page text does not count as the API retrieval attempt.
+- Do not call a page inaccessible unless you actually issued its API request and that request failed or returned no usable `parse.wikitext`.
+- For a Fandom URL, if the main API request fails, returns no usable wikitext, or yields no supported coordinates, you must actually request the `/Spoiler` title before deciding the result is empty.
+- After successful retrieval, inspect the complete applicable wikitext twice as required. Finding no coordinates without performing those passes does not satisfy this gate.
+
+An empty result is permitted only when the URL is missing or cannot be parsed as a Tibia Wiki article URL, every API request required above was actually attempted but no usable source could be retrieved, or the complete retrieved source was inspected as required and contains no supported coordinates. The empty fallback is never the default. Never invent coordinates when retrieval genuinely fails.
 
 ## Retrieve the Wiki Source Correctly
 
@@ -17,7 +27,7 @@ Do not scrape or depend on the rendered Fandom article. Retrieve the article's r
 1. Derive the page title from the supplied URL. For `/wiki/Page_Title`, use the path after `/wiki/`; for `/index.php?title=Page_Title`, use the `title` query parameter. URL-decode it and treat underscores as spaces.
 2. Use the supplied URL's own origin and request `/api.php` with these parameters: `action=parse`, `page=<page title>`, `prop=wikitext`, `format=json`, `formatversion=2`, `redirects=1`, and `origin=*`.
 3. Read the raw article source from the JSON response's `parse.wikitext` field. Do not substitute rendered HTML from `parse.text`, a browser DOM, or the public article page.
-4. On `tibia.fandom.com`, the walkthrough commonly lives at `<page title>/Spoiler`. If the requested article's wikitext contains no supported quest coordinates and the title does not already end in `/Spoiler`, repeat the same API request for that subpage and use it when it contains coordinates.
+4. On `tibia.fandom.com`, the walkthrough commonly lives at `<page title>/Spoiler`. If the requested article API request fails, returns no usable wikitext, or the retrieved wikitext contains no supported quest coordinates, and the title does not already end in `/Spoiler`, repeat the same API request for that subpage and use it when it contains coordinates.
 
 Equivalent request shape:
 
@@ -47,7 +57,7 @@ For every Fandom X or Y value, keep the digits before and after the dot separate
 
 ## Required Workflow
 
-1. Retrieve `parse.wikitext` through the MediaWiki API exactly as described above, following Fandom's `/Spoiler` subpage when required.
+1. Actually issue the request for `parse.wikitext` through the MediaWiki API exactly as described above; do not merely state that it should be requested. Actually issue Fandom's `/Spoiler` request when the retrieval gate requires it.
 2. Read the entire raw wikitext once to understand the quest stages and progression.
 3. Traverse the wikitext again from beginning to end and collect every exact coordinate from quest-relevant prose, wikilinks, `Mapa`, `Mapper Coords`, and `Minimap` templates, including spoiler, hidden, collapsed, or tabbed sections.
 4. For each coordinate, determine what exists or happens there from the template's link text or `text=` value, surrounding wikitext, nearby heading, previous and next steps, source endpoint, destination endpoint, paired transition, and map context.
@@ -78,7 +88,7 @@ Requirements:
 - `icon` must be one of the exact icon tokens listed below.
 - Output no headings, explanations, sources, comments, totals, bullets, numbering, blank commentary, or Markdown tables inside the code block.
 - Output each exact `(x, y, z)` tuple once only.
-- If no supported coordinates exist, return an empty code block.
+- If and only if the Mandatory Retrieval Gate permits an empty result, return exactly two lines: an opening triple-backtick fence immediately followed on the next line by the closing triple-backtick fence. Put no spaces, blank content line, or other whitespace between the fences.
 
 ## Allowed Icon Tokens
 
@@ -271,6 +281,9 @@ These examples explain the format only. Never include them in the final result u
 Before responding, confirm all of the following silently:
 
 - The response contains exactly one unlabeled fenced code block and nothing else.
+- The main `parse.wikitext` API request was actually attempted for every valid article URL; it was not merely planned or described.
+- When a Fandom main-page request failed, returned no usable wikitext, or yielded no supported coordinate, the `/Spoiler` API request was actually attempted before concluding that the result was empty.
+- If the result is empty, the Mandatory Retrieval Gate is satisfied and the block contains no whitespace or blank content line between its two fence lines.
 - Every nonempty line has exactly five comma-separated fields.
 - Every coordinate is directly supported by `parse.wikitext` for the supplied Tibia Wiki article or its Fandom `/Spoiler` subpage.
 - No coordinate was estimated or imported from prior knowledge.
