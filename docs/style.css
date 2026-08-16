@@ -412,15 +412,18 @@ header h1 {
   overflow-x: auto;
   border-bottom: 1px solid var(--border);
   scrollbar-width: none;
-  /* A CSS-only scroll shadow: the two --bg-coloured gradients scroll with the
-     content and occlude the two shadow gradients wherever there's nothing
-     left to reveal, so the fade only shows on the side that still has
-     off-screen tabs -- exactly what tells a narrow viewport that Marker Sets
-     is still reachable, without a fixed affordance sitting there needlessly
-     on wide screens where every tab already fits. */
-  background:
-    linear-gradient(to right, var(--bg) 40%, transparent),
-    linear-gradient(to left, var(--bg) 40%, transparent) 100% 0,
+  /* A CSS-only scroll shadow. The solid --bg fill is what actually hides
+     content scrolling up behind the sticky strip -- an earlier version of
+     this rule dropped it in favor of two narrow cover gradients, which left
+     everything past their first few pixels transparent and let scrolled
+     content show through the middle of the strip. The two --bg-coloured
+     gradients on top of that fill scroll WITH the content and occlude the
+     two shadow gradients wherever there's nothing left to reveal, so the
+     fade only shows on the side that still has off-screen tabs. */
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, var(--bg), var(--bg) 40%, transparent),
+    linear-gradient(to left, var(--bg), var(--bg) 40%, transparent) 100% 0,
     linear-gradient(to right, rgba(0, 0, 0, .16), transparent 20px),
     linear-gradient(to left, rgba(0, 0, 0, .16), transparent 20px) 100% 0;
   background-repeat: no-repeat;

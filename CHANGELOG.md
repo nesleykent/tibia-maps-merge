@@ -4,6 +4,17 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.19.1] - 2026-08-16
+
+### Fixed
+
+- **The sticky tab strip was transparent through most of its width**, so
+  content scrolling up from below showed straight through it instead of
+  being hidden -- most visible with the Edit Marks selection toolbar text
+  bleeding into the tab labels. The strip's scroll-shadow effect (added in
+  1.19.0) had dropped the solid background fill it needs underneath the
+  shadow gradients; restored.
+
 ## [1.19.0] - 2026-08-16
 
 ### Added
