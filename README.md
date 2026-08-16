@@ -124,6 +124,9 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
 
 ### Guides
 
+- [**End-to-end user UX workflow**](guides/user-ux-workflow.md)
+  -- maps the shared entry, all five tool branches, state and persistence,
+  recovery paths, accessibility risks, and the external install/return loop.
 - [**Generating quest marks from Tibia Wiki with an AI assistant**](guides/quest-marks-from-tibia-wiki.md)
   -- give the app a Tibia Wiki quest URL and hand a wiki-specific extraction
   prompt to ChatGPT to get back `x, y, z, Label, icon` lines for every NPC,
