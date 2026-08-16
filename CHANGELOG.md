@@ -4,6 +4,17 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.3] - 2026-08-15
+
+### Changed
+
+- **Restored the complete pre-redesign interface.** The page structure,
+  spacing, typography, controls, icon grid, marker table, dialogs, responsive
+  behavior, copy, and original rose-to-magenta-to-purple branded header now
+  match commit `1ae79db`. Marker conflict review, the shared marker upload,
+  personal-marker extraction, and the newer coordinate-extraction prompt
+  remain available.
+
 ## [1.18.2] - 2026-08-15
 
 ### Fixed

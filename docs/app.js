@@ -501,7 +501,6 @@ const wikiStatus = document.getElementById('wiki-status');
 const coordsField = document.getElementById('mark-coords');
 const markLabelField = document.getElementById('mark-label');
 const addButton = document.getElementById('add-marks');
-const addDraftCancel = document.getElementById('add-draft-cancel');
 const addFeedback = document.getElementById('add-feedback');
 const addRows = document.getElementById('add-rows');
 const reviewStep = document.getElementById('review-step');
@@ -518,26 +517,22 @@ const editFieldZ = document.getElementById('edit-z');
 const editFieldLabel = document.getElementById('edit-label');
 const editMessage = document.getElementById('edit-message');
 const clearSheet = document.getElementById('clear-sheet');
-const markIconOpen = document.getElementById('mark-icon-open');
-const markIconCurrent = document.getElementById('mark-icon-current');
-const markIconName = document.getElementById('mark-icon-name');
-const editIconOpen = document.getElementById('edit-icon-open');
-const editIconCurrent = document.getElementById('edit-icon-current');
-const editIconName = document.getElementById('edit-icon-name');
-const iconPickerSheet = document.getElementById('icon-picker-sheet');
 
 /**
- * Build an icon radio group. The main form and edit sheet keep hidden groups
- * as their canonical state; a focused chooser presents the same values with
- * names and applies a selection only when its trailing action is confirmed.
- * The numeric type byte is resolved by the encoder, never stored in the UI.
+ * Build the icon picker in `container`: every marker type the format supports,
+ * laid out as one grid you pick from directly. No dropdown and no sheet in
+ * between -- choosing an icon is a single click on the icon itself.
+ *
+ * Backed by real radio inputs, so the group behaves the way a picker should:
+ * one selection, arrow keys move between options, and each option carries its
+ * icon's name for screen readers. The values are the canonical icon names --
+ * the numeric type byte is looked up from those by the encoder, never stored
+ * in the UI.
  */
 function mountIconField(container) {
   const group = container.dataset.iconField;
   container.setAttribute('role', 'radiogroup');
-  const labelElement = document.getElementById(`${group}-label`);
-  if (labelElement) container.setAttribute('aria-labelledby', labelElement.id);
-  else container.setAttribute('aria-label', document.getElementById('icon-picker-title')?.textContent ?? 'Marker icon');
+  container.setAttribute('aria-labelledby', `${group}-label`);
 
   for (const { id, name } of MARKER_ICONS) {
     const choice = document.createElement('label');
@@ -556,7 +551,7 @@ function mountIconField(container) {
     glyph.innerHTML = iconGlyph(name, { size: 22 });
 
     const label = document.createElement('span');
-    label.className = container.classList.contains('icon-field-sheet') ? 'icon-choice-name' : 'visually-hidden';
+    label.className = 'visually-hidden';
     label.textContent = iconLabel(name);
 
     choice.append(input, glyph, label);
@@ -576,9 +571,9 @@ function mountIconField(container) {
 }
 
 // ---------- Icon name reference ----------
-// Coordinate lines use canonical icon names, so keep the complete name/byte
-// reference available from the hint even though the focused chooser also
-// presents a human-readable name for every symbol.
+// The picker itself shows icons only -- names would just be noise to anyone
+// who plays the game. They matter in one place: typing an icon at the end of
+// a coordinate line, so they live in a reference sheet opened from that hint.
 document.getElementById('icon-names-list').innerHTML = MARKER_ICONS.map(({ id, name }) => (
   `<div class="icon-name">${iconGlyph(name, { size: 22 })}`
   + `<code>${escapeHtml(name)}</code>`
@@ -587,47 +582,6 @@ document.getElementById('icon-names-list').innerHTML = MARKER_ICONS.map(({ id, n
 
 const markIconSelect = mountIconField(document.querySelector('[data-icon-field="mark-icon"]'));
 const editIconSelect = mountIconField(document.querySelector('[data-icon-field="edit-icon"]'));
-const iconPickerSelect = mountIconField(document.querySelector('[data-icon-field="icon-picker"]'));
-
-function renderIconButton(select, current, name) {
-  current.innerHTML = iconGlyph(select.value, { size: 22 });
-  name.textContent = iconLabel(select.value);
-}
-
-function refreshMainIconButton() {
-  renderIconButton(markIconSelect, markIconCurrent, markIconName);
-}
-
-function refreshEditIconButton() {
-  renderIconButton(editIconSelect, editIconCurrent, editIconName);
-}
-
-let activeIconTarget = null;
-
-function openIconPicker(target) {
-  activeIconTarget = target;
-  iconPickerSelect.value = target.select.value;
-  iconPickerSheet.showModal();
-}
-
-markIconOpen.addEventListener('click', () => openIconPicker({
-  select: markIconSelect,
-  render: refreshMainIconButton,
-}));
-editIconOpen.addEventListener('click', () => openIconPicker({
-  select: editIconSelect,
-  render: refreshEditIconButton,
-}));
-document.getElementById('icon-picker-cancel').addEventListener('click', () => iconPickerSheet.close());
-document.getElementById('icon-picker-confirm').addEventListener('click', () => {
-  if (activeIconTarget) {
-    activeIconTarget.select.value = iconPickerSelect.value;
-    activeIconTarget.render();
-  }
-  iconPickerSheet.close();
-});
-refreshMainIconButton();
-refreshEditIconButton();
 
 // ---------- Pending marker list ----------
 function loadPending() {
@@ -779,7 +733,9 @@ function renderPending() {
       <td class="cell-map">
         <a class="map-link" href="${mapUrl(marker)}" target="_blank" rel="noopener">${MAP_PIN_SVG}<span class="visually-hidden"></span></a>
       </td>
-      <td class="cell-coordinate">${coordinates}</td>
+      <td>${marker.x}</td>
+      <td>${marker.y}</td>
+      <td>${marker.z}</td>
       <td class="cell-label"></td>
       <td class="cell-icon">${iconGlyph(marker.icon, { size: 18 })}<span class="visually-hidden"></span></td>
       <td class="cell-actions">
@@ -810,7 +766,7 @@ function renderPending() {
       const detailRow = document.createElement('tr');
       detailRow.className = 'marker-conflict-detail';
       const detailCell = document.createElement('td');
-      detailCell.colSpan = 5;
+      detailCell.colSpan = 7;
       const fieldset = document.createElement('fieldset');
       fieldset.className = 'coordinate-conflict';
       const legend = document.createElement('legend');
@@ -847,14 +803,13 @@ function markDirection() {
 }
 
 function refreshApplyStep() {
-  const hasUnaddedDraft = parseMarks().markers.length > 0;
   const ready = pending.length > 0 && yourMarkers.length > 0;
   markApplyStep.classList.toggle('hidden', !ready);
   if (!ready) {
     markPreview.innerHTML = '';
     reviewConflicts.classList.add('hidden');
     document.querySelectorAll('.marker-conflict-detail').forEach((row) => row.classList.add('hidden'));
-    addRunButton.disabled = pending.length === 0 || hasUnaddedDraft;
+    addRunButton.disabled = pending.length === 0;
     return;
   }
   const mode = markDirection();
@@ -872,7 +827,7 @@ function refreshApplyStep() {
   const replaced = Object.values(resolutions).filter((resolution) => resolution === 'replace').length;
   const kept = Object.values(resolutions).filter((resolution) => resolution === 'keep').length;
   renderConflictOverview(reviewConflictsList, mode);
-  addRunButton.disabled = unresolved > 0 || hasUnaddedDraft;
+  addRunButton.disabled = unresolved > 0;
   const rows = mode === 'remove'
     ? `<dt>${t('setLabelRemoved')}</dt><dd>${localeNumber(removed)}</dd>`
     : `<dt>${t('setLabelAdded')}</dt><dd>${localeNumber(added)}</dd>`
@@ -926,23 +881,10 @@ function parseMarks() {
 
 // Name the action by what it will actually do -- "Add 6 Marks" beats "Add".
 function syncAddButton() {
-  const count = parseMarks().markers.length;
-  addButton.textContent = t('addMarksCount', count);
-  addButton.disabled = count === 0;
-  refreshApplyStep();
+  addButton.textContent = t('addMarksCount', parseMarks().markers.length);
 }
 coordsField.addEventListener('input', syncAddButton);
 syncAddButton();
-
-addDraftCancel.addEventListener('click', () => {
-  coordsField.value = '';
-  markLabelField.value = '';
-  markIconSelect.value = DEFAULT_ICON;
-  refreshMainIconButton();
-  addFeedback.textContent = '';
-  syncAddButton();
-  coordsField.focus();
-});
 
 // ---------- Quick prompt ----------
 // The importer can only read wikis that allow it; an assistant can read any of
@@ -1097,7 +1039,6 @@ function openEditSheet(index) {
   editFieldZ.value = marker.z;
   editFieldLabel.value = marker.description;
   editIconSelect.value = marker.icon;
-  refreshEditIconButton();
   editMessage.classList.add('hidden');
   editSheet.showModal();
 }
