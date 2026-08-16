@@ -58,6 +58,13 @@
         <div class="status-line" id="community-status">Loading…</div>
       </li>
 
+      <li class="step" id="merge-preview-step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Review merge</h3>
+        </div>
+        <p class="micro-hint">At a shared coordinate, your marker replaces the community marker's label and icon. The review below shows the exact outcome before download.</p>
+        <div class="result" id="merge-preview" aria-live="polite"></div>
+      </li>
     </ol>
 
     <label class="switch-row">
@@ -66,7 +73,9 @@
       <span class="switch" aria-hidden="true"></span>
     </label>
 
-    <button class="primary-btn" id="merge-run" disabled>Download merged minimapmarkers.bin</button>
+    <div class="panel-actions">
+      <button class="primary-btn" id="merge-run" disabled>Download merged minimapmarkers.bin</button>
+    </div>
     <p class="micro-hint">Downloads a <code>.zip</code> with the merged <code>minimapmarkers.bin</code>, a backup of your original file(s), and <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
   </section>

@@ -25,6 +25,8 @@ Marker Sets all use it. Clear it there to switch files. Five modes:
 - **Merge** -- your uploaded marker file(s) (`minimapmarkers.bin` from
   your Tibia client, or `markers.json`) are merged with the live
   community markers, yours taking priority at any shared coordinate.
+  A live pre-download review shows the community, personal, new, identical,
+  overridden, and final marker totals before anything is downloaded.
   Downloads a `.zip` containing the merged `minimapmarkers.bin`, an
   unmodified backup of whatever you uploaded, and `merge-log.txt` (a full
   audit: counts loaded/added/identical/conflicting, the policy applied, and

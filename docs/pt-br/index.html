@@ -59,6 +59,13 @@
         <div class="status-line" id="community-status">Carregando…</div>
       </li>
 
+      <li class="step" id="merge-preview-step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Revisar mesclagem</h3>
+        </div>
+        <p class="micro-hint">Em uma coordenada compartilhada, a sua marcação substitui o rótulo e o ícone da marcação da comunidade. A revisão abaixo mostra o resultado exato antes do download.</p>
+        <div class="result" id="merge-preview" aria-live="polite"></div>
+      </li>
     </ol>
 
     <label class="switch-row">
@@ -67,7 +74,9 @@
       <span class="switch" aria-hidden="true"></span>
     </label>
 
-    <button class="primary-btn" id="merge-run" disabled>Baixar minimapmarkers.bin mesclado</button>
+    <div class="panel-actions">
+      <button class="primary-btn" id="merge-run" disabled>Baixar minimapmarkers.bin mesclado</button>
+    </div>
     <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> mesclado, um backup do(s) seu(s) arquivo(s) original(is), e o <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
   </section>

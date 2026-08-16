@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.14] - 2026-08-15
+
+### Added
+
+- **Merge now includes a complete pre-download review.** It explains the
+  personal-marker conflict policy and shows community, personal, new,
+  identical, overridden, and final marker totals as soon as a file is loaded.
+  Before a file is loaded, the review states what input is still needed.
+
 ## [1.18.13] - 2026-08-15
 
 ### Fixed

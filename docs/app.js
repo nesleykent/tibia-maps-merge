@@ -100,6 +100,7 @@ let yourMarkersLoad = Promise.resolve();
 // ---------- Community markers (shared by Merge and Extract Own) ----------
 const runButton = document.getElementById('merge-run');
 const statusEl = document.getElementById('community-status');
+const mergePreview = document.getElementById('merge-preview');
 
 let community = null; // {markers, lastModified}
 let communityLoad = Promise.resolve();
@@ -109,6 +110,7 @@ async function loadCommunityMarkers(forceRefresh = false) {
   statusEl.textContent = t('loading');
   statusEl.classList.remove('error');
   runButton.disabled = true;
+  refreshMergePreview();
   try {
     community = await fetchCommunityMarkers({ forceRefresh });
     communityError = null;
@@ -119,6 +121,7 @@ async function loadCommunityMarkers(forceRefresh = false) {
     refresh.textContent = t('checkForUpdates');
     refresh.addEventListener('click', () => { communityLoad = loadCommunityMarkers(true); });
     statusEl.appendChild(refresh);
+    refreshMergePreview();
     refreshExtractPreview();
   } catch (err) {
     community = null;
@@ -130,6 +133,7 @@ async function loadCommunityMarkers(forceRefresh = false) {
     retry.textContent = t('retry');
     retry.addEventListener('click', () => { communityLoad = loadCommunityMarkers(true); });
     statusEl.appendChild(retry);
+    refreshMergePreview();
     refreshExtractPreview();
   }
 }
@@ -154,6 +158,7 @@ document.querySelectorAll('.file-picker input[type="file"]').forEach(wireFilePic
 
 function syncYourMarkersConsumers() {
   runButton.disabled = !community || yourMarkers.length === 0;
+  refreshMergePreview();
   updateConversionSourceOptions();
   renderPending();
   refreshSetsPreview();
@@ -266,6 +271,59 @@ async function backupYourMarkerFiles(generatedAt) {
 }
 
 // ================= Merge Mode =================
+function analyzeMerge() {
+  if (!community || yourMarkers.length === 0) return null;
+  const communityByKey = new Map(community.markers.map((marker) => [markerKey(marker), marker]));
+  const personalByKey = new Map(yourMarkers.map((marker) => [markerKey(marker), marker]));
+  let identicalCount = 0;
+  const conflicts = [];
+
+  for (const [key, personalMarker] of personalByKey) {
+    const communityMarker = communityByKey.get(key);
+    if (!communityMarker) continue;
+    if (sameContent(communityMarker, personalMarker)) {
+      identicalCount += 1;
+    } else {
+      conflicts.push({
+        x: personalMarker.x,
+        y: personalMarker.y,
+        z: personalMarker.z,
+        community: communityMarker,
+        yours: personalMarker,
+      });
+    }
+  }
+
+  return {
+    personalLoadedCount: yourMarkerGroups.reduce((sum, group) => sum + group.length, 0),
+    addedCount: personalByKey.size - identicalCount - conflicts.length,
+    identicalCount,
+    conflictCount: conflicts.length,
+    conflicts,
+    merged: mergeMarkers(community.markers, yourMarkers),
+  };
+}
+
+function refreshMergePreview() {
+  if (!mergePreview) return;
+  const analysis = analyzeMerge();
+  if (!analysis) {
+    const message = communityError ? t('communityFailed')
+      : community ? t('mergePreviewNeedsMarkers') : t('loading');
+    mergePreview.innerHTML = `<div class="result-card"><p>${escapeHtml(message)}</p></div>`;
+    return;
+  }
+
+  mergePreview.innerHTML = `<div class="result-card ok"><dl>`
+    + `<dt>${t('labelCommunity')}</dt><dd>${localeNumber(community.markers.length)}</dd>`
+    + `<dt>${t('labelYours')}</dt><dd>${localeNumber(analysis.personalLoadedCount)}</dd>`
+    + `<dt>${t('labelAdded')}</dt><dd>${localeNumber(analysis.addedCount)}</dd>`
+    + `<dt>${t('labelIdentical')}</dt><dd>${localeNumber(analysis.identicalCount)}</dd>`
+    + `<dt>${t('labelConflicts')}</dt><dd>${localeNumber(analysis.conflictCount)}</dd>`
+    + `<dt>${t('labelTotal')}</dt><dd>${localeNumber(analysis.merged.length)}</dd>`
+    + '</dl></div>';
+}
+
 runButton.addEventListener('click', withBusy(runButton, async () => {
   await yourMarkersLoad;
   if (!community) {
@@ -280,25 +338,8 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
   const lang = currentLang();
   const backupEntries = await backupYourMarkerFiles(generatedAt);
 
-  const communityByKey = new Map(community.markers.map((m) => [markerKey(m), m]));
-  const personalByKey = new Map(yourMarkers.map((marker) => [markerKey(marker), marker]));
-
-  let identicalCount = 0;
-  const conflicts = [];
-  for (const [key, personalMarker] of personalByKey) {
-    const communityMarker = communityByKey.get(key);
-    if (!communityMarker) continue;
-    if (sameContent(communityMarker, personalMarker)) {
-      identicalCount += 1;
-    } else {
-      conflicts.push({ x: personalMarker.x, y: personalMarker.y, z: personalMarker.z, community: communityMarker, yours: personalMarker });
-    }
-  }
-  const conflictCount = conflicts.length;
-  const addedCount = personalByKey.size - identicalCount - conflictCount;
-
-  const merged = mergeMarkers(community.markers, yourMarkers);
-  const personalLoadedCount = yourMarkerGroups.reduce((sum, group) => sum + group.length, 0);
+  const analysis = analyzeMerge();
+  const { addedCount, identicalCount, conflictCount, conflicts, merged, personalLoadedCount } = analysis;
 
   const entries = [
     { name: 'minimapmarkers.bin', data: writeMarkersBin(merged) },
