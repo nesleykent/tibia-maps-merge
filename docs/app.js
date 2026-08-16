@@ -1666,19 +1666,18 @@ function refreshExtractPreview() {
   const hasSource = extractCommunityInput.checked || selectedSetsForExtraction.length > 0;
   const communityReady = !extractCommunityInput.checked || community !== null;
   const setsReadyForExtraction = selectedSetsForExtraction.every(({ id }) => loadedSets.has(id));
-  const ready = yourMarkers.length > 0 && hasSource && communityReady
-    && setsReadyForExtraction && extractFailedSets.size === 0;
+  const sourcesReady = hasSource && communityReady && setsReadyForExtraction
+    && extractFailedSets.size === 0;
+  const ready = yourMarkers.length > 0 && sourcesReady;
 
-  extractPreviewStep.classList.toggle('hidden', !ready);
   extractRunButton.disabled = !ready;
-  if (!ready) extractPreview.innerHTML = '';
+  const renderPreviewMessage = (message) => {
+    extractPreview.innerHTML = `<div class="result-card"><p>${escapeHtml(message)}</p></div>`;
+  };
 
-  if (yourMarkers.length === 0) {
-    renderExtractStatus(t('extractNeedsMarkers'));
-    return;
-  }
   if (!hasSource) {
     renderExtractStatus(t('extractChooseSource'));
+    renderPreviewMessage(t('extractChooseSource'));
     return;
   }
   if (extractCommunityInput.checked && communityError) {
@@ -1686,6 +1685,7 @@ function refreshExtractPreview() {
       error: true,
       retry: () => { communityLoad = loadCommunityMarkers(true); },
     });
+    renderPreviewMessage(t('communityFailed'));
     return;
   }
   if (extractFailedSets.size > 0) {
@@ -1698,16 +1698,23 @@ function refreshExtractPreview() {
         refreshExtractPreview();
       },
     });
+    renderPreviewMessage(t('setUnreachable'));
     return;
   }
   if (!communityReady || !setsReadyForExtraction) {
     renderExtractStatus(t('extractLoading'));
+    renderPreviewMessage(t('extractLoading'));
     return;
   }
 
   const references = extractReferences();
-  const outcome = extractOwnMarkers(yourMarkers, references);
   renderExtractStatus(t('extractReady', references.length, extractSourceNames().join(', ')));
+  if (yourMarkers.length === 0) {
+    renderPreviewMessage(t('extractNeedsMarkers'));
+    return;
+  }
+
+  const outcome = extractOwnMarkers(yourMarkers, references);
   extractPreview.innerHTML = `<div class="result-card ok"><dl>`
     + `<dt>${t('labelUploaded')}</dt><dd>${localeNumber(yourMarkers.length)}</dd>`
     + `<dt>${t('labelPublishedRemoved')}</dt><dd>${localeNumber(outcome.exactMatches)}</dd>`

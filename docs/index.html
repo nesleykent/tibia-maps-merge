@@ -96,18 +96,20 @@
         <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
         <span class="visually-hidden" id="extract-set-choices-label">Marker Sets to subtract</span>
         <div class="status-line" id="extract-source-status" aria-live="polite"></div>
-        <p class="micro-hint">Only exact published copies are removed. A marker at the same coordinate with your own label or icon is kept as a personal override.</p>
       </li>
 
-      <li class="step hidden" id="extract-preview-step">
+      <li class="step" id="extract-preview-step">
         <div class="step-head">
           <h3><span class="step-number">2</span>Review extraction</h3>
         </div>
+        <p class="micro-hint">Exact published copies are removed. A different label or icon at the same coordinate is personal and stays in the result.</p>
         <div class="result" id="extract-preview"></div>
       </li>
     </ol>
 
-    <button class="primary-btn" id="extract-run" disabled>Download own markers</button>
+    <div class="panel-actions">
+      <button class="primary-btn" id="extract-run" disabled>Download own markers</button>
+    </div>
     <p class="micro-hint">Downloads a <code>.zip</code> with <code>own-minimapmarkers.bin</code>, <code>own-markers.json</code>, backups of your uploaded files, and <code>extract-own-log.txt</code>.</p>
     <div class="result" id="extract-result"></div>
   </section>

@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.15] - 2026-08-15
+
+### Fixed
+
+- **Extract Own now follows the same information and action hierarchy as
+  Merge.** Its review step stays visible, explains the extraction policy,
+  shows the missing input or current source state before it can calculate a
+  result, uses the shared result-card presentation, and places the primary
+  download action on the trailing side.
+
 ## [1.18.14] - 2026-08-15
 
 ### Added

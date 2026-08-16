@@ -97,18 +97,20 @@
         <div class="set-choices" id="extract-set-choices" role="group" aria-labelledby="extract-set-choices-label"></div>
         <span class="visually-hidden" id="extract-set-choices-label">Coleções para subtrair</span>
         <div class="status-line" id="extract-source-status" aria-live="polite"></div>
-        <p class="micro-hint">Somente cópias publicadas idênticas são removidas. Uma marcação na mesma coordenada com seu próprio rótulo ou ícone é mantida como uma substituição pessoal.</p>
       </li>
 
-      <li class="step hidden" id="extract-preview-step">
+      <li class="step" id="extract-preview-step">
         <div class="step-head">
           <h3><span class="step-number">2</span>Revisar extração</h3>
         </div>
+        <p class="micro-hint">Cópias publicadas idênticas são removidas. Um rótulo ou ícone diferente na mesma coordenada é pessoal e permanece no resultado.</p>
         <div class="result" id="extract-preview"></div>
       </li>
     </ol>
 
-    <button class="primary-btn" id="extract-run" disabled>Baixar marcações próprias</button>
+    <div class="panel-actions">
+      <button class="primary-btn" id="extract-run" disabled>Baixar marcações próprias</button>
+    </div>
     <p class="micro-hint">Baixa um <code>.zip</code> com <code>own-minimapmarkers.bin</code>, <code>own-markers.json</code>, backups dos arquivos carregados e <code>extract-own-log.txt</code>.</p>
     <div class="result" id="extract-result"></div>
   </section>
