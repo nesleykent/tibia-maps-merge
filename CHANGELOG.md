@@ -4,6 +4,16 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.17] - 2026-08-15
+
+### Fixed
+
+- **All five page-level download actions now use the same structure and
+  leading alignment.** Merge, Extract Own, and Edit Marks no longer use a
+  special right-aligned wrapper; they now match Convert and Marker Sets.
+  Trailing/right action placement remains limited to dialog and sheet action
+  groups.
+
 ## [1.18.16] - 2026-08-15
 
 ### Fixed

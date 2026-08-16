@@ -14,7 +14,8 @@ test('Merge exposes a pre-download outcome review in both languages', async () =
   for (const html of [english, portuguese]) {
     assert.match(html, /id="merge-preview-step"/);
     assert.match(html, /id="merge-preview" aria-live="polite"/);
-    assert.match(html, /<div class="panel-actions">\s*<button class="primary-btn" id="merge-run"/);
+    assert.match(html, /<button class="primary-btn" id="merge-run"/);
+    assert.doesNotMatch(html, /panel-actions/);
   }
 
   assert.match(app, /function analyzeMerge\(\)/);

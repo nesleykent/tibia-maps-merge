@@ -189,6 +189,8 @@ the trigger, backdrop-click and Escape to dismiss.
 All five modes share one structure, so they read and behave the same way:
 numbered steps, one prominent action per panel, and a primary action that
 names what it produces (in Convert the label follows the chosen conversion).
+All page-level download actions use the same leading alignment; trailing
+action placement is reserved for sheets and dialogs.
 Temporary contexts -- editing a mark, confirming a removal, picking an icon
 -- are sheets with `Cancel` leading and the completing action trailing, per
 the macOS convention.

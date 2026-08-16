@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
-test('Extract Own uses the shared persistent review and trailing action hierarchy', async () => {
+test('Extract Own uses the shared persistent review and standard page action structure', async () => {
   const [app, english, portuguese] = await Promise.all([
     read('../docs/app.js'),
     read('../docs/index.html'),
@@ -17,7 +17,8 @@ test('Extract Own uses the shared persistent review and trailing action hierarch
     assert.doesNotMatch(html, /id="extract-community"/);
     assert.match(html, /<li class="step" id="extract-preview-step">/);
     assert.doesNotMatch(html, /<li class="step hidden" id="extract-preview-step">/);
-    assert.match(html, /<div class="panel-actions">\s*<button class="primary-btn" id="extract-run"/);
+    assert.match(html, /<button class="primary-btn" id="extract-run"/);
+    assert.doesNotMatch(html, /panel-actions/);
   }
 
   assert.match(app, /function createSetChoice\(/);

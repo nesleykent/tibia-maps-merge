@@ -619,12 +619,6 @@ button { font-family: inherit; }
 
 .form-row .form-message { margin-right: auto; }
 
-/* The action that completes a workspace trails, matching macOS dialog order. */
-.panel-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .form-message {
   min-width: 0;
   color: var(--muted);

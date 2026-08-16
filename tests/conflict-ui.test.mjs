@@ -24,7 +24,7 @@ test('conflict decisions use one action vocabulary and expose the map link', asy
   assert.doesNotMatch(i18n, /Reviewed Mark|Reviewed Marks/);
 });
 
-test('bulk conflict and download actions follow trailing macOS hierarchy', async () => {
+test('bulk conflict actions follow macOS hierarchy and page downloads share one structure', async () => {
   const [app, html, css] = await Promise.all([
     read('../docs/app.js'),
     read('../docs/index.html'),
@@ -38,8 +38,9 @@ test('bulk conflict and download actions follow trailing macOS hierarchy', async
   assert.ok(bulkActions.indexOf('data-resolution="keep"') < bulkActions.indexOf('data-resolution="replace"'));
   assert.match(bulkActions, /class="secondary-btn" data-resolution="keep"/);
   assert.match(bulkActions, /class="primary-btn" data-resolution="replace"/);
-  assert.match(html, /<div class="panel-actions">\s*<button class="primary-btn" id="add-run"/);
-  assert.match(css, /\.panel-actions\s*\{[\s\S]*?justify-content: flex-end/);
+  assert.match(html, /<button class="primary-btn" id="add-run"/);
+  assert.doesNotMatch(html, /panel-actions/);
+  assert.doesNotMatch(css, /\.panel-actions/);
   assert.doesNotMatch(css, /\.conflict-map-link/);
   assert.match(css, /\.marker-conflict-detail \.cell-map\s*\{/);
   assert.match(css, /\.marker-table tr:not\(\.marker-conflict-detail\) td:nth-child/);
