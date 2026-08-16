@@ -1,16 +1,16 @@
 # Tibia Maps Merge: end-to-end UX workflow
 
-Current-state map for the English GitHub Pages app, version 1.18.20, captured on August 16, 2026. The Portuguese entry point mirrors the same structure and behavior.
+Current-state map for the English-only GitHub Pages app, version 1.18.20, captured on August 16, 2026.
 
 ## Product model
 
-The app is one browser workspace with a shared marker-file input and five task modes. A user can deep-link directly to a mode through the URL hash, switch language, or open contextual help. Most modes require a personal marker file; Edit Markers can create a new file without one, and Convert can export the live community markers without one.
+The app is one browser workspace with a shared marker-file input and five task modes. A user can deep-link directly to a mode through the URL hash or open contextual help. Most modes require a personal marker file; Edit Markers can create a new file without one, and Convert can export the live community markers without one.
 
 ```mermaid
 flowchart TD
     A["Arrive at GitHub Pages app"] --> B["Understand promise: combine or manage Tibia markers locally"]
     B --> H{"Need orientation?"}
-    H -->|"Yes"| H1["Open How It Works, file-location help, or Portuguese version"]
+    H -->|"Yes"| H1["Open How It Works or file-location help"]
     H1 --> C
     H -->|"No"| C{"Load personal marker file?"}
     C -->|"Yes"| U["Choose one or more .bin or .json files"]
@@ -69,7 +69,7 @@ flowchart TD
 
 | Step | What the user does | General health |
 |---|---|---|
-| 1 | Arrives, reads the promise, optionally changes language or opens help. | Healthy. The value proposition, local-processing reassurance, and five modes are prominent and current. |
+| 1 | Arrives, reads the promise, and optionally opens help. | Healthy. The value proposition, local-processing reassurance, and five modes are prominent and current. |
 | 2 | Optionally loads one or more personal `.bin` or `.json` files under Your marker file. | Healthy. One upload feeds every tool, partial parse failures are reported, file priority is explained, and Remove file returns focus to the picker. The position may still imply a file is mandatory for every task. |
 | 3 | Chooses a mode from the sticky tab list or arrives through a hash link. | Healthy. The tablist has correct roles, roving keyboard focus, Arrow/Home/End behavior, and stable deep links. |
 | 4 | Uses Merge for the everyday update path. | Healthy. Community freshness, precedence, outcome counts, optional audit data, backup, and log are all visible before or after download. |
@@ -86,7 +86,6 @@ flowchart TD
 
 - `/` opens Merge.
 - `#merge`, `#extract-own`, `#convert`, `#edit-marks`, and `#marker-sets` deep-link to a mode and survive reload.
-- `/pt-br/` provides the same workflows in Brazilian Portuguese.
 - How It Works, file-location help, icon names, assistant choices, marker editing, and destructive confirmation open as modal sheets rather than routes.
 
 ### Shared file state

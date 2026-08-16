@@ -103,9 +103,7 @@ header > * {
   z-index: 1;
 }
 
-/* The one row the page already spends on chrome. Anything that has to be
-   reachable but must not take space from the tool goes here -- it costs
-   nothing, because the language switch was paying for the row anyway. */
+/* The compact header row keeps secondary navigation out of the tool body. */
 .header-links {
   display: flex;
   flex-wrap: wrap;

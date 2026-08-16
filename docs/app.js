@@ -2,7 +2,7 @@ import { fetchCommunityMarkers } from './lib/community.js';
 import { applyEditedMarks } from './lib/edit-marks.js';
 import { extractOwnMarkers } from './lib/extract-markers.js';
 import { DEFAULT_ICON, MARKER_ICONS, iconGlyph } from './lib/icons.js';
-import { currentLang, iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
+import { iconLabel, localeDate, localeNumber, t } from './lib/i18n.js';
 import { buildAddMarksLog, buildConversionLog, buildExtractOwnLog, buildMarkerSetsLog, buildMergeLog, formatBackupTimestamp } from './lib/logs.js';
 import { checkMarkerFields, parseMarkerLines, resolveIcon, toInteger } from './lib/marker-input.js';
 import { loadMarkersFile, mergeMarkers, parseMarkersBin, validateMarkers, writeMarkersBin } from './lib/markers.js';
@@ -335,7 +335,6 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
     return;
   }
   const generatedAt = new Date();
-  const lang = currentLang();
   const backupEntries = await backupYourMarkerFiles(generatedAt);
 
   const analysis = analyzeMerge();
@@ -357,7 +356,7 @@ runButton.addEventListener('click', withBusy(runButton, async () => {
         conflictCount,
         totalCount: merged.length,
         conflicts,
-      }, lang)),
+      })),
     },
   ];
 
@@ -442,7 +441,6 @@ updateConversionFieldVisibility();
 convertButton.addEventListener('click', withBusy(convertButton, async () => {
   await yourMarkersLoad;
   const generatedAt = new Date();
-  const lang = currentLang();
   const type = conversionType.value;
   const config = CONVERSION_CONFIG[type];
 
@@ -511,7 +509,7 @@ convertButton.addEventListener('click', withBusy(convertButton, async () => {
       name: 'conversion-log.txt',
       data: new TextEncoder().encode(buildConversionLog({
         generatedAt, sourceLabel, sourceFormatKey, outputFormatKey, markerCount, validationLine,
-      }, lang)),
+      })),
     },
   ];
 
@@ -1206,8 +1204,6 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
   }
   await yourMarkersLoad; // a file picked a moment ago may still be parsing
   const generatedAt = new Date();
-  const lang = currentLang();
-
   const mode = markDirection();
   const reviewConflictsList = currentReviewConflicts();
   const unresolved = mode === 'add'
@@ -1268,7 +1264,7 @@ addRunButton.addEventListener('click', withBusy(addRunButton, async () => {
         totalCount: outcome.total,
         validationLine,
         addedMarkers: pending,
-      }, lang)),
+      })),
     },
   ];
 
@@ -1383,9 +1379,7 @@ async function fillSetDates() {
   } catch {
     return; // a card without a date still works; an error here would not help
   }
-  const format = new Intl.DateTimeFormat(currentLang(), { year: 'numeric', month: 'short' });
-  // Month and year only, joined by a space: pt-BR's own short format is
-  // "dez. de 2023", which is two words longer than the card has room for.
+  const format = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short' });
   const monthAndYear = (date) => format
     // Read as UTC noon -- a bare YYYY-MM-DD is midnight UTC, which slips back
     // a month for anyone west of Greenwich when the commit landed on the 1st.
@@ -1510,7 +1504,6 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
   if (yourMarkers.length === 0 || chosenSets().length === 0 || !setsReady()) return;
   const chosenMarks = { label: chosenLabel(), markers: chosenMarkers() };
   const generatedAt = new Date();
-  const lang = currentLang();
   const mode = setsDirection();
 
   let outcome;
@@ -1552,7 +1545,7 @@ setsRunButton.addEventListener('click', withBusy(setsRunButton, async () => {
         removedCount: outcome.removed,
         totalCount: outcome.total,
         validationLine,
-      }, lang)),
+      })),
     },
   ];
 
@@ -1752,7 +1745,6 @@ extractRunButton.addEventListener('click', withBusy(extractRunButton, async () =
   if (extractRunButton.disabled) return;
 
   const generatedAt = new Date();
-  const lang = currentLang();
   const references = extractReferences();
   const sourceNames = extractSourceNames();
   const outcome = extractOwnMarkers(yourMarkers, references);
@@ -1793,7 +1785,7 @@ extractRunButton.addEventListener('click', withBusy(extractRunButton, async () =
         unique: outcome.unique,
         totalCount: outcome.total,
         validationLine,
-      }, lang)),
+      })),
     },
   ];
 

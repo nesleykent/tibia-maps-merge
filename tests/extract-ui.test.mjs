@@ -5,22 +5,19 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
 test('Extract uses the shared persistent review and standard page action structure', async () => {
-  const [app, css, english, portuguese] = await Promise.all([
+  const [app, css, html] = await Promise.all([
     read('../docs/app.js'),
     read('../docs/style.css'),
     read('../docs/index.html'),
-    read('../docs/pt-br/index.html'),
   ]);
 
-  for (const html of [english, portuguese]) {
-    assert.match(html, /class="set-choices" id="extract-source-choices"/);
-    assert.doesNotMatch(html, /class="direction-choices extract-source-choice"/);
-    assert.doesNotMatch(html, /id="extract-community"/);
-    assert.match(html, /<li class="step" id="extract-preview-step">/);
-    assert.doesNotMatch(html, /<li class="step hidden" id="extract-preview-step">/);
-    assert.match(html, /<button class="primary-btn" id="extract-run"/);
-    assert.doesNotMatch(html, /panel-actions/);
-  }
+  assert.match(html, /class="set-choices" id="extract-source-choices"/);
+  assert.doesNotMatch(html, /class="direction-choices extract-source-choice"/);
+  assert.doesNotMatch(html, /id="extract-community"/);
+  assert.match(html, /<li class="step" id="extract-preview-step">/);
+  assert.doesNotMatch(html, /<li class="step hidden" id="extract-preview-step">/);
+  assert.match(html, /<button class="primary-btn" id="extract-run"/);
+  assert.doesNotMatch(html, /panel-actions/);
 
   assert.match(app, /function createSetChoice\(/);
   assert.match(app, /id: 'extract-community'/);

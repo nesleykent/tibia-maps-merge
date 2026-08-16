@@ -104,7 +104,7 @@ test('audit log records the selected policy and both sides of each conflict', ()
     totalCount: outcome.total,
     validationLine: 'OK',
     addedMarkers: reviewed,
-  }, 'en');
+  });
 
   assert.match(log, /Conflict policy: keep the marker already in the loaded file/);
   assert.match(log, /Different markers at the same coordinate: 1/);
@@ -137,7 +137,7 @@ test('audit log records mixed coordinate-by-coordinate conflict decisions', () =
     totalCount: outcome.total,
     validationLine: 'OK',
     addedMarkers: moreReviewed,
-  }, 'en');
+  });
 
   assert.match(log, /reviewed individually, coordinate by coordinate/);
   assert.match(log, /kept loaded-file marker/);

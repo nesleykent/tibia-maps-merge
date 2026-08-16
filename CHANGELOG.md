@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.19.0] - 2026-08-16
+
+### Changed
+
+- **The web app is now English-only.** The Portuguese entry point, language
+  switch, translated UI strings, icon labels, locale selection, and
+  language-specific log generation were removed. Numbers and dates now use a
+  fixed `en-US` locale throughout the app and its downloadable logs.
+
 ## [1.18.20] - 2026-08-15
 
 ### Fixed

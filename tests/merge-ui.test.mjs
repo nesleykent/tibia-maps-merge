@@ -4,19 +4,16 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
-test('Merge exposes a pre-download outcome review in both languages', async () => {
-  const [app, english, portuguese] = await Promise.all([
+test('Merge exposes a pre-download outcome review', async () => {
+  const [app, html] = await Promise.all([
     read('../docs/app.js'),
     read('../docs/index.html'),
-    read('../docs/pt-br/index.html'),
   ]);
 
-  for (const html of [english, portuguese]) {
-    assert.match(html, /id="merge-preview-step"/);
-    assert.match(html, /id="merge-preview" aria-live="polite"/);
-    assert.match(html, /<button class="primary-btn" id="merge-run"/);
-    assert.doesNotMatch(html, /panel-actions/);
-  }
+  assert.match(html, /id="merge-preview-step"/);
+  assert.match(html, /id="merge-preview" aria-live="polite"/);
+  assert.match(html, /<button class="primary-btn" id="merge-run"/);
+  assert.doesNotMatch(html, /panel-actions/);
 
   assert.match(app, /function analyzeMerge\(\)/);
   assert.match(app, /function refreshMergePreview\(\)/);

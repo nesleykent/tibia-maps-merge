@@ -1,6 +1,6 @@
-// Plain-text audit logs bundled into the output ZIP. Pure functions (take a
-// `lang` explicitly) so they're testable without a DOM.
-import { localeNumber, tFor } from './i18n.js';
+// Plain-text audit logs bundled into the output ZIP. Pure functions so they
+// are testable without a DOM.
+import { localeNumber, t } from './i18n.js';
 
 function pad(n) {
   return String(n).padStart(2, '0');
@@ -27,8 +27,7 @@ function line(label, value) {
 
 export function buildConversionLog({
   generatedAt, sourceLabel, sourceFormatKey, outputFormatKey, markerCount, validationLine,
-}, lang) {
-  const t = (key, ...args) => tFor(lang, key, ...args);
+}) {
   return [
     t('logTitleConversion'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
@@ -36,7 +35,7 @@ export function buildConversionLog({
     line(t('logSourceFile'), sourceLabel),
     line(t('logSourceFormat'), t(sourceFormatKey)),
     line(t('logOutputFormat'), t(outputFormatKey)),
-    line(t('logMarkersConverted'), localeNumber(markerCount, lang)),
+    line(t('logMarkersConverted'), localeNumber(markerCount)),
     line(t('logValidation'), validationLine ?? t('logValidationOk')),
     line(t('logMarkersModified'), t('logMarkersModifiedNone')),
     line(t('logProcessingLocation'), t('logProcessingLocal')),
@@ -47,9 +46,8 @@ export function buildConversionLog({
 export function buildExtractOwnLog({
   generatedAt, userFilenames, backupFilenames, sourceNames, referenceCount,
   uploadedCount, exactMatches, overrides, unique, totalCount, validationLine,
-}, lang) {
-  const t = (key, ...args) => tFor(lang, key, ...args);
-  const n = (value) => localeNumber(value, lang);
+}) {
+  const n = (value) => localeNumber(value);
   return [
     t('logTitleExtractOwn'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
@@ -77,9 +75,8 @@ export function buildMarkerSetsLog({
   generatedAt, userFilenames, backupFilenames, setName, setCount,
   setCountsByName = [], mode, baseCount, addedCount, keptCount, removedCount,
   totalCount, validationLine,
-}, lang) {
-  const t = (key, ...args) => tFor(lang, key, ...args);
-  const n = (value) => localeNumber(value, lang);
+}) {
+  const n = (value) => localeNumber(value);
   const lines = [
     t('logTitleSets'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,
@@ -124,9 +121,8 @@ export function buildAddMarksLog({
   existingCount, addedCount, identicalCount = 0, replacedCount,
   keptCount = 0, conflicts = [], removedCount, totalCount, validationLine,
   addedMarkers,
-}, lang) {
-  const t = (key, ...args) => tFor(lang, key, ...args);
-  const n = (value) => localeNumber(value, lang);
+}) {
+  const n = (value) => localeNumber(value);
   const keepingConflicts = conflictPolicy === 'keep';
   const individualConflicts = conflictPolicy === 'individual';
   const lines = [
@@ -188,9 +184,8 @@ export function buildAddMarksLog({
 export function buildMergeLog({
   generatedAt, userFilenames, backupFilenames, communityCount, personalLoadedCount,
   addedCount, identicalCount, conflictCount, totalCount, conflicts,
-}, lang) {
-  const t = (key, ...args) => tFor(lang, key, ...args);
-  const n = (value) => localeNumber(value, lang);
+}) {
+  const n = (value) => localeNumber(value);
   const lines = [
     t('logTitleMerge'),
     `${t('logGeneratedAt')}: ${formatLogTimestamp(generatedAt)}`,

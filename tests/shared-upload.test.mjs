@@ -2,14 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-const pages = [
-  '../docs/index.html',
-  '../docs/pt-br/index.html',
-];
-
-for (const page of pages) {
-  test(`${page} uses one shared marker upload for all tools`, async () => {
-    const html = await readFile(new URL(page, import.meta.url), 'utf8');
+test('the English app uses one shared marker upload for all tools', async () => {
+  const html = await readFile(new URL('../docs/index.html', import.meta.url), 'utf8');
 
     assert.equal((html.match(/id="your-marker-files"/g) ?? []).length, 1);
     assert.match(html, /id="your-markers-clear"/);
@@ -25,5 +19,4 @@ for (const page of pages) {
     assert.doesNotMatch(html, /id="add-existing-files"/);
     assert.doesNotMatch(html, /id="sets-files"/);
     assert.doesNotMatch(html, /id="conversion-file"/);
-  });
-}
+});
