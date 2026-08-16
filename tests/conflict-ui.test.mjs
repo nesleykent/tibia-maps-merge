@@ -13,7 +13,7 @@ test('conflict decisions use one action vocabulary and expose the map link', asy
   assert.match(app, /function createMapLink\(marker, coordinates\)/);
   assert.match(app, /mapCell\.appendChild\(createMapLink\(conflict\.incoming, coordinates\)\)/);
   assert.match(app, /detailCell\.colSpan = 6/);
-  assert.match(app, /detailRow\.append\(mapCell, detailCell\)/);
+  assert.match(app, /detailRow\.append\(selectSpacerCell, mapCell, detailCell\)/);
   assert.match(app, /createConflictOption\(conflict, 'keep', 'markConflictKeep'\)/);
   assert.match(app, /createConflictOption\(conflict, 'replace', 'markConflictUseNew'\)/);
   assert.doesNotMatch(app, /markConflictInFile|markConflictReviewed|markConflictDecided|markConflictUseReviewed/);
@@ -36,8 +36,12 @@ test('bulk conflict actions follow macOS hierarchy and page downloads share one 
     app.indexOf('</div>`;', app.indexOf('<div class="review-conflict-actions">')),
   );
   assert.ok(bulkActions.indexOf('data-resolution="keep"') < bulkActions.indexOf('data-resolution="replace"'));
-  assert.match(bulkActions, /class="secondary-btn" data-resolution="keep"/);
-  assert.match(bulkActions, /class="primary-btn" data-resolution="replace"/);
+  // Neither bulk action is a .primary-btn: the panel's one primary action is
+  // the download button below, and these resolve a step within it -- the
+  // same tertiary/tertiary-emphasized pairing "Add to List" uses elsewhere.
+  assert.match(bulkActions, /class="tertiary-btn" data-resolution="keep"/);
+  assert.match(bulkActions, /class="tertiary-btn emphasized" data-resolution="replace"/);
+  assert.doesNotMatch(bulkActions, /class="(?:primary-btn|secondary-btn)"/);
   assert.match(html, /<button class="primary-btn" id="add-run"/);
   assert.doesNotMatch(html, /panel-actions/);
   assert.doesNotMatch(css, /\.panel-actions/);

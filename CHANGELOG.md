@@ -4,6 +4,62 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.19.0] - 2026-08-16
+
+### Added
+
+- **The marker table in Edit Marks supports multi-select.** Row checkboxes
+  support shift-range selection and a select-all header checkbox; a selection
+  toolbar offers a batch delete. Delete/Backspace also acts on the current
+  selection from anywhere in the table.
+- **Row editing happens inline in the table**, not in a dialog. The edit-sheet
+  modal and its markup are removed; Edit now expands the row into real
+  X/Y/Z/label inputs and an inline icon picker, with Enter to save and Escape
+  to cancel.
+- **Deleting a mark (single or batch) offers Undo** instead of only a
+  confirmation dialog, following the app's own action-then-undo pattern.
+  Remove All keeps its confirmation, since it clears the whole list at once.
+- **The shared marker-file picker accepts drag-and-drop.** A page-wide guard
+  also stops a near-miss drop from navigating the browser away and losing
+  in-progress work.
+- **Dark mode**, matching the system color scheme automatically. Semantic
+  color tokens are re-tuned per theme rather than mechanically inverted.
+
+### Fixed
+
+- **Text contrast now clears WCAG AA (4.5:1) everywhere it previously fell
+  short** -- inline links, the warning/orange accent, the hero subtitle, and
+  secondary text sitting on the page background (as opposed to a white card)
+  all measured under 4.5:1 before this pass.
+- **The active-tab underline is a solid accent color, not the brand
+  gradient.** The gradient stays reserved for the hero, its one intended
+  expressive moment.
+- **The keyboard focus ring on the sticky tab strip is no longer clipped**
+  by the strip's own scroll container.
+- **A scroll-shadow now signals that Marker Sets sits off-screen** in the
+  tab strip on narrow viewports, where it was previously scrollable but
+  undiscoverable.
+- **Ordinary content cards (the shared marker-file panel, coordinate-conflict
+  callouts) use a border instead of a layered card shadow**, matching the
+  archive's own elevation rule; sheets keep the single flat floating shadow.
+  A stray `--card-border-radius` reference to a token that was never
+  defined -- silently rendering one callout square-cornered -- is fixed too.
+- **The hero headline uses continuous fluid sizing** in place of a fixed
+  56px/38px breakpoint jump, and restores the archive's display letter-
+  spacing token (previously overridden to zero).
+- **Several off-scale type sizes and a mis-shaped pill are corrected**: two
+  button/heading sizes that fell back to hand-picked pixel values now use
+  the nearest size on the archive's type ladder, and a progress pill that
+  was accidentally a circle (`border-radius: 50%` on a wide element) is now
+  actually pill-shaped.
+- **Five different surfaces (buttons, tiles, table wrap, row items,
+  callouts) that were all borrowing the 6px input-field radius now use a
+  dedicated control radius**, so a future change to input rounding can't
+  silently reshape every button in the app.
+- **The tab order is now Merge, Marker Sets, Edit Marks, Extract Own,
+  Convert**, matching how the tools are actually reached for; the panel
+  order in the page and the "How it works" copy were updated to match.
+
 ## [1.18.20] - 2026-08-15
 
 ### Fixed

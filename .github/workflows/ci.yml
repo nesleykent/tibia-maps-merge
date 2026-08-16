@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -29,3 +31,40 @@ jobs:
 
       - name: Compile Python sources
         run: python -m compileall -q cli.py tibiamaps
+
+      - name: Check version bump and changelog
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          if [ -z "$BASE_SHA" ]; then
+            BASE_SHA="${{ github.event.before }}"
+          fi
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "No base commit to compare against (new branch or first push); skipping."
+            exit 0
+          fi
+          if ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            echo "Base commit $BASE_SHA not available locally; skipping."
+            exit 0
+          fi
+
+          CHANGED_APP_FILES=$(git diff --name-only "$BASE_SHA" HEAD -- docs/ | grep -v '^docs/lib/version\.js$' || true)
+          if [ -z "$CHANGED_APP_FILES" ]; then
+            echo "No app files changed; version bump not required."
+            exit 0
+          fi
+
+          VERSION_CHANGED=$(git diff --name-only "$BASE_SHA" HEAD -- docs/lib/version.js)
+          CHANGELOG_CHANGED=$(git diff --name-only "$BASE_SHA" HEAD -- CHANGELOG.md)
+          if [ -z "$VERSION_CHANGED" ] || [ -z "$CHANGELOG_CHANGED" ]; then
+            echo "::error::Files changed under docs/ (excluding version.js), but docs/lib/version.js and/or CHANGELOG.md were not updated. Bump VERSION in docs/lib/version.js and add a matching CHANGELOG.md entry."
+            exit 1
+          fi
+
+          VERSION=$(grep -oE "VERSION = '[0-9]+\.[0-9]+\.[0-9]+'" docs/lib/version.js | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          TOP_ENTRY=$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          if [ "$VERSION" != "$TOP_ENTRY" ]; then
+            echo "::error::docs/lib/version.js has VERSION=$VERSION but CHANGELOG.md's top entry is [$TOP_ENTRY]. They must match."
+            exit 1
+          fi
+
+          echo "Version bump check passed: $VERSION"

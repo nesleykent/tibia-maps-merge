@@ -41,10 +41,10 @@
 
   <nav class="mode-tabs" role="tablist" aria-label="Modo">
     <button class="mode-tab-button active" role="tab" id="tab-merge" aria-controls="mode-merge" aria-selected="true" data-mode="merge" data-slug="merge">Mesclar</button>
+    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Coleções</button>
+    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Editar Marcações</button>
     <button class="mode-tab-button" role="tab" id="tab-extract" aria-controls="mode-extract" aria-selected="false" tabindex="-1" data-mode="extract" data-slug="extract-own">Extrair Próprias</button>
     <button class="mode-tab-button" role="tab" id="tab-convert" aria-controls="mode-convert" aria-selected="false" tabindex="-1" data-mode="convert" data-slug="convert">Converter</button>
-    <button class="mode-tab-button" role="tab" id="tab-add" aria-controls="mode-add" aria-selected="false" tabindex="-1" data-mode="add" data-slug="edit-marks">Editar Marcações</button>
-    <button class="mode-tab-button" role="tab" id="tab-sets" aria-controls="mode-sets" aria-selected="false" tabindex="-1" data-mode="sets" data-slug="marker-sets">Coleções</button>
   </nav>
 
   <section class="mode-panel active" id="mode-merge" role="tabpanel" aria-labelledby="tab-merge">
@@ -77,6 +77,125 @@
     <button class="primary-btn" id="merge-run" disabled>Baixar minimapmarkers.bin mesclado</button>
     <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> mesclado, um backup do(s) seu(s) arquivo(s) original(is), e o <code>merge-log.txt</code>.</p>
     <div class="result" id="merge-result"></div>
+  </section>
+
+  <section class="mode-panel" id="mode-sets" role="tabpanel" aria-labelledby="tab-sets">
+    <p class="hint">Aplique uma coleção pronta de marcações ao seu arquivo -- ou tire uma de volta. Útil para marcações de eventos, achievements e respawns. Para marcações que você mesmo monta, use <strong>Editar Marcações</strong>.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Escolher marcações</h3>
+          <span class="step-note">Escolha uma ou mais</span>
+          <button class="secondary-btn hidden" id="sets-clear">Limpar Seleção</button>
+        </div>
+        <div class="set-choices" id="set-choices" role="group" aria-labelledby="set-choices-label"></div>
+        <span class="visually-hidden" id="set-choices-label">Marcações a aplicar</span>
+        <p class="set-explainer hidden" id="set-note-points-of-interest">A <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> espalha Points of Interest por cada subárea que você começa a descobrir, em lugares diferentes para cada personagem. Esta coleção traz todas as posições em que um deles pode aparecer -- são 5.205, e 98% sem rótulo nenhum, porque é uma lista de busca para vasculhar, não marcações feitas para ficar no seu arquivo. Carregue enquanto estiver procurando, e remova aqui quando terminar.</p>
+        <div class="status-line" id="sets-source-status"></div>
+        <p class="micro-hint">As coleções vêm dos <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">dados de marcação publicados pelo tibiamaps.io</a>, lidos na hora. Escolha quantas quiser; uma marcação que esteja em duas conta uma vez só.</p>
+      </li>
+
+      <li class="step hidden" id="sets-apply-step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Adicionar ou remover</h3>
+        </div>
+        <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
+          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
+          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remover do meu arquivo</span></label>
+        </div>
+        <span class="visually-hidden" id="direction-label">O que fazer com essas marcações</span>
+        <div class="result" id="sets-preview"></div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="sets-run" disabled>Baixar minimapmarkers.bin</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> atualizado, um backup do arquivo que você carregou, e o <code>marker-sets-log.txt</code>.</p>
+    <div class="result" id="sets-result"></div>
+  </section>
+
+  <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
+    <p class="hint">Monte uma lista de marcações -- digitadas manualmente, ou lidas direto de uma quest do Tibia Wiki -- edite linha por linha, e então adicione essa lista ao seu arquivo de marcações ou remova de volta.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-head">
+          <h3><span class="step-number">1</span>Definir marcações</h3>
+        </div>
+        <div class="marker-form">
+          <div class="field field-full">
+            <label for="wiki-url">Importar de uma quest do Tibia Wiki</label>
+            <div class="import-row">
+              <input type="text" inputmode="url" autocomplete="off" id="wiki-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
+              <button type="button" class="tertiary-btn" id="wiki-import">Importar</button>
+              <button type="button" class="tertiary-btn" id="prompt-copy">Copiar Prompt</button>
+              <button type="button" class="tertiary-btn" id="prompt-chatgpt">Abrir no ChatGPT</button>
+            </div>
+            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Abrir no ChatGPT</strong> abre com o prompt gerado já incluído. Nele, o TibiaWikiBR usa apenas a URL; o Gemini também recebe um trecho da fonte do TibiaWikiBR buscado pelo app. O Fandom sempre inclui a fonte para que o assistente não precise acessar a rede do Fandom. Depois cole a resposta em Coordenadas. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
+            <div class="status-line" id="wiki-status"></div>
+          </div>
+          <div class="field field-main">
+            <label for="mark-coords">Coordenadas</label>
+            <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
+31938, 31652, 10
+32057, 32792, 13"></textarea>
+            <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">Ver os nomes dos ícones</button></p>
+          </div>
+          <div class="field field-side">
+            <span class="field-label" id="mark-icon-label">Ícone da marcação</span>
+            <div class="icon-field" data-icon-field="mark-icon"></div>
+          </div>
+          <div class="field field-full">
+            <label for="mark-label">Rótulo</label>
+            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
+          </div>
+        </div>
+        <div class="form-row">
+          <button class="tertiary-btn emphasized" id="add-marks">Adicionar à Lista</button>
+        </div>
+        <div class="step-feedback" id="add-feedback"></div>
+      </li>
+
+      <li class="step hidden" id="review-step">
+        <div class="step-head">
+          <h3><span class="step-number">2</span>Revisar</h3>
+          <button class="secondary-btn destructive" id="add-clear">Remover Tudo</button>
+        </div>
+        <div class="selection-toolbar hidden" id="add-selection-toolbar">
+          <span id="add-selection-count"></span>
+          <button type="button" class="secondary-btn destructive" id="add-delete-selected">Excluir Selecionados</button>
+        </div>
+        <div class="review-conflicts hidden" id="review-conflicts"></div>
+        <div class="table-wrap">
+          <table class="marker-table">
+            <thead>
+              <tr>
+                <th class="col-select"><input type="checkbox" id="add-select-all" aria-label="Selecionar todas as marcas"></th>
+                <th class="col-map">Mapa</th><th>X</th><th>Y</th><th>Z</th><th>Rótulo</th><th>Ícone</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="add-rows"></tbody>
+          </table>
+        </div>
+      </li>
+
+      <li class="step hidden" id="mark-apply-step">
+        <div class="step-head">
+          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
+        </div>
+        <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
+          <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
+          <label class="direction"><input type="radio" name="mark-direction" value="remove"><span>Remover do meu arquivo</span></label>
+        </div>
+        <span class="visually-hidden" id="mark-direction-label">O que fazer com as marcações acima</span>
+        <p class="micro-hint" id="mark-direction-hint"></p>
+        <div class="result" id="mark-preview"></div>
+      </li>
+    </ol>
+
+    <button class="primary-btn" id="add-run" disabled>Baixar minimapmarkers.bin</button>
+    <p class="micro-hint">Baixa um <code>.zip</code> com o novo <code>minimapmarkers.bin</code>, um backup de qualquer arquivo que você carregar, e o <code>edit-marks-log.txt</code>. Coloque o novo arquivo na pasta <code>minimap</code> do seu cliente Tibia (substituindo o antigo) e reinicie o cliente.</p>
+    <div class="result" id="add-result"></div>
   </section>
 
   <section class="mode-panel" id="mode-extract" role="tabpanel" aria-labelledby="tab-extract">
@@ -137,118 +256,6 @@
     <div class="result" id="convert-result"></div>
   </section>
 
-  <section class="mode-panel" id="mode-add" role="tabpanel" aria-labelledby="tab-add">
-    <p class="hint">Monte uma lista de marcações -- digitadas manualmente, ou lidas direto de uma quest do Tibia Wiki -- edite linha por linha, e então adicione essa lista ao seu arquivo de marcações ou remova de volta.</p>
-
-    <ol class="steps">
-      <li class="step">
-        <div class="step-head">
-          <h3><span class="step-number">1</span>Definir marcações</h3>
-        </div>
-        <div class="marker-form">
-          <div class="field field-full">
-            <label for="wiki-url">Importar de uma quest do Tibia Wiki</label>
-            <div class="import-row">
-              <input type="text" inputmode="url" autocomplete="off" id="wiki-url" placeholder="https://www.tibiawiki.com.br/wiki/The_Dream_Courts_Quest">
-              <button type="button" class="tertiary-btn" id="wiki-import">Importar</button>
-              <button type="button" class="tertiary-btn" id="prompt-copy">Copiar Prompt</button>
-              <button type="button" class="tertiary-btn" id="prompt-chatgpt">Abrir no ChatGPT</button>
-            </div>
-            <p class="micro-hint"><strong>Importar</strong> preenche Coordenadas a partir do próprio artigo -- funciona com <a href="https://www.tibiawiki.com.br/wiki/Quests" target="_blank" rel="noopener">tibiawiki.com.br</a> e <a href="https://tibia.fandom.com/wiki/Quests" target="_blank" rel="noopener">tibia.fandom.com</a>. <strong>Abrir no ChatGPT</strong> abre com o prompt gerado já incluído. Nele, o TibiaWikiBR usa apenas a URL; o Gemini também recebe um trecho da fonte do TibiaWikiBR buscado pelo app. O Fandom sempre inclui a fonte para que o assistente não precise acessar a rede do Fandom. Depois cole a resposta em Coordenadas. <button type="button" class="link-btn" data-open-sheet="assistant-sheet">Outros assistentes</button> &middot; <a href="https://github.com/nesleykent/tibia-maps-merge/blob/main/guides/quest-marks-from-tibia-wiki.md" target="_blank" rel="noopener">Como funciona</a>.</p>
-            <div class="status-line" id="wiki-status"></div>
-          </div>
-          <div class="field field-main">
-            <label for="mark-coords">Coordenadas</label>
-            <textarea id="mark-coords" rows="5" spellcheck="false" placeholder="32250, 31385, 5
-31938, 31652, 10
-32057, 32792, 13"></textarea>
-            <p class="micro-hint">Uma marcação por linha: <code>x, y, z</code>. Dê a uma linha o seu próprio rótulo e ícone acrescentando-os -- <code>32250, 31385, 5, Depot, flag</code> -- caso contrário ela usa os dois campos abaixo. <button type="button" class="link-btn" data-open-sheet="icon-names-sheet">Ver os nomes dos ícones</button></p>
-          </div>
-          <div class="field field-side">
-            <span class="field-label" id="mark-icon-label">Ícone da marcação</span>
-            <div class="icon-field" data-icon-field="mark-icon"></div>
-          </div>
-          <div class="field field-full">
-            <label for="mark-label">Rótulo</label>
-            <input type="text" id="mark-label" autocomplete="off" placeholder="Respawn">
-          </div>
-        </div>
-        <div class="form-row">
-          <button class="tertiary-btn emphasized" id="add-marks">Adicionar à Lista</button>
-        </div>
-        <div class="step-feedback" id="add-feedback"></div>
-      </li>
-
-      <li class="step hidden" id="review-step">
-        <div class="step-head">
-          <h3><span class="step-number">2</span>Revisar</h3>
-          <button class="secondary-btn destructive" id="add-clear">Remover Tudo</button>
-        </div>
-        <div class="review-conflicts hidden" id="review-conflicts"></div>
-        <div class="table-wrap">
-          <table class="marker-table">
-            <thead>
-              <tr><th class="col-map">Mapa</th><th>X</th><th>Y</th><th>Z</th><th>Rótulo</th><th>Ícone</th><th>Ações</th></tr>
-            </thead>
-            <tbody id="add-rows"></tbody>
-          </table>
-        </div>
-      </li>
-
-      <li class="step hidden" id="mark-apply-step">
-        <div class="step-head">
-          <h3><span class="step-number">3</span>Adicionar ou remover</h3>
-        </div>
-        <div class="direction-choices" role="radiogroup" aria-labelledby="mark-direction-label">
-          <label class="direction"><input type="radio" name="mark-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
-          <label class="direction"><input type="radio" name="mark-direction" value="remove"><span>Remover do meu arquivo</span></label>
-        </div>
-        <span class="visually-hidden" id="mark-direction-label">O que fazer com as marcações acima</span>
-        <p class="micro-hint" id="mark-direction-hint"></p>
-        <div class="result" id="mark-preview"></div>
-      </li>
-    </ol>
-
-    <button class="primary-btn" id="add-run" disabled>Baixar minimapmarkers.bin</button>
-    <p class="micro-hint">Baixa um <code>.zip</code> com o novo <code>minimapmarkers.bin</code>, um backup de qualquer arquivo que você carregar, e o <code>edit-marks-log.txt</code>. Coloque o novo arquivo na pasta <code>minimap</code> do seu cliente Tibia (substituindo o antigo) e reinicie o cliente.</p>
-    <div class="result" id="add-result"></div>
-  </section>
-
-  <section class="mode-panel" id="mode-sets" role="tabpanel" aria-labelledby="tab-sets">
-    <p class="hint">Aplique uma coleção pronta de marcações ao seu arquivo -- ou tire uma de volta. Útil para marcações de eventos, achievements e respawns. Para marcações que você mesmo monta, use <strong>Editar Marcações</strong>.</p>
-
-    <ol class="steps">
-      <li class="step">
-        <div class="step-head">
-          <h3><span class="step-number">1</span>Escolher marcações</h3>
-          <span class="step-note">Escolha uma ou mais</span>
-          <button class="secondary-btn hidden" id="sets-clear">Limpar Seleção</button>
-        </div>
-        <div class="set-choices" id="set-choices" role="group" aria-labelledby="set-choices-label"></div>
-        <span class="visually-hidden" id="set-choices-label">Marcações a aplicar</span>
-        <p class="set-explainer hidden" id="set-note-points-of-interest">A <a href="https://tibia.fandom.com/wiki/Measuring_Tibia_Quest" target="_blank" rel="noopener">Measuring Tibia Quest</a> espalha Points of Interest por cada subárea que você começa a descobrir, em lugares diferentes para cada personagem. Esta coleção traz todas as posições em que um deles pode aparecer -- são 5.205, e 98% sem rótulo nenhum, porque é uma lista de busca para vasculhar, não marcações feitas para ficar no seu arquivo. Carregue enquanto estiver procurando, e remova aqui quando terminar.</p>
-        <div class="status-line" id="sets-source-status"></div>
-        <p class="micro-hint">As coleções vêm dos <a href="https://github.com/tibiamaps/tibia-map-data/tree/main/extra" target="_blank" rel="noopener">dados de marcação publicados pelo tibiamaps.io</a>, lidos na hora. Escolha quantas quiser; uma marcação que esteja em duas conta uma vez só.</p>
-      </li>
-
-      <li class="step hidden" id="sets-apply-step">
-        <div class="step-head">
-          <h3><span class="step-number">2</span>Adicionar ou remover</h3>
-        </div>
-        <div class="direction-choices" role="radiogroup" aria-labelledby="direction-label">
-          <label class="direction"><input type="radio" name="set-direction" value="add" checked><span>Adicionar ao meu arquivo</span></label>
-          <label class="direction"><input type="radio" name="set-direction" value="remove"><span>Remover do meu arquivo</span></label>
-        </div>
-        <span class="visually-hidden" id="direction-label">O que fazer com essas marcações</span>
-        <div class="result" id="sets-preview"></div>
-      </li>
-    </ol>
-
-    <button class="primary-btn" id="sets-run" disabled>Baixar minimapmarkers.bin</button>
-    <p class="micro-hint">Baixa um <code>.zip</code> com o <code>minimapmarkers.bin</code> atualizado, um backup do arquivo que você carregou, e o <code>marker-sets-log.txt</code>.</p>
-    <div class="result" id="sets-result"></div>
-  </section>
-
   <dialog class="sheet" id="assistant-sheet" aria-labelledby="assistant-title">
     <div class="sheet-head"><h3 id="assistant-title">Outros Assistentes</h3></div>
     <div class="sheet-body">
@@ -270,41 +277,6 @@
     <div class="sheet-actions">
       <button type="button" class="primary-btn" data-close-sheet="icon-names-sheet">Concluído</button>
     </div>
-  </dialog>
-
-  <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-sheet-title">
-    <form method="dialog">
-      <div class="sheet-head"><h3 id="edit-sheet-title">Editar Marcação</h3></div>
-      <div class="sheet-body">
-        <div class="marker-form">
-          <div class="field field-coord">
-            <label for="edit-x">X</label>
-            <input type="text" inputmode="numeric" autocomplete="off" id="edit-x">
-          </div>
-          <div class="field field-coord">
-            <label for="edit-y">Y</label>
-            <input type="text" inputmode="numeric" autocomplete="off" id="edit-y">
-          </div>
-          <div class="field field-coord">
-            <label for="edit-z">Z (andar)</label>
-            <input type="text" inputmode="numeric" autocomplete="off" id="edit-z">
-          </div>
-          <div class="field field-full">
-            <label for="edit-label">Rótulo</label>
-            <input type="text" id="edit-label" autocomplete="off">
-          </div>
-          <div class="field field-full">
-            <span class="field-label" id="edit-icon-label">Ícone da marcação</span>
-            <div class="icon-field" data-icon-field="edit-icon"></div>
-          </div>
-        </div>
-        <p class="form-message error hidden" id="edit-message"></p>
-      </div>
-      <div class="sheet-actions">
-        <button type="button" class="tertiary-btn" id="edit-cancel">Cancelar</button>
-        <button type="submit" class="primary-btn" id="edit-save">Salvar Alterações</button>
-      </div>
-    </form>
   </dialog>
 
   <dialog class="sheet sheet-confirm" id="clear-sheet" aria-labelledby="clear-sheet-title">
@@ -362,6 +334,8 @@
     · <a href="https://github.com/nesleykent/tibia-maps-merge" target="_blank" rel="noopener">Código-fonte no GitHub</a>
     · <a class="version-link" href="#" target="_blank" rel="noopener">v0.0.0</a>
   </footer>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
 </div>
 
 <script type="module" src="../app.js"></script>

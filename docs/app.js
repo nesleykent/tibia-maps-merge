@@ -227,6 +227,35 @@ yourMarkersClear.addEventListener('click', () => {
   yourMarkersInput.focus();
 });
 
+// ---------- Drag and drop onto the shared picker ----------
+// The dashed border already reads as a drop target; without this, dragging a
+// file onto it did the opposite of what it looked like -- the browser
+// navigated to the file and any unsaved work in the tab was gone. A page-wide
+// guard stops that outcome even on a near miss a few pixels outside the
+// picker; only a drop that actually lands on the picker is accepted.
+window.addEventListener('dragover', (event) => event.preventDefault());
+window.addEventListener('drop', (event) => {
+  if (!event.target.closest('.workspace-picker')) event.preventDefault();
+});
+
+const yourMarkersPicker = yourMarkersInput.closest('.workspace-picker');
+yourMarkersPicker.addEventListener('dragenter', (event) => {
+  event.preventDefault();
+  yourMarkersPicker.classList.add('drag-over');
+});
+yourMarkersPicker.addEventListener('dragover', (event) => event.preventDefault());
+yourMarkersPicker.addEventListener('dragleave', (event) => {
+  if (event.target === yourMarkersPicker) yourMarkersPicker.classList.remove('drag-over');
+});
+yourMarkersPicker.addEventListener('drop', (event) => {
+  event.preventDefault();
+  yourMarkersPicker.classList.remove('drag-over');
+  const { files } = event.dataTransfer;
+  if (!files || files.length === 0) return;
+  yourMarkersInput.files = files;
+  yourMarkersInput.dispatchEvent(new Event('change', { bubbles: true }));
+});
+
 // ---------- Shared helpers ----------
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -261,6 +290,34 @@ function withBusy(button, fn) {
       button.textContent = original;
     }
   };
+}
+
+/**
+ * Action -> result -> undo, for a reversible removal that doesn't need a
+ * confirmation dialog interrupting it up front. `onUndo` restores whatever
+ * was removed; the toast clears itself after a few seconds if not used.
+ */
+function showUndoToast(message, onUndo) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  const text = document.createElement('span');
+  text.textContent = message;
+  const undo = document.createElement('button');
+  undo.type = 'button';
+  undo.className = 'link-btn';
+  undo.textContent = t('undoAction');
+  let timer;
+  const dismiss = () => {
+    clearTimeout(timer);
+    toast.remove();
+  };
+  undo.addEventListener('click', () => {
+    dismiss();
+    onUndo();
+  });
+  toast.append(text, undo);
+  toastRegion.appendChild(toast);
+  timer = setTimeout(dismiss, 8000);
 }
 
 async function backupYourMarkerFiles(generatedAt) {
@@ -551,13 +608,12 @@ const markApplyStep = document.getElementById('mark-apply-step');
 const markPreview = document.getElementById('mark-preview');
 const markDirectionHint = document.getElementById('mark-direction-hint');
 const addRunButton = document.getElementById('add-run');
-const editSheet = document.getElementById('edit-sheet');
-const editFieldX = document.getElementById('edit-x');
-const editFieldY = document.getElementById('edit-y');
-const editFieldZ = document.getElementById('edit-z');
-const editFieldLabel = document.getElementById('edit-label');
-const editMessage = document.getElementById('edit-message');
 const clearSheet = document.getElementById('clear-sheet');
+const addSelectionToolbar = document.getElementById('add-selection-toolbar');
+const addSelectionCount = document.getElementById('add-selection-count');
+const addDeleteSelectedButton = document.getElementById('add-delete-selected');
+const addSelectAllCheckbox = document.getElementById('add-select-all');
+const toastRegion = document.getElementById('toast-region');
 
 /**
  * Build the icon picker in `container`: every marker type the format supports,
@@ -622,7 +678,6 @@ document.getElementById('icon-names-list').innerHTML = MARKER_ICONS.map(({ id, n
 )).join('');
 
 const markIconSelect = mountIconField(document.querySelector('[data-icon-field="mark-icon"]'));
-const editIconSelect = mountIconField(document.querySelector('[data-icon-field="edit-icon"]'));
 
 // ---------- Pending marker list ----------
 function loadPending() {
@@ -651,6 +706,14 @@ function savePending() {
 
 let pending = loadPending();
 let conflictResolutions = new Map();
+
+// Selection is keyed by coordinate, the same identity `upsertMarker` already
+// treats as unique -- stable across re-renders and row reordering, unlike an
+// index into `pending`. The one row mid-edit is tracked the same way, so at
+// most one row can be in edit mode at a time.
+let selectedKeys = new Set();
+let editingKey = null;
+let lastCheckedIndex = null;
 
 // tibiamaps.io's map takes the position in its fragment, with a zoom level
 // after the colon: https://tibiamaps.io/map#33281,31724,7:1
@@ -758,8 +821,8 @@ function renderConflictOverview(conflicts, mode) {
       <p>${escapeHtml(t('markConflictsReviewHint'))}</p>
     </div>
     <div class="review-conflict-actions">
-      <button type="button" class="secondary-btn" data-resolution="keep">${escapeHtml(t('markConflictKeepAll'))}</button>
-      <button type="button" class="primary-btn" data-resolution="replace">${escapeHtml(t('markConflictUseAll'))}</button>
+      <button type="button" class="tertiary-btn" data-resolution="keep">${escapeHtml(t('markConflictKeepAll'))}</button>
+      <button type="button" class="tertiary-btn emphasized" data-resolution="replace">${escapeHtml(t('markConflictUseAll'))}</button>
     </div>`;
   reviewConflicts.querySelectorAll('[data-resolution]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -767,6 +830,150 @@ function renderConflictOverview(conflicts, mode) {
       renderPending();
     });
   });
+}
+
+/**
+ * Removes the given `pending` indices together, keyed by coordinate so the
+ * selection and any in-progress edit stay consistent, then offers one
+ * action -> result -> undo toast for the whole batch. Used by both the
+ * per-row Delete button (a batch of one) and the selection toolbar.
+ */
+function deleteMarkers(indices) {
+  if (indices.length === 0) return;
+  const removed = [...indices].sort((a, b) => b - a).map((index) => ({ index, marker: pending[index] }));
+  removed.forEach(({ index }) => pending.splice(index, 1));
+  removed.forEach(({ marker }) => selectedKeys.delete(markerKey(marker)));
+  if (editingKey !== null && removed.some(({ marker }) => markerKey(marker) === editingKey)) {
+    editingKey = null;
+  }
+  renderPending();
+
+  const label = removed.length === 1
+    ? t('markDeleted', removed[0].marker.description)
+    : t('marksDeletedCount', removed.length);
+  showUndoToast(label, () => {
+    [...removed].sort((a, b) => a.index - b.index).forEach(({ index, marker }) => {
+      pending.splice(Math.min(index, pending.length), 0, marker);
+    });
+    renderPending();
+  });
+}
+
+function handleRowCheckboxClick(key, index, event) {
+  const checked = event.target.checked;
+  if (event.shiftKey && lastCheckedIndex !== null) {
+    const [start, end] = [lastCheckedIndex, index].sort((a, b) => a - b);
+    for (let i = start; i <= end; i += 1) {
+      const rangeKey = markerKey(pending[i]);
+      if (checked) selectedKeys.add(rangeKey); else selectedKeys.delete(rangeKey);
+    }
+  } else if (checked) {
+    selectedKeys.add(key);
+  } else {
+    selectedKeys.delete(key);
+  }
+  lastCheckedIndex = index;
+  renderPending();
+}
+
+function updateSelectionUI() {
+  const total = pending.length;
+  const selected = selectedKeys.size;
+  addSelectAllCheckbox.checked = total > 0 && selected === total;
+  addSelectAllCheckbox.indeterminate = selected > 0 && selected < total;
+  addSelectionToolbar.classList.toggle('hidden', selected === 0);
+  addSelectionCount.textContent = t('selectedCount', selected);
+}
+
+/**
+ * The row-in-place editor: two <tr>s (fields, then the icon grid, which is
+ * too wide to share a row with the rest) swapped in for one pending marker.
+ * Direct manipulation in the table itself, no dialog -- Enter saves, Escape
+ * cancels, same as the rest of the app's inline controls.
+ */
+function buildEditRow(marker, index) {
+  const coordinates = `${marker.x}, ${marker.y}, ${marker.z}`;
+  const row = document.createElement('tr');
+  row.className = 'row-editing';
+  row.innerHTML = `
+    <td class="cell-select"></td>
+    <td class="cell-map"></td>
+    <td class="edit-cell cell-x"><input type="text" inputmode="numeric" autocomplete="off"></td>
+    <td class="edit-cell cell-y"><input type="text" inputmode="numeric" autocomplete="off"></td>
+    <td class="edit-cell cell-z"><input type="text" inputmode="numeric" autocomplete="off"></td>
+    <td class="edit-cell cell-label-edit"><input type="text" autocomplete="off"></td>
+    <td class="cell-icon"></td>
+    <td class="cell-actions">
+      <button type="button" class="row-btn" data-action="save"></button>
+      <button type="button" class="row-btn" data-action="cancel"></button>
+    </td>`;
+  row.querySelector('.cell-map').appendChild(createMapLink(marker, coordinates));
+  const xInput = row.querySelector('.cell-x input');
+  const yInput = row.querySelector('.cell-y input');
+  const zInput = row.querySelector('.cell-z input');
+  const labelInput = row.querySelector('.cell-label-edit input');
+  xInput.value = marker.x;
+  yInput.value = marker.y;
+  zInput.value = marker.z;
+  labelInput.value = marker.description;
+  xInput.setAttribute('aria-label', t('editXLabel'));
+  yInput.setAttribute('aria-label', t('editYLabel'));
+  zInput.setAttribute('aria-label', t('editZLabel'));
+  labelInput.setAttribute('aria-label', t('editLabelLabel'));
+  const [saveButton, cancelButton] = row.querySelectorAll('.row-btn');
+  saveButton.textContent = t('saveAction');
+  cancelButton.textContent = t('cancelAction');
+
+  const iconRow = document.createElement('tr');
+  iconRow.className = 'row-editing';
+  const iconCell = document.createElement('td');
+  iconCell.colSpan = 8;
+  iconCell.className = 'row-icon-editor';
+  const errorMessage = document.createElement('p');
+  errorMessage.className = 'row-edit-error hidden';
+  const iconWrap = document.createElement('div');
+  iconWrap.className = 'icon-field';
+  iconWrap.dataset.iconField = `row-icon-${index}`;
+  iconCell.append(errorMessage, iconWrap);
+  iconRow.appendChild(iconCell);
+  const iconSelect = mountIconField(iconWrap);
+  iconWrap.removeAttribute('aria-labelledby');
+  iconWrap.setAttribute('aria-label', t('markIconFieldLabel'));
+  iconSelect.value = marker.icon;
+
+  const commit = () => {
+    const candidate = {
+      description: labelInput.value.trim(),
+      icon: iconSelect.value,
+      x: toInteger(xInput.value),
+      y: toInteger(yInput.value),
+      z: toInteger(zInput.value),
+    };
+    const problem = checkMarkerFields(candidate);
+    if (problem) {
+      errorMessage.textContent = t(problem.key, ...(problem.args ?? []));
+      errorMessage.classList.remove('hidden');
+      return;
+    }
+    upsertMarker(candidate, { replacingIndex: index });
+    editingKey = null;
+    renderPending();
+  };
+  const cancel = () => {
+    editingKey = null;
+    renderPending();
+  };
+  saveButton.addEventListener('click', commit);
+  cancelButton.addEventListener('click', cancel);
+  [xInput, yInput, zInput, labelInput].forEach((input) => {
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') { event.preventDefault(); commit(); } else if (event.key === 'Escape') { event.preventDefault(); cancel(); }
+    });
+  });
+
+  const fragment = document.createDocumentFragment();
+  fragment.append(row, iconRow);
+  return fragment;
 }
 
 function renderPending() {
@@ -777,10 +984,24 @@ function renderPending() {
   conflictResolutions = new Map(
     [...conflictResolutions].filter(([signature]) => currentSignatures.has(signature)),
   );
+
+  const pendingKeys = new Set(pending.map(markerKey));
+  selectedKeys = new Set([...selectedKeys].filter((key) => pendingKeys.has(key)));
+  if (editingKey !== null && !pendingKeys.has(editingKey)) editingKey = null;
+
   pending.forEach((marker, index) => {
+    const key = markerKey(marker);
+
+    if (key === editingKey) {
+      addRows.appendChild(buildEditRow(marker, index));
+      return;
+    }
+
     const coordinates = `${marker.x}, ${marker.y}, ${marker.z}`;
     const row = document.createElement('tr');
+    if (selectedKeys.has(key)) row.className = 'row-selected';
     row.innerHTML = `
+      <td class="cell-select"><input type="checkbox"></td>
       <td class="cell-map"></td>
       <td>${marker.x}</td>
       <td>${marker.y}</td>
@@ -798,20 +1019,23 @@ function renderPending() {
     iconCell.querySelector('.visually-hidden').textContent = iconLabel(marker.icon);
     iconCell.title = iconLabel(marker.icon);
     row.querySelector('.cell-map').appendChild(createMapLink(marker, coordinates));
+    const checkbox = row.querySelector('.cell-select input');
+    checkbox.checked = selectedKeys.has(key);
+    checkbox.setAttribute('aria-label', t('selectRowLabel', coordinates));
+    checkbox.addEventListener('click', (event) => handleRowCheckboxClick(key, index, event));
     const [editButton, deleteButton] = row.querySelectorAll('.row-btn');
     editButton.textContent = t('editAction');
     deleteButton.textContent = t('deleteAction');
-    editButton.addEventListener('click', () => openEditSheet(index));
-    deleteButton.addEventListener('click', () => {
-      pending.splice(index, 1);
-      renderPending();
-    });
+    editButton.addEventListener('click', () => { editingKey = key; renderPending(); });
+    deleteButton.addEventListener('click', () => deleteMarkers([index]));
     addRows.appendChild(row);
 
-    const conflict = conflictByCoordinate.get(markerKey(marker));
+    const conflict = conflictByCoordinate.get(key);
     if (conflict) {
       const detailRow = document.createElement('tr');
       detailRow.className = 'marker-conflict-detail';
+      const selectSpacerCell = document.createElement('td');
+      selectSpacerCell.className = 'cell-select';
       const mapCell = document.createElement('td');
       mapCell.className = 'cell-map';
       mapCell.appendChild(createMapLink(conflict.incoming, coordinates));
@@ -835,7 +1059,7 @@ function renderPending() {
       );
       fieldset.append(legend, choices);
       detailCell.appendChild(fieldset);
-      detailRow.append(mapCell, detailCell);
+      detailRow.append(selectSpacerCell, mapCell, detailCell);
       addRows.appendChild(detailRow);
     }
   });
@@ -845,8 +1069,38 @@ function renderPending() {
   reviewStep.classList.toggle('hidden', pending.length === 0);
   addRunButton.disabled = pending.length === 0;
   refreshApplyStep();
+  updateSelectionUI();
   savePending();
 }
+
+addSelectAllCheckbox.addEventListener('change', () => {
+  selectedKeys = addSelectAllCheckbox.checked ? new Set(pending.map(markerKey)) : new Set();
+  renderPending();
+});
+
+addDeleteSelectedButton.addEventListener('click', () => {
+  const indices = pending.map((marker, index) => index).filter((index) => selectedKeys.has(markerKey(pending[index])));
+  deleteMarkers(indices);
+});
+
+// Text-editing controls need Delete/Backspace for their own job; a checkbox
+// or button does not, so only those two input types are excluded here.
+const isTextEditingControl = (el) => el.tagName === 'TEXTAREA'
+  || el.tagName === 'SELECT'
+  || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'submit'].includes(el.type));
+
+// Delete/Backspace acts on the current selection from anywhere in the table
+// -- macOS reports its main delete key as "Backspace", so both are bound --
+// but never inside a text control, where the same key has to keep deleting
+// characters instead.
+addRows.addEventListener('keydown', (event) => {
+  if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+  if (selectedKeys.size === 0) return;
+  if (isTextEditingControl(event.target)) return;
+  event.preventDefault();
+  const indices = pending.map((marker, index) => index).filter((index) => selectedKeys.has(markerKey(pending[index])));
+  deleteMarkers(indices);
+});
 
 // With no file loaded there is nothing to remove from, so the only thing the
 // list can produce is a new file. Answering 'add' there keeps a stale radio
@@ -1144,46 +1398,6 @@ addButton.addEventListener('click', () => {
   if (markers.length > 0 && errors.length === 0) coordsField.value = '';
   syncAddButton();
 });
-
-// ---------- Edit sheet ----------
-// Editing is a temporary, cancellable context, so it gets its own sheet with
-// a Cancel / Save Changes pair rather than putting a Cancel button in the
-// workspace next to the tab's primary action.
-let editingIndex = -1;
-
-function openEditSheet(index) {
-  editingIndex = index;
-  const marker = pending[index];
-  editFieldX.value = marker.x;
-  editFieldY.value = marker.y;
-  editFieldZ.value = marker.z;
-  editFieldLabel.value = marker.description;
-  editIconSelect.value = marker.icon;
-  editMessage.classList.add('hidden');
-  editSheet.showModal();
-}
-
-editSheet.querySelector('form').addEventListener('submit', (event) => {
-  const marker = {
-    description: editFieldLabel.value.trim(),
-    icon: editIconSelect.value,
-    x: toInteger(editFieldX.value),
-    y: toInteger(editFieldY.value),
-    z: toInteger(editFieldZ.value),
-  };
-  const problem = checkMarkerFields(marker);
-  if (problem) {
-    // Keep the sheet open so the entry can be corrected in place.
-    event.preventDefault();
-    editMessage.textContent = t(problem.key, ...(problem.args ?? []));
-    editMessage.classList.remove('hidden');
-    return;
-  }
-  upsertMarker(marker, { replacingIndex: editingIndex });
-  renderPending();
-});
-
-document.getElementById('edit-cancel').addEventListener('click', () => editSheet.close());
 
 // ---------- Remove-all confirmation ----------
 addClearButton.addEventListener('click', () => {

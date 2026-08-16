@@ -1,22 +1,39 @@
 @import "./vendor/instagram-design-system/styles.css";
 
+/* Token layer: light values live on the bare :root; the dark values below
+   override only the tokens that change, so an un-stamped root (the common
+   case -- no explicit user choice) still resolves a complete theme from
+   `prefers-color-scheme` alone, and an explicit [data-theme] wins either way.
+
+   Several values here are deliberately darker or bluer than the archive's
+   literal token, the same way --ig-tertiary-text below was already darkened
+   from the archive's 199,199,199 (1.9:1 on white) to something legible.
+   --ig-primary-button, --ig-error-or-destructive and --warning fail 4.5:1 as
+   text or as white-on-fill at their literal values; §119 puts the
+   Accessibility gate above literal Instagram fidelity, so the same rule that
+   justified the tertiary-text override applies here too. Every replacement
+   keeps the source hue family and clears 4.5:1 with margin -- see the ratios
+   noted beside each line. */
 :root {
   color-scheme: light;
-  /* Keep the product UI in the Instagram light token set regardless of OS theme. */
   --ig-primary-background: 255, 255, 255;
   --ig-secondary-background: 243, 245, 247;
   --ig-elevated-background: 255, 255, 255;
   --ig-secondary-elevated-background: 243, 245, 247;
   --ig-primary-text: 0, 0, 0;
-  --ig-secondary-text: 115, 115, 115;
-  --ig-tertiary-text: 115, 115, 115;
+  /* The archive's already-corrected 115,115,115 (itself darkened from the
+     source default) still only clears 4.5:1 against white cards, not
+     against --bg -- this text sits on both. 108,108,108 clears both
+     (5.25:1 / 4.8:1) at a difference too small to read as a hue shift. */
+  --ig-secondary-text: 108, 108, 108;
+  --ig-tertiary-text: 108, 108, 108;
   --ig-primary-icon: 38, 38, 38;
   --ig-secondary-icon: 142, 142, 142;
   --ig-highlight-background: 239, 239, 239;
   --ig-separator: 219, 219, 219;
   --post-separator: 239, 239, 239;
   --ig-stroke: 219, 219, 219;
-  --ig-focus-stroke: 168, 168, 168;
+  --ig-focus-stroke: 130, 130, 130;
   --ig-hover-overlay-rgb: 0, 0, 0;
   --ig-hover-overlay-alpha: .05;
   --ig-secondary-button: 250, 250, 250;
@@ -26,6 +43,24 @@
   --ig-tertiary-button-hover: 245, 245, 245;
   --ig-tertiary-button-text: 38, 38, 38;
   --ig-incoming-message-bubble: 243, 245, 247;
+  /* Same blue family as the archive's 0,149,246 -- deepened so white-on-fill
+     and text-on-page both clear 4.5:1 (5.3:1 and 4.85:1 respectively). The
+     original stays reserved for large decorative fills (the hero gradient)
+     where text never sits directly on it. */
+  --ig-primary-button: 0, 111, 184;
+  --ig-primary-button-hover: 0, 90, 150;
+  /* Same values again, named for the role: a solid button large enough to
+     carry white text needs only 4.5:1 for *that* pairing, which the light
+     accent already clears on its own -- dark mode is where the two roles
+     need to split, see below. */
+  --ig-button-fill: 0, 111, 184;
+  --ig-button-fill-hover: 0, 90, 150;
+  --ig-success: 88, 195, 34;
+  /* Archive value 237,73,86 is 3.69:1 on white; darkened ~20% along the same
+     hue reaches 5.45:1 as text and as white-on-fill (the destructive button). */
+  --ig-error-or-destructive: 189, 58, 68;
+  --ig-destructive-fill: 189, 58, 68;
+  --ig-destructive-fill-hover: 165, 48, 57;
   --bg: rgb(var(--ig-secondary-background));
   --surface: rgb(var(--ig-primary-background));
   --surface-raised: rgb(var(--ig-elevated-background));
@@ -35,14 +70,115 @@
   --muted: rgb(var(--ig-secondary-text));
   --accent: rgb(var(--ig-primary-button));
   --accent-hover: rgb(var(--ig-primary-button-hover));
+  --accent-fill: rgb(var(--ig-button-fill));
+  --accent-fill-hover: rgb(var(--ig-button-fill-hover));
   --ok: rgb(var(--ig-success));
   --err: rgb(var(--ig-error-or-destructive));
-  --warning: var(--ig-gradient-stop-orange);
+  --err-fill: rgb(var(--ig-destructive-fill));
+  --err-fill-hover: rgb(var(--ig-destructive-fill-hover));
+  /* A semantic status colour, not a borrowed gradient stop (the gradient's
+     own stops stay reserved for the hero per the archive's "one loud
+     gradient, everything else quiet" rule). 178,85,0 on the same orange hue
+     clears 4.5:1 as text (5.0:1) where the gradient stop itself measured
+     2.6:1. */
+  --warning: rgb(178, 85, 0);
+  --shadow-floating: 0 0 10px rgba(0, 0, 0, .2);
+  /* --input-border-radius (6px, archive-exact) stays reserved for genuine
+     form controls -- text inputs, selects, the file picker. Everything else
+     that was borrowing it (buttons, tiles, row items, callouts) takes this
+     instead, so a change to input rounding doesn't silently reshape buttons
+     too. --ig-radius-md is the archive's general-surface rung. */
+  --radius-control: var(--ig-radius-md);
   /* Optical adjustments stay derived from the same 4px spacing scale. */
   --space-optical-nudge: calc(var(--ig-space-1) / 2);
   --space-inline-code-x: calc(var(--ig-space-3) / 2);
   --control-chevron-space: calc(var(--ig-space-4) + var(--space-optical-nudge));
   --selection-check-size: calc(var(--ig-space-3) + var(--space-optical-nudge));
+}
+
+/* Dark values, same token set. The un-stamped case (no explicit
+   [data-theme]) is what most visitors get -- an OS/browser set to dark with
+   no per-site override -- so it has to resolve a complete theme from the
+   media query alone; an explicit light choice must still win over it. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ig-primary-background: 12, 16, 20;
+    --ig-secondary-background: 8, 11, 14;
+    --ig-elevated-background: 33, 35, 40;
+    --ig-secondary-elevated-background: 43, 48, 54;
+    --ig-primary-text: 245, 245, 245;
+    --ig-secondary-text: 168, 168, 168;
+    --ig-tertiary-text: 168, 168, 168;
+    --ig-primary-icon: 245, 245, 245;
+    --ig-secondary-icon: 168, 168, 168;
+    --ig-highlight-background: 38, 38, 38;
+    --ig-separator: 56, 60, 65;
+    --post-separator: 38, 38, 38;
+    --ig-stroke: 85, 85, 85;
+    --ig-focus-stroke: 150, 150, 150;
+    --ig-hover-overlay-rgb: 255, 255, 255;
+    --ig-hover-overlay-alpha: .1;
+    --ig-secondary-button: 38, 38, 38;
+    --ig-secondary-button-hover: 54, 54, 54;
+    --ig-tertiary-button-background: 33, 35, 40;
+    --ig-tertiary-button-border: 54, 54, 54;
+    --ig-tertiary-button-hover: 38, 38, 38;
+    --ig-tertiary-button-text: 245, 245, 245;
+    /* Same accessible blue as light mode -- already clears 4.5:1 against
+       both the dark page ground and white fill text, so nothing about the
+       accent needs to change between themes. */
+    --ig-primary-button: 64, 156, 224;
+    --ig-primary-button-hover: 100, 176, 232;
+    /* Split from --ig-primary-button here: the lighter blue that reads as
+       text against a near-black page (6.4:1) is too light for white button
+       text on top of it (2.98:1) -- a solid fill needs its own, darker
+       value to carry white text at 4.5:1+. */
+    --ig-button-fill: 0, 98, 180;
+    --ig-button-fill-hover: 0, 80, 150;
+    --ig-success: 108, 209, 66;
+    --ig-error-or-destructive: 224, 104, 112;
+    --ig-destructive-fill: 190, 55, 65;
+    --ig-destructive-fill-hover: 170, 48, 58;
+    --warning: rgb(224, 152, 80);
+    --shadow-floating: 0 0 12px rgba(0, 0, 0, .55);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ig-primary-background: 12, 16, 20;
+  --ig-secondary-background: 8, 11, 14;
+  --ig-elevated-background: 33, 35, 40;
+  --ig-secondary-elevated-background: 43, 48, 54;
+  --ig-primary-text: 245, 245, 245;
+  --ig-secondary-text: 168, 168, 168;
+  --ig-tertiary-text: 168, 168, 168;
+  --ig-primary-icon: 245, 245, 245;
+  --ig-secondary-icon: 168, 168, 168;
+  --ig-highlight-background: 38, 38, 38;
+  --ig-separator: 56, 60, 65;
+  --post-separator: 38, 38, 38;
+  --ig-stroke: 85, 85, 85;
+  --ig-focus-stroke: 150, 150, 150;
+  --ig-hover-overlay-rgb: 255, 255, 255;
+  --ig-hover-overlay-alpha: .1;
+  --ig-secondary-button: 38, 38, 38;
+  --ig-secondary-button-hover: 54, 54, 54;
+  --ig-tertiary-button-background: 33, 35, 40;
+  --ig-tertiary-button-border: 54, 54, 54;
+  --ig-tertiary-button-hover: 38, 38, 38;
+  --ig-tertiary-button-text: 245, 245, 245;
+  --ig-primary-button: 64, 156, 224;
+  --ig-primary-button-hover: 100, 176, 232;
+  --ig-button-fill: 0, 98, 180;
+  --ig-button-fill-hover: 0, 80, 150;
+  --ig-success: 108, 209, 66;
+  --ig-error-or-destructive: 224, 104, 112;
+  --ig-destructive-fill: 190, 55, 65;
+  --ig-destructive-fill-hover: 170, 48, 58;
+  --warning: rgb(224, 152, 80);
+  --shadow-floating: 0 0 12px rgba(0, 0, 0, .55);
 }
 
 * { box-sizing: border-box; }
@@ -79,6 +215,15 @@ a:hover { text-decoration: underline; }
   padding: var(--ig-space-6) var(--ig-space-6) var(--ig-space-16);
 }
 
+/* Past 980px there was nothing for the extra width to do -- one column got
+   wider margins, not more structure. Edit Marks is the mode that actually
+   needs the room: its form, its table, and its apply step no longer have to
+   stack in one long scroll on a screen wide enough for a form | review
+   split (see #add-marks-steps below). */
+@media (min-width: 1040px) {
+  .app { width: min(100%, 1200px); }
+}
+
 header {
   position: relative;
   overflow: hidden;
@@ -89,12 +234,16 @@ header {
   color: rgb(var(--web-always-white));
 }
 
+/* A flat wash over the whole hero, not just a bottom fade -- the fade left the
+   top of the subtitle sitting almost directly on the gradient, which measured
+   as low as 3.25:1 against white text at its lightest (rose) point. A uniform
+   .2 wash clears 4.5:1 everywhere the gradient goes, including under the
+   headline. */
 header::after {
   position: absolute;
-  inset: auto 0 0;
-  height: 42%;
+  inset: 0;
   content: "";
-  background: linear-gradient(to top, rgba(0, 0, 0, .26), transparent);
+  background: rgba(0, 0, 0, .2);
   pointer-events: none;
 }
 
@@ -143,10 +292,13 @@ header h1 {
   max-width: 720px;
   margin: 0 0 var(--ig-space-4);
   font-family: var(--font-family-brand-headline);
-  font-size: 56px;
+  /* Continuous scaling in place of the old fixed-56px/mobile-38px jump, and
+     the archive's own display tracking restored (was letter-spacing: 0). */
+  font-size: clamp(34px, 6vw + 14px, 56px);
   font-weight: var(--font-weight-system-bold);
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: var(--ig-tracking-display);
+  text-wrap: balance;
 }
 
 .subtitle {
@@ -175,7 +327,9 @@ header h1 {
   border: 1px solid var(--border);
   border-radius: var(--ig-radius-lg);
   background: var(--surface-raised);
-  box-shadow: var(--ig-shadow-card);
+  /* Ordinary content, not floating chrome: a border carries the boundary,
+     the way the archive's own cards do -- the layered shadow belongs to the
+     sheet below, where the plane is genuinely elevated above the page. */
 }
 
 .workspace-source-head {
@@ -189,8 +343,10 @@ header h1 {
 .workspace-source-head h2 {
   margin: var(--space-optical-nudge) 0 var(--ig-space-1);
   font-family: var(--font-family-brand);
-  font-size: var(--system-20-font-size, 20px);
-  line-height: 1.2;
+  /* 20px isn't on the archive's ladder (18 steps to 22) -- the nearest rung
+     up, with its own paired line-height rather than a hand-set 1.2. */
+  font-size: var(--system-22-font-size);
+  line-height: var(--system-22-line-height);
 }
 
 .workspace-source-head p {
@@ -249,10 +405,27 @@ header h1 {
   gap: var(--ig-space-2);
   margin-bottom: var(--ig-space-6);
   padding-top: var(--ig-space-2);
+  /* Extra room below the tabs so a keyboard focus ring has space to sit in --
+     overflow-x: auto otherwise computes overflow-y to auto too, and an
+     outline sitting right at the container's edge gets clipped as overflow. */
+  padding-bottom: var(--ig-space-2);
   overflow-x: auto;
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
   scrollbar-width: none;
+  /* A CSS-only scroll shadow: the two --bg-coloured gradients scroll with the
+     content and occlude the two shadow gradients wherever there's nothing
+     left to reveal, so the fade only shows on the side that still has
+     off-screen tabs -- exactly what tells a narrow viewport that Marker Sets
+     is still reachable, without a fixed affordance sitting there needlessly
+     on wide screens where every tab already fits. */
+  background:
+    linear-gradient(to right, var(--bg) 40%, transparent),
+    linear-gradient(to left, var(--bg) 40%, transparent) 100% 0,
+    linear-gradient(to right, rgba(0, 0, 0, .16), transparent 20px),
+    linear-gradient(to left, rgba(0, 0, 0, .16), transparent 20px) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 32px 100%, 32px 100%, 16px 100%, 16px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .mode-tabs::-webkit-scrollbar { display: none; }
@@ -285,7 +458,10 @@ header h1 {
   height: 3px;
   border-radius: var(--ig-radius-pill);
   content: "";
-  background: var(--ig-gradient-warm);
+  /* Solid accent, not the brand gradient -- the gradient is the hero's one
+     loud moment; a tab underline is routine chrome and the warm ramp doesn't
+     appear anywhere else in the product. */
+  background: var(--accent);
   opacity: 0;
 }
 
@@ -460,6 +636,15 @@ textarea:focus {
   background: rgba(var(--ig-hover-overlay-rgb), var(--ig-hover-overlay-alpha));
 }
 
+/* The dashed border already reads as a drop target; this is what confirms a
+   file dragged over it will actually be accepted here rather than
+   navigating the browser away. */
+.file-picker.drag-over {
+  border-style: solid;
+  border-color: var(--accent);
+  background: rgba(var(--ig-primary-button), .08);
+}
+
 .file-picker input[type="file"] {
   position: absolute;
   max-width: 1px;
@@ -491,7 +676,7 @@ button { font-family: inherit; }
   justify-content: center;
   appearance: none;
   -webkit-appearance: none;
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   cursor: pointer;
   font-weight: var(--font-weight-system-semibold);
   letter-spacing: 0;
@@ -505,13 +690,16 @@ button { font-family: inherit; }
   min-height: 44px;
   padding: 0 var(--ig-space-6);
   border: 1px solid transparent;
-  background: var(--accent);
+  /* The fill token, not --accent: in dark mode the two diverge because a
+     blue light enough to read as text on a near-black page is too light to
+     carry white button text at 4.5:1. */
+  background: var(--accent-fill);
   color: rgb(var(--web-always-white));
-  font-size: var(--system-15-font-size, 15px);
-  line-height: 20px;
+  font-size: var(--system-16-font-size);
+  line-height: var(--system-16-line-height);
 }
 
-.primary-btn:hover { background: var(--accent-hover); }
+.primary-btn:hover { background: var(--accent-fill-hover); }
 
 .primary-btn:disabled {
   cursor: default;
@@ -565,13 +753,13 @@ button { font-family: inherit; }
   min-height: 40px;
   padding: 0 var(--ig-space-5);
   border: 1px solid transparent;
-  background: var(--err);
+  background: var(--err-fill);
   color: rgb(var(--web-always-white));
   font-size: var(--system-14-font-size);
   line-height: var(--system-14-line-height);
 }
 
-.destructive-btn:hover { background: rgba(var(--ig-error-or-destructive), .85); }
+.destructive-btn:hover { background: var(--err-fill-hover); }
 
 .secondary-btn.destructive { color: var(--err); }
 
@@ -649,7 +837,7 @@ button { font-family: inherit; }
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   cursor: pointer;
   transition:
     background var(--ig-duration-micro) var(--ig-ease-standard),
@@ -686,7 +874,7 @@ button { font-family: inherit; }
   min-height: 42px;
   padding: 0 var(--ig-space-4);
   border: 1px solid var(--border);
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   background: var(--surface);
 }
 
@@ -715,7 +903,7 @@ button { font-family: inherit; }
   appearance: none;
   -webkit-appearance: none;
   border: 1px solid var(--border);
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -787,7 +975,9 @@ button { font-family: inherit; }
   border-radius: var(--ig-radius-lg);
   background: var(--surface-raised);
   color: var(--text);
-  box-shadow: var(--ig-shadow-card);
+  /* Plane 3, genuinely floating above the page: the single flat shadow the
+     archive specifies for floating chrome, not the two-layer card shadow. */
+  box-shadow: var(--shadow-floating);
 }
 
 /* Never on the bare element -- a dialog is display:none until it's open. */
@@ -901,7 +1091,7 @@ button { font-family: inherit; }
   min-height: 46px;
   padding: var(--ig-space-3) var(--ig-space-4);
   border: 1px solid var(--border);
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   background: var(--surface);
   cursor: pointer;
   font-size: var(--system-14-font-size);
@@ -1005,7 +1195,9 @@ button { font-family: inherit; }
   margin-bottom: var(--ig-space-4);
   padding: var(--ig-space-4);
   border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
-  border-radius: var(--card-border-radius);
+  /* Was --card-border-radius, an undefined custom property -- it resolved to
+     the initial value (0), so this box has been rendering square-cornered. */
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--warning) 8%, transparent);
 }
 
@@ -1029,7 +1221,7 @@ button { font-family: inherit; }
 .review-conflict-progress {
   display: inline-block;
   padding: var(--space-optical-nudge) var(--ig-space-2);
-  border-radius: var(--ig-radius-circle);
+  border-radius: var(--ig-radius-pill);
   background: var(--surface);
   color: var(--muted);
   font-size: var(--system-12-font-size);
@@ -1045,7 +1237,7 @@ button { font-family: inherit; }
   gap: var(--ig-space-2);
 }
 
-.review-conflict-actions .secondary-btn {
+.review-conflict-actions .tertiary-btn {
   min-height: 44px;
   margin-left: 0;
 }
@@ -1070,7 +1262,7 @@ button { font-family: inherit; }
   margin: 0;
   padding: var(--ig-space-3);
   border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
-  border-radius: var(--ig-radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-raised);
 }
 
@@ -1094,7 +1286,7 @@ button { font-family: inherit; }
   align-items: start;
   padding: var(--ig-space-3);
   border: 1px solid var(--border);
-  border-radius: var(--ig-radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface);
   cursor: pointer;
 }
@@ -1170,7 +1362,7 @@ button { font-family: inherit; }
   margin: var(--ig-space-3) 0 0;
   padding: var(--ig-space-3) var(--ig-space-4);
   border-left: 3px solid var(--accent);
-  border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
   background: rgba(var(--ig-primary-button), .06);
   color: var(--muted);
   font-size: var(--system-12-font-size);
@@ -1238,6 +1430,39 @@ button { font-family: inherit; }
 
 .step-feedback:empty { display: none; }
 
+/* Edit Marks' form | review split. Define Marks keeps a fixed-ish column on
+   the left (it's a form, not something that benefits from stretching);
+   Review and Add/Remove stack in the remaining width on the right, since the
+   table is what actually wants the room. Source order stays 1, 2, 3 -- only
+   the visual position changes, so tab order and screen-reader order still
+   match the step numbering. */
+@media (min-width: 1040px) {
+  #add-marks-steps {
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+    column-gap: var(--ig-space-8);
+    align-items: start;
+  }
+
+  #define-marks-step {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
+  }
+
+  #review-step {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #mark-apply-step {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
 .import-row {
   display: flex;
   flex-wrap: wrap;
@@ -1257,7 +1482,7 @@ button { font-family: inherit; }
   contain: inline-size;
   overflow-x: auto;
   border: 1px solid var(--border);
-  border-radius: var(--ig-radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-raised);
 }
 
@@ -1299,6 +1524,28 @@ button { font-family: inherit; }
    screen readers, but repeating it as text made every row noisy. */
 .cell-icon { line-height: 0; }
 
+.col-select,
+.cell-select {
+  width: 1%;
+  padding-right: 0;
+  white-space: nowrap;
+}
+
+.cell-select input,
+.col-select input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* A batch import routinely lands dozens of rows; range- and modifier-select
+   let a wrong subset get cleared in one action instead of one Delete click
+   per row. */
+tr.row-selected td {
+  background: rgba(var(--ig-primary-button), .06);
+}
+
 .col-map,
 .cell-map {
   width: 1%;
@@ -1311,7 +1558,7 @@ button { font-family: inherit; }
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   color: var(--muted);
 }
 
@@ -1346,7 +1593,7 @@ button { font-family: inherit; }
   -webkit-appearance: none;
   padding: 0 var(--ig-space-3);
   border: 1px solid var(--border);
-  border-radius: var(--input-border-radius);
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -1364,12 +1611,58 @@ button { font-family: inherit; }
   background: rgba(var(--ig-error-or-destructive), .1);
 }
 
+/* Appears only once something is checked -- an empty toolbar sitting above
+   the table permanently would just be one more thing to read past. */
+.selection-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ig-space-3);
+  min-height: 44px;
+  margin-bottom: var(--ig-space-4);
+  padding: 0 var(--ig-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  font-size: var(--system-14-font-size);
+}
+
+/* Inline editing replaces a row's static cells with real inputs in place --
+   no dialog, so the rest of the table (and where you were in it) never
+   leaves view. */
+.edit-cell input[type="text"] {
+  min-height: 32px;
+  padding: 0 var(--ig-space-2);
+  font-size: var(--system-12-font-size);
+}
+
+.edit-cell.cell-x input,
+.edit-cell.cell-y input,
+.edit-cell.cell-z input { width: 68px; }
+
+.row-icon-editor {
+  padding: var(--ig-space-3) var(--ig-space-4) var(--ig-space-4);
+  background: var(--surface-muted);
+}
+
+.row-icon-editor .icon-field {
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  max-width: 460px;
+}
+
+.row-edit-error {
+  margin: 0 0 var(--ig-space-2);
+  color: var(--err);
+  font-size: var(--system-12-font-size);
+}
+
 .result { margin-top: var(--ig-space-6); }
 
 .result-card {
   padding: var(--ig-space-4);
   border: 1px solid var(--border);
-  border-radius: var(--ig-radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-raised);
   color: var(--text);
   font-size: var(--system-14-font-size);
@@ -1455,6 +1748,59 @@ footer .link-btn {
   outline-offset: 2px;
 }
 
+/* Action -> result -> undo, for the one deletion in the product that had
+   neither a confirmation nor a way back. Fixed to the viewport so it stays
+   reachable regardless of scroll position in a table that can run long. */
+.toast-region {
+  position: fixed;
+  right: var(--ig-space-6);
+  bottom: var(--ig-space-6);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ig-space-2);
+  width: min(calc(100% - var(--ig-space-8)), 420px);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ig-space-4);
+  padding: var(--ig-space-3) var(--ig-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: var(--shadow-floating);
+  font-size: var(--system-14-font-size);
+  line-height: var(--system-14-line-height);
+}
+
+.toast span { min-width: 0; overflow-wrap: anywhere; }
+
+.toast .link-btn { flex: 0 0 auto; font-weight: var(--font-weight-system-semibold); }
+
+/* The vendored reduced-motion block only targets its own rolling animation;
+   this covers what the app itself animates -- the switch thumb's real
+   translateX travel is the one actual movement in the product, everything
+   else here is a colour/background swap that reduced-motion cares less
+   about but costs nothing to include. */
+@media (prefers-reduced-motion: reduce) {
+  .mode-tab-button,
+  .switch,
+  .switch::after,
+  .file-picker,
+  .icon-field .icon-choice,
+  .set-check,
+  .primary-btn,
+  .secondary-btn,
+  .tertiary-btn,
+  .destructive-btn {
+    transition-duration: .01ms !important;
+  }
+}
+
 @media (max-width: 760px) {
   .app {
     padding: var(--ig-space-4) var(--ig-space-4) var(--ig-space-12);
@@ -1471,7 +1817,8 @@ footer .link-btn {
   }
 
   header h1 {
-    font-size: 38px;
+    /* Size is already fluid; only the line-height needs a mobile-specific
+       adjustment, since two lines get tighter at small widths than one. */
     line-height: 1.05;
   }
 
@@ -1551,15 +1898,22 @@ footer .link-btn {
 
   .review-conflict-actions { width: 100%; }
 
-  .review-conflict-actions .secondary-btn,
-  .review-conflict-actions .primary-btn {
+  .review-conflict-actions .tertiary-btn {
     flex: 1 1 180px;
     margin: 0;
   }
 
-  .marker-conflict-detail .cell-map {
+  .marker-conflict-detail .cell-select {
     position: sticky;
     left: 0;
+    z-index: 1;
+    width: 36px;
+    max-width: 36px;
+  }
+
+  .marker-conflict-detail .cell-map {
+    position: sticky;
+    left: 36px;
     z-index: 1;
     width: 44px;
     max-width: 44px;
@@ -1567,14 +1921,14 @@ footer .link-btn {
 
   .marker-conflict-detail .conflict-decision-cell {
     position: sticky;
-    left: 44px;
-    width: calc(100vw - 78px);
-    max-width: calc(100vw - 78px);
+    left: 80px;
+    width: calc(100vw - 114px);
+    max-width: calc(100vw - 114px);
   }
 
   .coordinate-conflict {
-    width: calc(100vw - 110px);
-    max-width: calc(100vw - 110px);
+    width: calc(100vw - 146px);
+    max-width: calc(100vw - 146px);
   }
 
   .conflict-options { grid-template-columns: minmax(0, 1fr); }
