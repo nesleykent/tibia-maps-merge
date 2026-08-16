@@ -771,8 +771,12 @@ function renderPending() {
     if (conflict) {
       const detailRow = document.createElement('tr');
       detailRow.className = 'marker-conflict-detail';
+      const mapCell = document.createElement('td');
+      mapCell.className = 'cell-map';
+      mapCell.appendChild(createMapLink(conflict.incoming, coordinates));
       const detailCell = document.createElement('td');
-      detailCell.colSpan = 7;
+      detailCell.className = 'conflict-decision-cell';
+      detailCell.colSpan = 6;
       const fieldset = document.createElement('fieldset');
       fieldset.className = 'coordinate-conflict';
       const legend = document.createElement('legend');
@@ -782,17 +786,15 @@ function renderPending() {
         : resolution === 'replace'
           ? 'markConflictDecisionNew'
           : 'markConflictNeedsDecision');
-      const mapLink = createMapLink(conflict.incoming, coordinates);
-      mapLink.classList.add('conflict-map-link');
       const choices = document.createElement('div');
       choices.className = 'conflict-options';
       choices.append(
         createConflictOption(conflict, 'keep', 'markConflictKeep'),
         createConflictOption(conflict, 'replace', 'markConflictUseNew'),
       );
-      fieldset.append(legend, mapLink, choices);
+      fieldset.append(legend, choices);
       detailCell.appendChild(fieldset);
-      detailRow.appendChild(detailCell);
+      detailRow.append(mapCell, detailCell);
       addRows.appendChild(detailRow);
     }
   });

@@ -4,6 +4,14 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.13] - 2026-08-15
+
+### Fixed
+
+- **The conflict decision row now preserves the marker table's column
+  structure.** Its standard pin-only tibiamaps.io link lives in the Map column,
+  while the decision fieldset spans the remaining six columns.
+
 ## [1.18.12] - 2026-08-15
 
 ### Fixed
