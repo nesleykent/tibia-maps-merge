@@ -4,6 +4,15 @@ All notable changes to the web app are tracked here. Versions follow
 [Semantic Versioning](https://semver.org/); the version shown in the app
 footer always matches the latest entry below.
 
+## [1.18.20] - 2026-08-15
+
+### Fixed
+
+- **Extract Own now inherits the exact Marker Sets selection-card design.**
+  The Extract-specific checkmark and metadata overrides were removed, leaving
+  one shared component and one shared CSS path for cards in both workflows.
+  Selection behavior and extraction logic are unchanged.
+
 ## [1.18.19] - 2026-08-15
 
 ### Fixed

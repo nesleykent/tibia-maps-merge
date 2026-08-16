@@ -29,6 +29,6 @@ test('Extract Own uses the shared persistent review and standard page action str
   assert.match(app, /const renderPreviewMessage = \(message\)/);
   assert.match(app, /renderPreviewMessage\(t\('extractNeedsMarkers'\)\)/);
   assert.match(app, /extractPreview\.innerHTML = `<div class="result-card ok"><dl>`/);
-  assert.match(css, /#mode-extract \.set-check\s*\{\s*display:\s*none;\s*\}/);
-  assert.match(css, /#mode-extract \.set-date\s*\{\s*padding-left:\s*0;\s*\}/);
+  assert.doesNotMatch(css, /#mode-extract \.set-(?:choice|check|date|name|note|title)/);
+  assert.match(css, /\.set-choice:has\(input:checked\) \.set-check\s*\{\s*opacity:\s*1;\s*\}/);
 });
